@@ -11,6 +11,7 @@ import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import Coin;
 import Enemy;
 using flixel.util.FlxSpriteUtil;
+import flixel.ui.FlxVirtualPad;
 
 class PlayState extends FlxState
 {
