@@ -6,7 +6,7 @@ permissions:
   discussions: write
 
 env:
-  PROJECT_NAME: ModsEngine
+  PROJECT_NAME: DELTARUNE
 
 jobs:
   build:
