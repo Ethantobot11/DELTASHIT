@@ -36,7 +36,7 @@ jobs:
             artifactPath: export/release/macos/bin/*
           - name: Android
             os: macos-15
-            buildArgs: "android -final -D officialBuild"
+            buildArgs: "android -final -D officialBuild -nocompile-pch"
             artifactName: Android
             artifactPath: "export/release/android/bin/app/build/outputs/apk/release/*.apk"
           - name: iOS
