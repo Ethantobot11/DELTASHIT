@@ -37,9 +37,10 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
 
       - name: Setup Android NDK
+        if: inputs.name == 'Android'
         uses: android-actions/setup-android@v3
         with:
-          ndk-version: '23.1.7779620'
+          ndk-version: r21c
 
       - name: Install libVLC
         if: inputs.name == 'Linux'
