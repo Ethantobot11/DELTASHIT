@@ -99,10 +99,10 @@
 
 	<!-- _________________________________ Custom _______________________________ -->
 
-	<icon path="assets/icon/icon16.png" size='16'/>
-	<icon path="assets/icon/icon32.png" size='32'/>
-	<icon path="assets/icon/icon64.png" size='64'/>
-	<icon path="assets/icon/iconOG.png" />
+	<icon path="assets/icon/icon16.jpg" size='16'/>
+	<icon path="assets/icon/icon32.jpg" size='32'/>
+	<icon path="assets/icon/icon64.jpg" size='64'/>
+	<icon path="assets/icon/iconOG.jpg" />
 
 	<!--Place custom nodes like icons here-->
 </project>
