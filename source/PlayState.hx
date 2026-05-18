@@ -15,7 +15,6 @@ import flixel.ui.FlxVirtualPad;
 
 class PlayState extends FlxState
 {
-	public static var tiles__png:String = "assets/images/tiles.png";
 	var player:Player;
 	var map:FlxOgmo3Loader;
 	var walls:FlxTilemap;
