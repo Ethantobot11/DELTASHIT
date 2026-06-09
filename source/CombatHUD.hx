@@ -208,12 +208,20 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 
         if (enemy.type == REGULAR)
         {
+		if (FlxG.sound.music == null) // don't restart the music if it's already playing
+		{
+		FlxG.sound.destroy(true);
 		battle.play();
+		}
         }
         else if (enemy.type == BOSS)
         {
+		if (FlxG.sound.music == null) // don't restart the music if it's already playing
+		{
+		FlxG.sound.destroy(true);
         vs_susie.play();
         }
+		}
 		this.playerHealth = playerHealth; // we set our playerHealth variable to the value that was passed to us
 		this.enemy = enemy; // set our enemySprite object to the one passed to us
 
@@ -221,7 +229,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 
 		// setup our enemySprite
 		enemyMaxHealth = enemyHealth = if (enemy.type == REGULAR) 10 else 20; // each enemySprite will have health based on their type
-		enemyHealthBar.value = 200; // the enemySprite's health bar starts at 100%
+		enemyHealthBar.value = 100; // the enemySprite's health bar starts at 100%
 		enemySprite.changeType(enemy.type); // change our enemySprite's image to match their type.
 
 		// make sure we initialize all of these before we start so nothing looks 'wrong' the second time we get
@@ -273,7 +281,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 	 */
 	function updatePlayerHealth()
 	{
-		playerHealthCounter.text = playerHealth + " / 3";
+		playerHealthCounter.text = playerHealth + " / 20";
 		playerHealthCounter.x = playerSprite.x + 4 - (playerHealthCounter.width / 2);
 	}
 
