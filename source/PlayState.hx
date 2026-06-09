@@ -21,7 +21,7 @@ class PlayState extends FlxState
 	var coins:FlxTypedGroup<Coin>;
 	var enemies:FlxTypedGroup<Enemy>;
 	var hud:HUD;
-	var money:Int = -10;
+	var money:Int = 0;
 	var health:Int = 20;
 	var inCombat:Bool = false;
 	var combatHud:CombatHUD;
@@ -163,6 +163,9 @@ class PlayState extends FlxState
 		inCombat = false;
 		player.active = true;
 		enemies.active = true;
+		#if mobile
+	    virtualPad.visible = true;
+    	#end
 	}
 	}
 	}
