@@ -63,6 +63,7 @@ class MenuState extends FlxState
 	//FlxG.switchState(PlayState.new);
     FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
 	{
+	FlxG.sound.playMusic(AssetPaths.AUDIO_STORY__ogg, 0, false);
 	FlxG.switchState(new PlayState());
 	});
     }
