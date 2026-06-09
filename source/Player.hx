@@ -52,10 +52,10 @@ function updateMovement()
 
 	#if mobile
 	var virtualPad = PlayState.virtualPad;
-	up = up || virtualPad.buttonUp.pressed;
-	down = down || virtualPad.buttonDown.pressed;
-	left  = left || virtualPad.buttonLeft.pressed;
-	right = right || virtualPad.buttonRight.pressed;
+	up = up || virtualPad.buttonUp.justPressed;
+	down = down || virtualPad.buttonDown.justPressed;
+	left  = left || virtualPad.buttonLeft.justPressed;
+	right = right || virtualPad.buttonRight.justPressed;
 	#end
 
     var action = "idle";
