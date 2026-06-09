@@ -46,11 +46,11 @@ class Enemy extends FlxSprite
 		animation.add("d_idle", [9]);
 		animation.add("lr_idle", [4]);
 		animation.add("u_idle", [0]);
-		animation.add("d_walk", [8, 9, 10, 11], 6);
-		animation.add("lr_walk", [4, 5, 6, 7], 6);
-		animation.add("u_walk", [0, 1, 2, 3], 6);
+		animation.add("d_walk", [8, 9, 10, 11], 4);
+		animation.add("lr_walk", [4, 5, 6, 7], 5);
+		animation.add("u_walk", [0, 1, 2, 3], 5);
 		drag.x = drag.y = 10;
-		if (type == BOSS)
+		/*if (type == BOSS)
         {
 			setSize(25, 46);
 			offset.set(-2, 2);
@@ -59,7 +59,7 @@ class Enemy extends FlxSprite
         {
 			setSize(21, 41);
 			offset.set(0, 2);
-		}
+		}*/
 		offset.x = 4;
 		offset.y = 8;
         brain = new FSM(idle);
