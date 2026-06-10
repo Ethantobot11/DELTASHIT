@@ -208,19 +208,26 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 
         if (enemy.type == REGULAR)
         {
-		if (FlxG.sound.music == null) // don't restart the music if it's already playing
+		if (FlxG.sound.music != null) // don't restart the music if it's already playing
 		{
-		FlxG.sound.destroy(true);
+		FlxG.sound.destroy();
+		battle.play();
+        }
+		else
+		{
 		battle.play();
 		}
-        }
         else if (enemy.type == BOSS)
         {
-		if (FlxG.sound.music == null) // don't restart the music if it's already playing
+		if (FlxG.sound.music != null) // don't restart the music if it's already playing
 		{
-		FlxG.sound.destroy(true);
-        vs_susie.play();
+		FlxG.sound.destroy();
+		vs_susie.play();
         }
+		else
+		{
+		vs_susie.play();
+		}
 		}
 		this.playerHealth = playerHealth; // we set our playerHealth variable to the value that was passed to us
 		this.enemy = enemy; // set our enemySprite object to the one passed to us
