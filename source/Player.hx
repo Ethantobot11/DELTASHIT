@@ -8,10 +8,10 @@ class Player extends FlxSprite
 {
 	static inline var SPEED:Float = 100;
 
-	public var up:Bool = false;
-	public var down:Bool = false;
-	public var left:Bool = false;
-	public var right:Bool = false;
+	public var up:Bool<dynamic>;
+	public var down:Bool;
+	public var left:Bool;
+	public var right:Bool;
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
