@@ -76,7 +76,7 @@ jobs:
 
       - name: Clean
         if: inputs.name == 'iOS'
-        run: haxelib run lime build ${{ inputs.cleanArgs }}
+        run: haxelib run lime clean ${{ inputs.cleanArgs }}
         
       - name: Compile
         run: haxelib run lime build ${{ inputs.buildArgs }}
