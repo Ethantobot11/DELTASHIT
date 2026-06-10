@@ -38,7 +38,7 @@ import flixel.system.FlxAssets.FlxTilemapGraphicAsset;
 #if ios
 @:build(flixel.system.FlxAssets.buildFileReferences("assets/.", true))
 #elseif !ios
-@:build(flixel.system.FlxAssets.buildFileReferences("assets/", true))
+@:build(flixel.system.FlxAssets.buildFileReferences("assets", true))
 #end
 class AssetPaths {
 }
