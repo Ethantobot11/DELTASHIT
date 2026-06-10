@@ -34,10 +34,7 @@
     <set name="BUILD_DIR" value="export/release" unless="debug" />
     <set name="BUILD_DIR" value="export/32bit" if="32bits" />
 	<source path="source" />
-	<assets path="assets" unless="ios" />
-
-	<assets path="assets" rename="." if="ios" />
-	
+	<assets path="assets" />
 
 	<!-- _______________________________ Libraries ______________________________ -->
 
