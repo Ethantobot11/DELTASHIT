@@ -7,6 +7,7 @@ import flixel.ui.FlxBar;
 import flixel.ui.FlxButton;
 import flixel.util.FlxAxes;
 import flixel.util.FlxColor;
+import Main;
 
 class OptionsState extends FlxState
 {
@@ -19,6 +20,7 @@ class OptionsState extends FlxState
 	var volumeUpButton:FlxButton;
 	var clearDataButton:FlxButton;
 	var backButton:FlxButton;
+	public static var storageType:String = 'EXTERNAL_DATA';
 	#if desktop
 	var fullscreenButton:FlxButton;
 	#end
@@ -84,6 +86,16 @@ class OptionsState extends FlxState
 		FlxG.camera.fade(FlxColor.BLACK, 0.33, true);
 
 		super.create();
+	}
+
+	public static function saveSettings() {
+	FlxG.save.data.storageType = storageType;
+	}
+
+	public static function loadPrefs() {
+	if(FlxG.save.data.storageType != null)
+        storageType = FlxG.save.data.storageType;
+	save.bind("Android Storage","TurnBasedRPG");
 	}
 
 	#if desktop
