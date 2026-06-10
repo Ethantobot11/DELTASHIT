@@ -12,6 +12,7 @@ import flixel.FlxG;
 
 #if sys
 import sys.FileSystem;
+import sys.io.Process;
 import sys.io.File;
 #end
 
@@ -49,7 +50,7 @@ class StorageUtil
 		var daPath:String = '';
 		#if android
 		if (!FileSystem.exists(rootDir + 'storagetype.txt'))
-			File.saveContent(rootDir + 'storagetype.txt', ClientPrefs.storageType);
+			File.saveContent(rootDir + 'storagetype.txt');
 		var curStorageType:String = File.getContent(rootDir + 'storagetype.txt');
 		daPath = force ? StorageType.fromStrForce(curStorageType) : StorageType.fromStr(curStorageType);
 		daPath = Path.addTrailingSlash(daPath);
