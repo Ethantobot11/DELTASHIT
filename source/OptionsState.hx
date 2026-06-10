@@ -94,7 +94,7 @@ class OptionsState extends FlxState
 	public static function loadPrefs() {
 	if(FlxG.save.data.storageType != null)
         storageType = FlxG.save.data.storageType;
-	var save = new FlxSave()
+	var save = new FlxSave();
 	save.bind("Android Storage","TurnBasedRPG");
 	}
 
