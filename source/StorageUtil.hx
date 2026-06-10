@@ -23,14 +23,14 @@ using StringTools;
  */
 class StorageUtil
 {
-	#if sys
-	// root directory, used for handling the saved storage type and path
-	public static final rootDir:String = LimeSystem.applicationStorageDirectory;
-
 	public static function showPopUp(message:String, title:String):Void
 	{
 		FlxG.stage.window.alert(message, title);
 	}
+	
+	#if sys
+	// root directory, used for handling the saved storage type and path
+	public static final rootDir:String = LimeSystem.applicationStorageDirectory;
 
 	public static function getStorageDirectory(?force:Bool = false):String
 	{
