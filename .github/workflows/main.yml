@@ -67,6 +67,7 @@ jobs:
           - name: iOS
             os: macos-15
             buildArgs: "ios -final -nosign"
+            cleanArgs: "ios"
             artifactName: iOS
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
           - name: HTM5
@@ -79,6 +80,7 @@ jobs:
         name: ${{ matrix.name }}
         os: ${{ matrix.os }}
         buildArgs: ${{ matrix.buildArgs }}
+        cleanArgs: ${{ matrix.cleanArgs }}
         artifactName: ${{ matrix.artifactName }}
         artifactPath: ${{ matrix.artifactPath }}
 
