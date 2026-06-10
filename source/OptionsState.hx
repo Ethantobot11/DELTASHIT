@@ -7,6 +7,7 @@ import flixel.ui.FlxBar;
 import flixel.ui.FlxButton;
 import flixel.util.FlxAxes;
 import flixel.util.FlxColor;
+import flixel.util.FlxSave;
 
 class OptionsState extends FlxState
 {
