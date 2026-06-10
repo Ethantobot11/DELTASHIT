@@ -12,6 +12,9 @@ on:
       buildArgs:
         required: true
         type: string
+      cleanArgs:
+        required: false
+        type: string
       artifactName:
         required: true
         type: string
@@ -64,12 +67,17 @@ jobs:
           haxelib run hmm install --quiet
 
       - name: Configure Android
+        if: inputs.name == 'Android'
         run: |
           haxelib run lime config ANDROID_SDK $ANDROID_HOME
           haxelib run lime config ANDROID_NDK_ROOT "${{ steps.setup-ndk.outputs.ndk-path }}"
           haxelib run lime config JAVA_HOME $JAVA_HOME
           haxelib run lime config ANDROID_SETUP true
 
+      - name: Clean
+        if: inputs.name == 'iOS'
+        run: haxelib run lime build ${{ inputs.cleanArgs }}
+        
       - name: Compile
         run: haxelib run lime build ${{ inputs.buildArgs }}
 
