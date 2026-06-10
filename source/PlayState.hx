@@ -36,6 +36,10 @@ class PlayState extends FlxState
 		#if FLX_MOUSE
 		FlxG.mouse.visible = false;
 		#end
+		if (FlxG.sound.music == null) // don't restart the music if it's already playing
+		{
+		FlxG.sound.playMusic(AssetPaths.boxing_game__ogg, 1, true);
+		}
 		map = new FlxOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
 		walls = map.loadTilemap(AssetPaths.tiles__png, "walls");
 		walls.follow();
@@ -117,6 +121,7 @@ class PlayState extends FlxState
 
 	function startCombat(enemy:Enemy)
 	{
+	FlxG.sound.music.stop();
 	inCombat = true;
 	player.active = false;
 	enemies.active = false;
@@ -143,6 +148,10 @@ class PlayState extends FlxState
 	{
 		ending = true;
 		FlxG.camera.fade(FlxColor.BLACK, 0.33, false, doneFadeOut);
+		if (FlxG.sound.music == null) // don't restart the music if it's already playing
+		{
+		FlxG.sound.playMusic(AssetPaths.LOSE__ogg, 1, true);
+		}
 	}
 	else
 	{
@@ -154,6 +163,10 @@ class PlayState extends FlxState
 				won = true;
 				ending = true;
 				FlxG.camera.fade(FlxColor.BLACK, 0.33, false, doneFadeOut);
+			}
+			if (FlxG.sound.music == null) // don't restart the music if it's already playing
+			{
+			FlxG.sound.playMusic(AssetPaths.boxing_game__ogg, 1, true);
 			}
 		}
 		else

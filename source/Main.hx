@@ -4,6 +4,8 @@ import flixel.FlxG;
 import flixel.util.FlxSave;
 import flixel.FlxGame;
 import openfl.display.Sprite;
+import CrashHandler;
+import StorageUtil;
 
 class Main extends Sprite
 {
@@ -11,6 +13,14 @@ class Main extends Sprite
 	{
 		var startFullscreen:Bool = false;
 		var save = new FlxSave();
+		#if mobile
+		#if android
+		StorageUtil.requestPermissions();
+		#end
+		Sys.setCwd(StorageUtil.getStorageDirectory());
+		#end
+		CrashHandler.init();
+
 		save.bind("TurnBasedRPG");
 		#if desktop
 		if (save.data.fullscreen != null)

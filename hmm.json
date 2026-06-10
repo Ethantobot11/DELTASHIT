@@ -35,10 +35,11 @@
       "type": "haxelib",
       "version": null
     },
-    {
+     {
       "name": "hxcpp",
-      "type": "haxelib",
-      "version": null
+      "type": "git",
+      "ref": "main",
+      "url": "https://github.com/kittycathy233/hxcpp"
     }
   ]
 }

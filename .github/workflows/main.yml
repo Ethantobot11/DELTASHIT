@@ -44,6 +44,11 @@ jobs:
             buildArgs: "ios -final -nosign"
             artifactName: iOS
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
+          - name: HTM5
+            os: windows-latest
+            buildArgs: "html5 -final"
+            artifactName: HTML5
+            artifactPath: "export/release/html5/*"
     uses: ./.github/workflows/build.yml
     with:
         name: ${{ matrix.name }}
@@ -119,8 +124,16 @@ jobs:
       - name: Move iOS File
         run: mv ${{ github.workspace }}/${{ env.PROJECT_NAME }}.ipa /home/runner/${{ env.PROJECT_NAME }}-iOS.ipa
 
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
+      - name: Download HTM5 Build
+        uses: actions/download-artifact@main
+        with:
+          name: HTML5
+          path: /home/runner/html5
+
+      - name: Zip HTML5 Build For Release
+        run: |
+          cd /home/runner/html5
+          zip -r "/home/runner/${{ env.PROJECT_NAME }}-HTML5.zip" .
 
       - name: Publish The Release
         uses: softprops/action-gh-release@v2

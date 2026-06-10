@@ -45,7 +45,7 @@ class MenuState extends FlxState
     	add(creditButton);
 
 		#if (desktop || mobile)
-		exitButton = new FlxButton(FlxG.width - 28, 8, "Close Game", clickExit);
+		exitButton = new FlxButton(FlxG.width - 28, 8, "X", clickExit);
 		exitButton.loadGraphic(AssetPaths.button__png, true, 20, 20);
 		add(exitButton);
 		#end
@@ -60,10 +60,13 @@ class MenuState extends FlxState
 
 	function clickPlay()
 	{
+	if (FlxG.sound.music != null)
+    {
+        FlxG.sound.music.stop();
+    }
 	//FlxG.switchState(PlayState.new);
     FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
 	{
-	FlxG.sound.playMusic(AssetPaths.AUDIO_STORY__ogg, 0, false);
 	FlxG.switchState(new PlayState());
 	});
     }

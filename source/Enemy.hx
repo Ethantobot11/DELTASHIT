@@ -50,7 +50,7 @@ class Enemy extends FlxSprite
 		animation.add("lr_walk", [4, 5, 6, 7], 5);
 		animation.add("u_walk", [0, 1, 2, 3], 5);
 		drag.x = drag.y = 10;
-		/*if (type == BOSS)
+		if (type == BOSS)
         {
 			setSize(25, 46);
 			offset.set(-2, 2);
@@ -59,9 +59,9 @@ class Enemy extends FlxSprite
         {
 			setSize(21, 41);
 			offset.set(0, 2);
-		}*/
-		offset.x = 4;
-		offset.y = 8;
+		}
+		//offset.x = 4;
+		//offset.y = 8;
         brain = new FSM(idle);
         idleTimer = 0;
         playerPosition = FlxPoint.get();
@@ -111,7 +111,26 @@ class Enemy extends FlxSprite
 	{
 		this.type = type;
 		var graphic = if (type == BOSS) AssetPaths.boss__png else AssetPaths.enemy__png;
-		loadGraphic(graphic, true, 16, 16);
+		if (type == BOSS)        
+        {
+            loadGraphic(graphic, true, 25, 46);
+			setSize(25, 46);
+			offset.set(-2, 2);
+        }
+        else if (type == REGULAR)
+        {
+            loadGraphic(graphic, true, 21, 40);
+			setSize(21, 41);
+			offset.set(0, 2);
+        }
+		else if (type == REGULAR && facing == LEFT || facing == RIGHT)
+		{
+			loadGraphic(graphic, true, 19, 40);
+			setSize(19, 40);
+			offset.set(0, 2);
+		}
+		//offset.x = 4;
+        //offset.y = 8;
 	}
 	}
 	override public function update(elapsed:Float)

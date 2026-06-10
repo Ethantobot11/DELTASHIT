@@ -8,7 +8,7 @@ class Player extends FlxSprite
 {
 	static inline var SPEED:Float = 100;
 
-	public var up:Bool<dynamic>;
+	public var up:Bool;
 	public var down:Bool;
 	public var left:Bool;
 	public var right:Bool;
@@ -43,6 +43,11 @@ FlxG.mouse.visible = false;
 
 function updateMovement()
 {
+	up = false;
+    down = false;
+    left = false;
+    right = false;
+
 	#if FLX_KEYBOARD
     up = FlxG.keys.anyPressed([UP, W]);
     down = FlxG.keys.anyPressed([DOWN, S]);
@@ -52,10 +57,10 @@ function updateMovement()
 
 	#if mobile
 	var virtualPad = PlayState.virtualPad;
-	up = up || virtualPad.buttonUp.justPressed;
-	down = down || virtualPad.buttonDown.justPressed;
-	left  = left || virtualPad.buttonLeft.justPressed;
-	right = right || virtualPad.buttonRight.justPressed;
+	up = up || virtualPad.buttonUp.pressed;
+    down = down || virtualPad.buttonDown.pressed;
+    left  = left || virtualPad.buttonLeft.pressed;
+    right = right || virtualPad.buttonRight.pressed;
 	#end
 
     var action = "idle";
