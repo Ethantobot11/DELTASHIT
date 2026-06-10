@@ -12,7 +12,7 @@ class Main extends Sprite
 	public function new()
 	{
 		var startFullscreen:Bool = false;
-		var save = new FlxSave();
+		public var save = new FlxSave();
 		#if mobile
 		#if android
 		StorageUtil.requestPermissions();
