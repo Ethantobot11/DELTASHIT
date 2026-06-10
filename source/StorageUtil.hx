@@ -3,6 +3,7 @@ package;
 import lime.system.System as LimeSystem;
 import haxe.io.Path;
 import haxe.Exception;
+import OptionsState;
 #if android
 import android.Tools;
 import android.callback.CallBack;
@@ -50,7 +51,7 @@ class StorageUtil
 		var daPath:String = '';
 		#if android
 		if (!FileSystem.exists(rootDir + 'storagetype.txt'))
-			File.saveContent(rootDir + 'storagetype.txt');
+			File.saveContent(rootDir + 'storagetype.txt', OptionsState.storageType);
 		var curStorageType:String = File.getContent(rootDir + 'storagetype.txt');
 		daPath = force ? StorageType.fromStrForce(curStorageType) : StorageType.fromStr(curStorageType);
 		daPath = Path.addTrailingSlash(daPath);
