@@ -10,6 +10,8 @@ hmm.json
 .DS_Store
 .icloud
 
+###testing the discord webhook
+
 ### VS Code
 vscode-project.hxml
 export/*
