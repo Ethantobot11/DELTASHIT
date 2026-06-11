@@ -41,40 +41,40 @@ jobs:
         include:
           - name: Windows x64
             os: windows-2022
-            buildArgs: "windows -final -X64 -D HXCPP_X64 -D 64bits"
+            buildArgs: "windows -final -release -X64 -D HXCPP_X64 -D 64bits"
             artifactName: Windows x64
             artifactPath: export/64bits/release/windows/bin/
           - name: Windows x32
             os: windows-2022
-            buildArgs: "windows -final -X32 -D HXCPP_X32 -D 32bits"
+            buildArgs: "windows -final -release -X32 -D HXCPP_X32 -D 32bits"
             artifactName: Windows x32
             artifactPath: export/32bits/release/windows/bin/
           - name: Linux
             os: ubuntu-22.04
-            buildArgs: "linux -final"
+            buildArgs: "linux -final -release"
             artifactName: Linux
             artifactPath: export/release/linux/bin/
           - name: MacOS
             os: macos-15
-            buildArgs: "mac -final"
+            buildArgs: "mac -final -release"
             artifactName: MacOS
             artifactPath: export/release/macos/bin/
           - name: Android
             os: macos-15
-            buildArgs: "android -final -D officialBuild -nocompile-pch"
+            buildArgs: "android -final -release -D officialBuild -nocompile-pch"
             artifactName: Android
             artifactPath: "export/release/android/bin/app/build/outputs/apk/release/*.apk"
           - name: iOS
             os: macos-15
-            buildArgs: "ios -final -nosign"
+            buildArgs: "ios -final -release -nosign"
             cleanArgs: "ios"
             artifactName: iOS
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
           - name: HTM5
             os: windows-latest
-            buildArgs: "html5 -final"
+            buildArgs: "html5 -final -release"
             artifactName: HTML5
-            artifactPath: "export/release/html5/*"
+            artifactPath: "export/release/html5/bin/"
     uses: ./.github/workflows/build.yml
     with:
         name: ${{ matrix.name }}
