@@ -147,7 +147,7 @@ class OptionsState extends FlxState
 	#if android
 	function onStorageChange():Void
 	{
-		File.saveContent(lime.system.System.applicationStorageDirectory + 'storagetype.txt', ClientPrefs.storageType);
+		File.saveContent(lime.system.System.applicationStorageDirectory + 'storagetype.txt', OptionsState.storageType);
 	}
 	#end
 
