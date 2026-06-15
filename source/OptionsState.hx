@@ -8,6 +8,7 @@ import flixel.ui.FlxButton;
 import flixel.util.FlxAxes;
 import flixel.util.FlxColor;
 import flixel.util.FlxSave;
+import StorageUtil;
 
 class OptionsState extends FlxState
 {
@@ -24,6 +25,7 @@ class OptionsState extends FlxState
 	#if android
 	public var storageTypes:Array<String> = ["EXTERNAL_DATA", "EXTERNAL", "EXTERNAL_OBB", "EXTERNAL_MEDIA"];
 	public var externalPaths:Array<String> = StorageUtil.checkExternalPaths(true);
+	public static var storageType:String = "EXTERNAL_DATA";
 	final lastStorageType:String = OptionsState.storageType;
 	#end
 
@@ -101,8 +103,7 @@ class OptionsState extends FlxState
 		add(DiscordRPCButton);
 
 		#if android
-		androidButton = new FlxButton(0, volumeBar.y + volumeBar.height + 32,
-			lastStorageType ? "STORAGE" : (storageTypes) , androidButtonClick);
+		androidButton = new FlxButton(0, 200, "Storage: " + storageTypes[currentStorageIndex], androidButtonClick);
 		androidButton.screenCenter(FlxAxes.X);
 		add(androidButton);
 		#end
@@ -139,7 +140,7 @@ class OptionsState extends FlxState
 	if(FlxG.save.data.discordRPC != null)
         discordRPC = FlxG.save.data.discordRPC;
 	var save = new FlxSave();
-	save.bind("Android Storage","TurnBasedRPG");
+	save.bind("Settings","TurnBasedRPG");
 	}
 
 	#if android
@@ -168,9 +169,13 @@ class OptionsState extends FlxState
 	#if android
 	function androidButtonClick()
 	{
-		androidButton.text = lastStorageType ? "STORAGE" : (storageTypes);
-		lastStorageType = storageTypes;
-		FlxG.save.data.lastStorageType = lastStorageType;
+		currentStorageIndex++;
+		if (currentStorageIndex >= storageTypes.length) {
+			currentStorageIndex = 0;
+		}
+		storageType = storageTypes[currentStorageIndex];
+		androidButton.label.text = "Storage: " + storageType;
+		FlxG.save.data.storageType = storageType;
 	}
 	#end
 
@@ -192,11 +197,9 @@ class OptionsState extends FlxState
 		FlxG.save.flush();
 		FlxG.camera.fade(FlxColor.BLACK, .33, false, function()
 		{
+			saveSettings();
 			FlxG.switchState(MenuState.new);
 		});
-		#if android
-		saveSettings();
-		#end
 	}
 
 	/**
