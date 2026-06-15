@@ -21,7 +21,7 @@ class HUD extends FlxTypedGroup<FlxSprite>
 		super();
 		background = new FlxSprite().makeGraphic(FlxG.width, 20, FlxColor.BLACK);
 		background.drawRect(0, 19, FlxG.width, 1, FlxColor.WHITE);
-		healthCounter = new FlxText(16, 2, 0, "3 / 3", 8);
+		healthCounter = new FlxText(16, 2, 0, "20 / 20", 8);
 		healthCounter.setBorderStyle(SHADOW, FlxColor.GRAY, 1, 1);
 		moneyCounter = new FlxText(0, 2, 0, "0", 8);
 		moneyCounter.setBorderStyle(SHADOW, FlxColor.GRAY, 1, 1);
@@ -39,7 +39,7 @@ class HUD extends FlxTypedGroup<FlxSprite>
 
 	public function updateHUD(health:Int, money:Int)
 	{
-		healthCounter.text = health + " / 3";
+		healthCounter.text = health + " / 20";
 		moneyCounter.text = Std.string(money);
 		moneyCounter.x = moneyIcon.x - moneyCounter.width - 4;
 	}

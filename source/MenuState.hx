@@ -1,9 +1,9 @@
 package;
-import flixel.util.FlxColor;
-import flixel.text.FlxText;
-import flixel.FlxState;
-import flixel.ui.FlxButton;
 import flixel.FlxG;
+import flixel.FlxState;
+import flixel.text.FlxText;
+import flixel.ui.FlxButton;
+import flixel.util.FlxColor;
 
 class MenuState extends FlxState
 {
@@ -17,10 +17,7 @@ class MenuState extends FlxState
 
 	override public function create()
 	{
-		if (FlxG.sound.music == null) // don't restart the music if it's already playing
-		{
 		FlxG.sound.playMusic(AssetPaths.AUDIO_STORY__ogg, 1, true);
-		}
 		var text = new flixel.text.FlxText(10, 10, 100, "DELTARUNE : CHAPTER 7");
 		add(text);
 
@@ -39,8 +36,8 @@ class MenuState extends FlxState
 		optionsButton.y = FlxG.height - optionsButton.height - 10;
 		add(optionsButton);
 
-		creditButton = new FlxButton(300, 0, "Credit", creditSwitch);
-		creditButton.x = (FlxG.width / 2) + 10;
+		creditButton = new FlxButton(-900, 0, "Credit", creditSwitch);
+		creditButton.x = (FlxG.width / 2) + 300;
 		creditButton.y = FlxG.height - creditButton.height - 10;
     	add(creditButton);
 

@@ -14,7 +14,7 @@ import Enemy;
 using flixel.util.FlxSpriteUtil;
 import flixel.ui.FlxVirtualPad;
 
-class PlayState extends FlxState
+class PlayState2 extends FlxState
 {
 	var player:Player;
 	var map:FlxOgmo3Loader;
@@ -38,13 +38,8 @@ class PlayState extends FlxState
 		#if FLX_MOUSE
 		FlxG.mouse.visible = false;
 		#end
-		#if !ios
 		music = FlxG.sound.load(AssetPaths.boxing_game__ogg, 1, true);
-		map = new FlxOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
-		#elseif ios
-		map = new FlxOgmo3Loader("data/turnBasedRPG.ogmo", "data/room_001.json");
-		walls = map.loadTilemap("images/tiles.png", "walls");
-		#end
+		map = new FlxOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_002__json);
 		walls = map.loadTilemap(AssetPaths.tiles__png, "walls");
 		walls.follow();
 		walls.setTileProperties(1, NONE);
@@ -164,9 +159,8 @@ class PlayState extends FlxState
 			combatHud.enemy.kill();
 			if (combatHud.enemy.type == BOSS)
 			{
-				//won = true;
-				//ending = true;
-				FlxG.switchState(new PlayState2());
+				won = true;
+				ending = true;
 				FlxG.camera.fade(FlxColor.BLACK, 0.33, false, doneFadeOut);
 			}
 			music.resume();	

@@ -20,13 +20,28 @@ class OptionsState extends FlxState
 	var volumeUpButton:FlxButton;
 	var clearDataButton:FlxButton;
 	var backButton:FlxButton;
-	public static var storageType:String = 'EXTERNAL_DATA';
+	#if android
+	public var storageTypes:Array<String> = ["EXTERNAL_DATA", "EXTERNAL", "EXTERNAL_OBB", "EXTERNAL_MEDIA"];
+	public var externalPaths:Array<String> = StorageUtil.checkExternalPaths(true);
+	final lastStorageType:String = OptionsState.storageType;
+	#end
 	#if desktop
 	var fullscreenButton:FlxButton;
 	#end
+	public function new()
+	{
+		#if android
+		storageTypes = storageTypes.concat(externalPaths); //SD Card
+		#end
+		super();
+	}
 
 	override public function create():Void
 	{
+		#if android
+		loadPrefs();
+		#end
+
 		// setup and add our objects to the screen
 		titleText = new FlxText(0, 20, 0, "Options", 22);
 		titleText.alignment = CENTER;
@@ -71,6 +86,13 @@ class OptionsState extends FlxState
 		add(fullscreenButton);
 		#end
 
+		#if android
+		fullscreenButton = new FlxButton(0, volumeBar.y + volumeBar.height + 16,
+			FlxG.fullscreen ? "STORAGE" : "INTERNAL", storageTypes););
+		fullscreenButton.screenCenter(FlxAxes.X);
+		add(fullscreenButton);
+		#end
+
 		clearDataButton = new FlxButton((FlxG.width / 2) - 90, FlxG.height - 28, "Clear Data",
 			clickClearData);
 		clearDataButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
@@ -89,15 +111,26 @@ class OptionsState extends FlxState
 	}
 
 	public static function saveSettings() {
-	FlxG.save.data.storageType = storageType;
+	#if android
+	FlxG.save.data.storageType = lastStorageType;
+	#end
 	}
 
 	public static function loadPrefs() {
+	#if android
 	if(FlxG.save.data.storageType != null)
-        storageType = FlxG.save.data.storageType;
+        lastStorageType = FlxG.save.data.storageType;
 	var save = new FlxSave();
 	save.bind("Android Storage","TurnBasedRPG");
+	#end
 	}
+
+	#if android
+	function onStorageChange():Void
+	{
+		File.saveContent(lime.system.System.applicationStorageDirectory + 'storagetype.txt', ClientPrefs.storageType);
+	}
+	#end
 
 	#if desktop
 	function clickFullscreen()
@@ -128,6 +161,9 @@ class OptionsState extends FlxState
 		{
 			FlxG.switchState(MenuState.new);
 		});
+		#if android
+		saveSettings();
+		#end
 	}
 
 	/**

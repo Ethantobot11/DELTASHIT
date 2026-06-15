@@ -30,6 +30,11 @@ class GameOverState extends FlxState
 		FlxG.mouse.visible = true;
 		#end
 
+		if (FlxG.sound.music == null) // don't restart the music if it's already playing
+		{
+		FlxG.sound.playMusic(AssetPaths.LOSE__ogg, 1, true);
+		}
+
 		// create and add each of our items
 
 		titleText = new FlxText(0, 20, 0, if (win) "You Win!" else "Game Over!", 22);

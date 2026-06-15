@@ -175,6 +175,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		visible = false;
 
         vs_susie = FlxG.sound.load(AssetPaths.vs_susie__ogg);
+		vs_susie.looped = true;
 		fledSound = FlxG.sound.load(AssetPaths.fled__wav);
 		hurtSound = FlxG.sound.load(AssetPaths.hurt__wav);
 		loseSound = FlxG.sound.load(AssetPaths.LOSE__ogg);
@@ -183,6 +184,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		winSound = FlxG.sound.load(AssetPaths.win__wav);
 		combatSound = FlxG.sound.load(AssetPaths.combat__wav);
         battle = FlxG.sound.load(AssetPaths.battle__ogg);
+		battle.looped = true;
 	}
 
 	/**
@@ -208,11 +210,11 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 
         if (enemy.type == REGULAR)
         {
-		battle.play();
+		battle.play(true);
         }
         else if (enemy.type == BOSS)
         {
-		vs_susie.play();
+		vs_susie.play(true);
 		}
 		this.playerHealth = playerHealth; // we set our playerHealth variable to the value that was passed to us
 		this.enemy = enemy; // set our enemySprite object to the one passed to us
@@ -476,6 +478,14 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 				if (FlxG.random.bool(50))
 				{
 					// if they succeed, we show the 'escaped' message and trigger it to fade in
+					if (enemy.type == REGULAR)
+					{
+					battle.stop();
+					}
+					else if (enemy.type == BOSS)
+					{
+					vs_susie.stop();
+					}
 					outcome = ESCAPE;
 					results.text = "ESCAPED!";
 					fledSound.play();
@@ -572,6 +582,14 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		if (playerHealth <= 0)
 		{
 			// if the playerSprite's health is 0, we show the defeat message on the screen and fade it in
+			if (enemy.type == REGULAR)
+			{
+			battle.stop();
+			}
+			else if (enemy.type == BOSS)
+			{
+			vs_susie.stop();
+			}
 			outcome = DEFEAT;
 			loseSound.play();
 			results.text = "DEFEAT!";
@@ -582,6 +600,14 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		else if (enemyHealth <= 0)
 		{
 			// if the enemySprite's health is 0, we show the victory message
+			if (enemy.type == REGULAR)
+			{
+			battle.stop();
+			}
+			else if (enemy.type == BOSS)
+			{
+			vs_susie.stop();
+			}
 			outcome = VICTORY;
 			winSound.play();
 			results.text = "VICTORY!";

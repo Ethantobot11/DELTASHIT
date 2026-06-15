@@ -17,8 +17,8 @@ class Player extends FlxSprite
 	{
 		super(x, y);
 		#if FLX_MOUSE
-FlxG.mouse.visible = false;
-#end
+		FlxG.mouse.visible = false;
+		#end
         loadGraphic(AssetPaths.player__png, true, 19, 38);
         setFacingFlip(LEFT, false, false);
 		if (down && right)
