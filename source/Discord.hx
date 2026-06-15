@@ -1,4 +1,4 @@
-package backend;
+package;
 
 import Sys.sleep;
 import lime.app.Application;
