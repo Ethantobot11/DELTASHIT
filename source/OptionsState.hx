@@ -19,6 +19,7 @@ class OptionsState extends FlxState
 	var volumeAmountText:FlxText;
 	var volumeDownButton:FlxButton;
 	var DiscordRPCButton:FlxButton;
+	var androidButton:FlxButton;
 	var volumeUpButton:FlxButton;
 	var clearDataButton:FlxButton;
 	var backButton:FlxButton;
@@ -26,7 +27,7 @@ class OptionsState extends FlxState
 	public var storageTypes:Array<String> = ["EXTERNAL_DATA", "EXTERNAL", "EXTERNAL_OBB", "EXTERNAL_MEDIA"];
 	public var externalPaths:Array<String> = StorageUtil.checkExternalPaths(true);
 	public static var storageType:String = "EXTERNAL_DATA";
-	final lastStorageType:String = OptionsState.storageType;
+	var currentStorageIndex:Int = 0;
 	#end
 
 	public static var discordRPC:Bool = true;
@@ -127,7 +128,7 @@ class OptionsState extends FlxState
 
 	public static function saveSettings() {
 	#if android
-	FlxG.save.data.storageType = lastStorageType;
+	FlxG.save.data.storageType = storageType;
 	#end
 	FlxG.save.data.discordRPC = discordRPC;
 	}
@@ -135,7 +136,7 @@ class OptionsState extends FlxState
 	public static function loadPrefs() {
 	#if android
 	if(FlxG.save.data.storageType != null)
-        lastStorageType = FlxG.save.data.storageType;
+        storageType = FlxG.save.data.storageType;
 	#end
 	if(FlxG.save.data.discordRPC != null)
         discordRPC = FlxG.save.data.discordRPC;
