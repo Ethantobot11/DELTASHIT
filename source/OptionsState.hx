@@ -17,6 +17,7 @@ class OptionsState extends FlxState
 	var volumeText:FlxText;
 	var volumeAmountText:FlxText;
 	var volumeDownButton:FlxButton;
+	var DiscordRPCButton:FlxButton;
 	var volumeUpButton:FlxButton;
 	var clearDataButton:FlxButton;
 	var backButton:FlxButton;
@@ -25,6 +26,9 @@ class OptionsState extends FlxState
 	public var externalPaths:Array<String> = StorageUtil.checkExternalPaths(true);
 	final lastStorageType:String = OptionsState.storageType;
 	#end
+
+	public static var discordRPC:Bool = true;
+	
 	#if desktop
 	var fullscreenButton:FlxButton;
 	#end
@@ -40,7 +44,7 @@ class OptionsState extends FlxState
 	{
 
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("CURRENTLY CHANGING THE CUKING OPTIONS AHHHHHHHHHHHHHHHHHHHHHHHHHHH\nHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", null);
+		DiscordClient.changePresence("CURRENTLY CHANGING THE FUKING OPTIONS AHHHHHHHHHHHHHHHHHHHHHHHHHHH\nHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", null);
 		#end
 
 		#if android
@@ -91,11 +95,16 @@ class OptionsState extends FlxState
 		add(fullscreenButton);
 		#end
 
+		DiscordRPCButton = new FlxButton(0, volumeBar.y + volumeBar.height + 24,
+			discordRPC ? "TRUE" : "FALSE", ClickDiscordRPCButton);
+		DiscordRPCButton.screenCenter(FlxAxes.X);
+		add(DiscordRPCButton);
+
 		#if android
-		fullscreenButton = new FlxButton(0, volumeBar.y + volumeBar.height + 16,
-			FlxG.fullscreen ? "STORAGE" : "INTERNAL", storageTypes););
-		fullscreenButton.screenCenter(FlxAxes.X);
-		add(fullscreenButton);
+		androidButton = new FlxButton(0, volumeBar.y + volumeBar.height + 32,
+			lastStorageType ? "STORAGE" : (storageTypes) , androidButtonClick);
+		androidButton.screenCenter(FlxAxes.X);
+		add(androidButton);
 		#end
 
 		clearDataButton = new FlxButton((FlxG.width / 2) - 90, FlxG.height - 28, "Clear Data",
@@ -119,15 +128,18 @@ class OptionsState extends FlxState
 	#if android
 	FlxG.save.data.storageType = lastStorageType;
 	#end
+	FlxG.save.data.discordRPC = discordRPC;
 	}
 
 	public static function loadPrefs() {
 	#if android
 	if(FlxG.save.data.storageType != null)
         lastStorageType = FlxG.save.data.storageType;
+	#end
+	if(FlxG.save.data.discordRPC != null)
+        discordRPC = FlxG.save.data.discordRPC;
 	var save = new FlxSave();
 	save.bind("Android Storage","TurnBasedRPG");
-	#end
 	}
 
 	#if android
@@ -143,6 +155,22 @@ class OptionsState extends FlxState
 		FlxG.fullscreen = !FlxG.fullscreen;
 		fullscreenButton.text = FlxG.fullscreen ? "FULLSCREEN" : "WINDOWED";
 		FlxG.save.data.fullscreen = FlxG.fullscreen;
+	}
+	#end
+
+	function ClickDiscordRPCButton()
+	{
+		discordRPC = !discordRPC;
+		DiscordRPCButton.text = discordRPC ? "TRUE" : "FALSE";
+		FlxG.save.data.discordRPC = discordRPC;
+	}
+
+	#if android
+	function androidButtonClick()
+	{
+		androidButton.text = lastStorageType ? "STORAGE" : (storageTypes);
+		lastStorageType = storageTypes;
+		FlxG.save.data.lastStorageType = lastStorageType;
 	}
 	#end
 

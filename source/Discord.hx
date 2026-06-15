@@ -4,6 +4,8 @@ import Sys.sleep;
 import lime.app.Application;
 import hxdiscord_rpc.Discord;
 import hxdiscord_rpc.Types;
+import OptionsState;
+import MenuState;
 
 class DiscordClient
 {
@@ -14,13 +16,13 @@ class DiscordClient
 
 	public static function check()
 	{
-		if(ClientPrefs.data.discordRPC) initialize();
+		if(OptionsState.discordRPC) initialize();
 		else if(isInitialized) shutdown();
 	}
 	
 	public static function prepare()
 	{
-		if (!isInitialized && ClientPrefs.data.discordRPC)
+		if (!isInitialized && OptionsState.discordRPC)
 			initialize();
 
 		Application.current.window.onClose.add(function() {
@@ -88,7 +90,7 @@ class DiscordClient
 		presence.details = details;
 		presence.state = state;
 		presence.largeImageKey = 'icon';
-		presence.largeImageText = "Engine Version: " + states.MainMenuState.shittaleversion;
+		presence.largeImageText = "Engine Version: " + MenuState.shittaleversion;
 		presence.smallImageKey = smallImageKey;
 		presence.startTimestamp = Std.int(startTimestamp / 1000);
 		presence.endTimestamp = Std.int(endTimestamp / 1000);
@@ -126,19 +128,6 @@ class DiscordClient
 			clientID = pack.discordRPC;
 			//trace('Changing clientID! $clientID, $_defaultID');
 		}
-	}
-	#end
-
-	#if LUA_ALLOWED
-	public static function addLuaCallbacks(lua:State) {
-		Lua_helper.add_callback(lua, "changeDiscordPresence", function(details:String, state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool, ?endTimestamp:Float) {
-			changePresence(details, state, smallImageKey, hasStartTimestamp, endTimestamp);
-		});
-
-		Lua_helper.add_callback(lua, "changeDiscordClientID", function(?newID:String = null) {
-			if(newID == null) newID = _defaultID;
-			clientID = newID;
-		});
 	}
 	#end
 }
