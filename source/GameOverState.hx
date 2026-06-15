@@ -26,6 +26,10 @@ class GameOverState extends FlxState
 	{
 		super();
 
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence("XD BRO LOST : GameOverState ;-;", null);
+		#end
+
 		#if FLX_MOUSE
 		FlxG.mouse.visible = true;
 		#end

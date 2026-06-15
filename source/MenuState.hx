@@ -7,6 +7,7 @@ import flixel.util.FlxColor;
 
 class MenuState extends FlxState
 {
+	public static var shittaleversion:String = 'DELTARUNE';
 	var playButton:FlxButton;
 	var creditButton:FlxButton;
 	var titleText:FlxText;
@@ -17,7 +18,14 @@ class MenuState extends FlxState
 
 	override public function create()
 	{
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence("WHOA SINCE WHEN THERE A MENU AND DISCORD RPC HERE ?", null);
+		#end
+
+		if (FlxG.sound.music == null)
+		{
 		FlxG.sound.playMusic(AssetPaths.AUDIO_STORY__ogg, 1, true);
+		}
 		var text = new flixel.text.FlxText(10, 10, 100, "DELTARUNE : CHAPTER 7");
 		add(text);
 
@@ -36,8 +44,8 @@ class MenuState extends FlxState
 		optionsButton.y = FlxG.height - optionsButton.height - 10;
 		add(optionsButton);
 
-		creditButton = new FlxButton(-900, 0, "Credit", creditSwitch);
-		creditButton.x = (FlxG.width / 2) + 300;
+		creditButton = new FlxButton(300, 0, "Credit", creditSwitch);
+		creditButton.x = (FlxG.width / 2) + -100;
 		creditButton.y = FlxG.height - creditButton.height - 10;
     	add(creditButton);
 

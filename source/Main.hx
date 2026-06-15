@@ -35,6 +35,10 @@ class Main extends Sprite
 		{
 			FlxG.sound.volume = save.data.volume;
 		}
+
+		#if DISCORD_ALLOWED
+		DiscordClient.prepare();
+		#end
 		save.close();
 	}
 }

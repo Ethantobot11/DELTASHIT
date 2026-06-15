@@ -35,6 +35,9 @@ class PlayState2 extends FlxState
 
 	override public function create()
 	{
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence("BRO I HAD NO BETTER NAME THAN PLAYSTATE 2.... OK ????!!!!!", null);
+		#end
 		#if FLX_MOUSE
 		FlxG.mouse.visible = false;
 		#end
@@ -121,6 +124,9 @@ class PlayState2 extends FlxState
 
 	function startCombat(enemy:Enemy)
 	{
+	#if DISCORD_ALLOWED
+	DiscordClient.changePresence("FIGHTING", null);
+	#end
 	inCombat = true;
 	player.active = false;
 	enemies.active = false;
@@ -163,6 +169,9 @@ class PlayState2 extends FlxState
 				ending = true;
 				FlxG.camera.fade(FlxColor.BLACK, 0.33, false, doneFadeOut);
 			}
+			#if DISCORD_ALLOWED
+			DiscordClient.changePresence("BRO I HAD NO BETTER NAME THAN PLAYSTATE 2.... OK ????!!!!!", null);
+			#end
 			music.resume();	
 		}
 		else

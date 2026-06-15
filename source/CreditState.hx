@@ -10,6 +10,11 @@ class CreditState extends FlxState
 
 	override public function create()
 	{
+
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence("a very awesome guy : Ethantobot\n not really.... but who care ?", null);
+		#end
+
 		var text2 = new flixel.text.FlxText(10, 10, 100, "Ethantobot");
 		add(text2);
 

@@ -38,6 +38,11 @@ class OptionsState extends FlxState
 
 	override public function create():Void
 	{
+
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence("CURRENTLY CHANGING THE CUKING OPTIONS AHHHHHHHHHHHHHHHHHHHHHHHHHHH\nHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", null);
+		#end
+
 		#if android
 		loadPrefs();
 		#end
