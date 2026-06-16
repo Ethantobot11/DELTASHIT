@@ -442,9 +442,8 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
             case ACT:
 
 			spareBar++;
-			spareBar.value += 15;
-			spareBar = Std.int(FlxMath.bound(spareBar, 0, 100));
-			spareBarGame.value = spareBar;
+			spareBarGame.value += 15;
+			spareBarGame = Std.int(FlxMath.bound(spareBarGame, 0, 100));
 				
 			spare[1].x = enemySprite.x + 2 - (spare[1].width / 2);
 			spare[1].y = enemySprite.y + 4 - (spare[1].height / 2);
