@@ -1,7 +1,7 @@
 package funk;
 
 import openfl.Assets;
-import mobile.backend.StorageUtil;
+import StorageUtil;
 #if sys
 import sys.FileSystem;
 import sys.FileStat;
@@ -9,6 +9,8 @@ import sys.io.File;
 import sys.io.FileInput;
 import sys.io.FileOutput;
 #end
+
+using StringsTools;
 
 /**
  * Unified file class that works with both native file access and OpenFL assets.
