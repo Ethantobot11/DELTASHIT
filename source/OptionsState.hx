@@ -165,6 +165,20 @@ class OptionsState extends FlxState
 		discordRPC = !discordRPC;
 		DiscordRPCButton.text = discordRPC ? "TRUE" : "FALSE";
 		FlxG.save.data.discordRPC = discordRPC;
+		if (!discordRPC)
+		{
+			#if DISCORD_ALLOWED
+			DiscordClient.shutdown();
+			#end
+			trace("turned off rpc ?");
+		}
+		else if (discordRPC)
+		{
+			#if DISCORD_ALLOWED
+			DiscordClient.prepare();
+			#end
+			trace("turned on rpc ?");
+		}
 	}
 
 	#if android

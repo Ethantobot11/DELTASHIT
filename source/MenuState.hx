@@ -93,6 +93,10 @@ class MenuState extends FlxState
 	#if (desktop || mobile)
 	function clickExit()
 	{
+	#if DISCORD_ALLOWED
+	DiscordClient.shutdown();
+	trace("turned off rpc ?");
+	#end
 	Sys.exit(0);
 	}
 	#end

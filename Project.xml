@@ -34,7 +34,7 @@
     <set name="BUILD_DIR" value="export/release" unless="debug" />
     <set name="BUILD_DIR" value="export/32bit" if="32bits" />
 	<source path="source" />
-	<assets path="assets" />
+	<assets path="assets"/>
 
 	<define name="DISCORD_ALLOWED" if="desktop" />
 
@@ -108,6 +108,9 @@
 	<!-- Category Type for Apple Systems -->
 	<config:ios category_type="public.app-category.music-games" />
 	<config:mac category_type="public.app-category.music-games" />
+	<haxedef name="lime_vorbis" if="ios" />
+	<haxedef name="lime_ogg" if="ios" />
+	<haxedef name="openfl_ogg" if="ios" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 
