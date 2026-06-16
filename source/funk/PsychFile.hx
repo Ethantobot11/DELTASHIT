@@ -10,7 +10,7 @@ import sys.io.FileInput;
 import sys.io.FileOutput;
 #end
 
-using StringsTools;
+using StringTools;
 
 /**
  * Unified file class that works with both native file access and OpenFL assets.
