@@ -443,7 +443,6 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 
 			spareBar++;
 			spareBarGame.value += 15;
-			spareBarGame = Std.int(FlxMath.bound(spareBarGame, 0, 100));
 				
 			spare[1].x = enemySprite.x + 2 - (spare[1].width / 2);
 			spare[1].y = enemySprite.y + 4 - (spare[1].height / 2);
@@ -458,8 +457,8 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 				}
 
 				// setup 2 tweens to allow the damage indicators to fade in and float up from the sprites
-				FlxTween.num(spare[0].y, spare[0].y - 12, 1, {ease: FlxEase.circOut}, spareY);
-				FlxTween.num(0, 1, .2, {ease: FlxEase.circInOut, onComplete: doneSpareIn}, spareAlpha);
+				FlxTween.num(spare[0].y, spare[0].y - 12, 1, {ease: FlxEase.circOut}, updateSpareY);
+				FlxTween.num(0, 1, .2, {ease: FlxEase.circInOut, onComplete: doneSpareIn}, updateSpareAlpha);
             case ITEM:
 
             var ITEMTEXT = new flixel.text.FlxText(10, 10, 100, "USED AN ITEM ?");
