@@ -3,6 +3,7 @@ package;
 import flash.filters.ColorMatrixFilter;
 import flash.geom.Matrix;
 import flash.geom.Point;
+import flixel.util.FlxMath;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.effects.chainable.FlxEffectSprite;
@@ -56,14 +57,18 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 	var enemySprite:Enemy; // this is a sprite of the enemySprite
 
 	// These variables will be used to track the enemySprite's health
+	var spareBar:Int;
 	var enemyHealth:Int;
 	var enemyMaxHealth:Int;
 	var enemyHealthBar:FlxBar; // This FlxBar will show us the enemySprite's current/max health
-
+	var spareBarGame:FlxBar;
+	
 	var playerHealthCounter:FlxText; // this will show the playerSprite's current/max health
 
 	var damages:Array<FlxText>; // This array will contain 2 FlxText objects which will appear to show damage dealt (or misses)
 
+	var spare:Array<FlxText>;
+	
 	var pointer:FlxSprite; // This will be the pointer to show which option (Fight or Flee) the user is pointing to.
 	var selected:Choice; // this will track which option is selected
 	var choices:Map<Choice, FlxText>; // this map will contain the FlxTexts for our 2 options: Fight and Flee
@@ -122,6 +127,11 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		add(playerHealthCounter);
 
 		// create and add a FlxBar to show the enemySprite's health. We'll make it Red and Yellow.
+		spareBarGame = new FlxBar(enemySprite.x - 15, playerHealthCounter.y - 40, LEFT_TO_RIGHT, 150, 20);
+		spareBarGame.createFilledBar(FlxColor.RED, FlxColor.YELLOW, true, FlxColor.BLACK);
+		spareBarGame.setRange(0, 100);
+		add(spareBarGame);
+
 		enemyHealthBar = new FlxBar(enemySprite.x - 35, playerHealthCounter.y, LEFT_TO_RIGHT, 150, 20);
 		enemyHealthBar.createFilledBar(0xfffc0000, FlxColor.LIME, true, FlxColor.LIME);
 		add(enemyHealthBar);
@@ -154,6 +164,18 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 			d.alignment = CENTER;
 			d.visible = false;
 			add(d);
+		}
+
+		spare = new Array<FlxText>();
+		spare.push(new FlxText(0, 0, 40));
+		spare.push(new FlxText(0, 0, 40));
+		for (b in spare)
+		{
+			b.color = FlxColor.YELLOW;
+			b.setBorderStyle(SHADOW, FlxColor.BLACK);
+			b.alignment = CENTER;
+			b.visible = false;
+			add(b);
 		}
 
 		// create our results text object. We'll position it, but make it hidden for now.
@@ -225,6 +247,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		// setup our enemySprite
 		enemyMaxHealth = enemyHealth = if (enemy.type == REGULAR) 10 else 20; // each enemySprite will have health based on their type
 		enemyHealthBar.value = 100; // the enemySprite's health bar starts at 100%
+		spareBar.value = 0;
 		enemySprite.changeType(enemy.type); // change our enemySprite's image to match their type.
 
 		// make sure we initialize all of these before we start so nothing looks 'wrong' the second time we get
@@ -392,7 +415,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 					});
 					hurtSound.play();
 					enemyHealth--;
-					enemyHealthBar.value = (enemyHealth / enemyMaxHealth) * 500; // change the enemySprite's health bar
+					enemyHealthBar.value = (enemyHealth / enemyMaxHealth) * 30; // change the enemySprite's health bar
 				}
 				else
 				{
@@ -419,7 +442,10 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
             
             case ACT:
 
-			enemyHealth++;
+			spareBar++;
+			spareBar.value += 15;
+			spareBar = Std.int(FlxMath.bound(spareBar, 0, 100));
+			spareBarGame.value = spareBar;
 				
 			spare[1].x = enemySprite.x + 2 - (spare[1].width / 2);
 			spare[1].y = enemySprite.y + 4 - (spare[1].height / 2);
@@ -464,7 +490,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
                     remove(SPARETEXT);
 				}
 
-				if (spare == 100)
+				if (spareBar == 100)
 				{
 					enemyAttack();
                     outcome = SPARED;
