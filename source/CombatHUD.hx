@@ -3,7 +3,7 @@ package;
 import flash.filters.ColorMatrixFilter;
 import flash.geom.Matrix;
 import flash.geom.Point;
-import flixel.util.FlxMath;
+import flixel.math.FlxMath;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.effects.chainable.FlxEffectSprite;
@@ -66,7 +66,6 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 	var playerHealthCounter:FlxText; // this will show the playerSprite's current/max health
 
 	var damages:Array<FlxText>; // This array will contain 2 FlxText objects which will appear to show damage dealt (or misses)
-
 	var spare:Array<FlxText>;
 	
 	var pointer:FlxSprite; // This will be the pointer to show which option (Fight or Flee) the user is pointing to.
@@ -247,7 +246,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		// setup our enemySprite
 		enemyMaxHealth = enemyHealth = if (enemy.type == REGULAR) 10 else 20; // each enemySprite will have health based on their type
 		enemyHealthBar.value = 100; // the enemySprite's health bar starts at 100%
-		spareBar.value = 0;
+		spareBarGame.value = 0;
 		enemySprite.changeType(enemy.type); // change our enemySprite's image to match their type.
 
 		// make sure we initialize all of these before we start so nothing looks 'wrong' the second time we get
@@ -573,7 +572,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		damages[0].y = damages[1].y = damageY;
 	}
 
-	function updateDamageAlpha(spareAlpha:Float)
+	function updateDamageAlpha(damagesAlpha:Float)
 	{
 		damages[0].alpha = damages[1].alpha = damagesAlpha;
 	}
