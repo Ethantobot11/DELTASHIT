@@ -42,7 +42,11 @@ class PlayState2 extends FlxState
 		FlxG.mouse.visible = false;
 		#end
 		music = FlxG.sound.load(AssetPaths.boxing_game__ogg, 1, true);
+		#if !ios
 		map = new FlxOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_002__json);
+		#elseif ios
+		map = new PsychOgmoLoader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_002__json);
+		#end
 		walls = map.loadTilemap(AssetPaths.tiles__png, "walls");
 		walls.follow();
 		walls.setTileProperties(1, NONE);

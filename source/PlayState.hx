@@ -13,6 +13,7 @@ import Coin;
 import Enemy;
 using flixel.util.FlxSpriteUtil;
 import flixel.ui.FlxVirtualPad;
+import PsychOgmoLoader;
 
 class PlayState extends FlxState
 {
@@ -41,12 +42,11 @@ class PlayState extends FlxState
 		#if FLX_MOUSE
 		FlxG.mouse.visible = false;
 		#end
-		#if !ios
 		music = FlxG.sound.load(AssetPaths.boxing_game__ogg, 1, true);
+		#if !ios
 		map = new FlxOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
 		#elseif ios
-		map = new FlxOgmo3Loader("data/turnBasedRPG.ogmo", "data/room_001.json");
-		walls = map.loadTilemap("images/tiles.png", "walls");
+		map = new PsychOgmoLoader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
 		#end
 		walls = map.loadTilemap(AssetPaths.tiles__png, "walls");
 		walls.follow();
