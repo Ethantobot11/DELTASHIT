@@ -26,6 +26,7 @@ enum Outcome
 	NONE;
 	ESCAPE;
 	VICTORY;
+	SPARED;
 	DEFEAT;
 }
 
@@ -121,7 +122,7 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		add(playerHealthCounter);
 
 		// create and add a FlxBar to show the enemySprite's health. We'll make it Red and Yellow.
-		enemyHealthBar = new FlxBar(enemySprite.x - 75, playerHealthCounter.y, LEFT_TO_RIGHT, 30, 20);
+		enemyHealthBar = new FlxBar(enemySprite.x - 35, playerHealthCounter.y, LEFT_TO_RIGHT, 150, 20);
 		enemyHealthBar.createFilledBar(0xfffc0000, FlxColor.LIME, true, FlxColor.LIME);
 		add(enemyHealthBar);
 
@@ -417,35 +418,29 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 				FlxTween.num(0, 1, .2, {ease: FlxEase.circInOut, onComplete: doneDamageIn}, updateDamageAlpha);
             
             case ACT:
-            
-            var ACTTEXT = new flixel.text.FlxText(10, 10, 100, "ACTED ?");
-		    add(ACTTEXT);
-            background.visible = false;
-				damages[1].x = enemySprite.x + 2 - (damages[1].width / 2);
-				damages[1].y = enemySprite.y + 4 - (damages[1].height / 2);
-				damages[1].alpha = 0;
-				damages[1].visible = true;
+
+			enemyHealth++;
+				
+			spare[1].x = enemySprite.x + 2 - (spare[1].width / 2);
+			spare[1].y = enemySprite.y + 4 - (spare[1].height / 2);
+			spare[1].alpha = 0;
+			spare[1].visible = true;
+				
 
 				// if the enemySprite is still alive, it will swing back!
 				if (enemyHealth > 0)
 				{
 					enemyAttack();
-                    background.visible = true;
-                    remove(ACTTEXT);
 				}
 
 				// setup 2 tweens to allow the damage indicators to fade in and float up from the sprites
-				FlxTween.num(damages[0].y, damages[0].y - 12, 1, {ease: FlxEase.circOut}, updateDamageY);
-				FlxTween.num(0, 1, .2, {ease: FlxEase.circInOut, onComplete: doneDamageIn}, updateDamageAlpha);
+				FlxTween.num(spare[0].y, spare[0].y - 12, 1, {ease: FlxEase.circOut}, spareY);
+				FlxTween.num(0, 1, .2, {ease: FlxEase.circInOut, onComplete: doneSpareIn}, spareAlpha);
             case ITEM:
 
             var ITEMTEXT = new flixel.text.FlxText(10, 10, 100, "USED AN ITEM ?");
 		    add(ITEMTEXT);
-             background.visible = false;
-				damages[1].x = enemySprite.x + 2 - (damages[1].width / 2);
-				damages[1].y = enemySprite.y + 4 - (damages[1].height / 2);
-				damages[1].alpha = 0;
-				damages[1].visible = true;
+            background.visible = false;
 
 				// if the enemySprite is still alive, it will swing back!
 				if (enemyHealth > 0)
@@ -460,10 +455,6 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
             var SPARETEXT = new flixel.text.FlxText(10, 10, 100, "SPARED ?");
 		    add(SPARETEXT);
             background.visible = false;
-				damages[1].x = enemySprite.x + 2 - (damages[1].width / 2);
-				damages[1].y = enemySprite.y + 4 - (damages[1].height / 2);
-				damages[1].alpha = 0;
-				damages[1].visible = true;
 
 				// if the enemySprite is still alive, it will swing back!
 				if (enemyHealth > 0)
@@ -472,6 +463,18 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
                     background.visible = true;
                     remove(SPARETEXT);
 				}
+
+				if (spare == 100)
+				{
+					enemyAttack();
+                    outcome = SPARED;
+					results.text = "SPARED!";
+					fledSound.play();
+					results.visible = true;
+					results.alpha = 0;
+					FlxTween.tween(results, {alpha: 1}, .66, {ease: FlxEase.circInOut, onComplete: doneResultsIn});
+				}
+			
 
 			case FLEE:
 				// if the playerSprite chose to FLEE, we'll give them a 50/50 chance to escape
@@ -544,12 +547,22 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 		damages[0].y = damages[1].y = damageY;
 	}
 
+	function updateDamageAlpha(spareAlpha:Float)
+	{
+		damages[0].alpha = damages[1].alpha = damagesAlpha;
+	}
+
+	function updateSpareY(spareY:Float)
+	{
+		spare[0].y = spare[1].y = spareY;
+	}
+
 	/**
 	 * This function is called from our Tweens to fade in/out the damage text
 	 */
-	function updateDamageAlpha(damageAlpha:Float)
+	function updateSpareAlpha(spareAlpha:Float)
 	{
-		damages[0].alpha = damages[1].alpha = damageAlpha;
+		spare[0].alpha = spare[1].alpha = spareAlpha;
 	}
 
 	/**
@@ -558,6 +571,11 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 	function doneDamageIn(_)
 	{
 		FlxTween.num(1, 0, .66, {ease: FlxEase.circInOut, startDelay: 1, onComplete: doneDamageOut}, updateDamageAlpha);
+	}
+
+	function doneSpareIn(_)
+	{
+		FlxTween.num(1, 0, .66, {ease: FlxEase.circInOut, startDelay: 1, onComplete: doneSpareOut}, updateSpareAlpha);
 	}
 
 	/**
@@ -621,5 +639,15 @@ class CombatHUD extends FlxTypedGroup<FlxSprite>
 			wait = false;
 			pointer.visible = true;
 		}
+	}
+
+	function doneSpareOut(_)
+	{
+		spare[0].visible = false;
+		spare[1].visible = false;
+		spare[0].text = "";
+		spare[1].text = "";
+		wait = false;
+		pointer.visible = true;
 	}
 }
