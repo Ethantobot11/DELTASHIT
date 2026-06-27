@@ -1,5 +1,6 @@
 package;
 
+import StorageUtil;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.text.FlxText;
@@ -8,7 +9,6 @@ import flixel.ui.FlxButton;
 import flixel.util.FlxAxes;
 import flixel.util.FlxColor;
 import flixel.util.FlxSave;
-import StorageUtil;
 
 class OptionsState extends FlxState
 {
@@ -32,7 +32,7 @@ class OptionsState extends FlxState
 
 	public static var discordRPC:Bool = true;
 	
-	#if desktop
+	#if PC_CONTROLS_CONTROLS_CONTROLS
 	var fullscreenButton:FlxButton;
 	#end
 	public function new()
@@ -91,7 +91,7 @@ class OptionsState extends FlxState
 		volumeAmountText.screenCenter(FlxAxes.X);
 		add(volumeAmountText);
 
-		#if desktop
+		#if PC_CONTROLS_CONTROLS_CONTROLS
 		fullscreenButton = new FlxButton(0, volumeBar.y + volumeBar.height + 8,
 			FlxG.fullscreen ? "FULLSCREEN" : "WINDOWED", clickFullscreen);
 		fullscreenButton.screenCenter(FlxAxes.X);
@@ -151,7 +151,7 @@ class OptionsState extends FlxState
 	}
 	#end
 
-	#if desktop
+	#if PC_CONTROLS_CONTROLS_CONTROLS
 	function clickFullscreen()
 	{
 		FlxG.fullscreen = !FlxG.fullscreen;

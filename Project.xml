@@ -38,6 +38,8 @@
 
 	<define name="DISCORD_ALLOWED" if="desktop" />
 
+	<define name="PC_CONTROLS" if="desktop" unless="mobile" />
+	<define name="MOBILE_CONTROLS" if="mobile" unless="desktop" />
 	<!-- _______________________________ Libraries ______________________________ -->
 
 	<haxelib name="flixel" />

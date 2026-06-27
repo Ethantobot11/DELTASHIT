@@ -7,4 +7,7 @@ import Discord;
 import sys.*;
 import sys.io.*;
 #end
+#if MOBILE_CONTROLS
+import mobile.*;
+#end
 #end

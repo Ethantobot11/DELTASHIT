@@ -1,18 +1,19 @@
 package;
-import flixel.util.FlxColor;
-import flixel.math.FlxPoint;
-import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.tile.FlxTilemap;
-import flixel.text.FlxText;
-import flixel.FlxState;
-import flixel.sound.FlxSound;
-import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import Coin;
 import Enemy;
-using flixel.util.FlxSpriteUtil;
+import flixel.FlxG;
+import flixel.FlxSprite;
+import flixel.FlxState;
+import flixel.addons.editors.ogmo.FlxOgmo3Loader;
+import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.math.FlxPoint;
+import flixel.sound.FlxSound;
+import flixel.text.FlxText;
+import flixel.tile.FlxTilemap;
 import flixel.ui.FlxVirtualPad;
+import flixel.util.FlxColor;
+
+using flixel.util.FlxSpriteUtil;
 
 class PlayState2 extends FlxState
 {
@@ -29,7 +30,7 @@ class PlayState2 extends FlxState
 	var ending:Bool;
 	var won:Bool;
 	var music:FlxSound;
-	#if mobile
+	#if MOBILE_CONTROLS_CONTROLS
 	public static var virtualPad:FlxVirtualPad;
 	#end
 
@@ -64,7 +65,7 @@ class PlayState2 extends FlxState
 		add(hud);	
 		combatHud = new CombatHUD();
 		add(combatHud);
-		#if mobile
+		#if MOBILE_CONTROLS_CONTROLS
 		virtualPad = new FlxVirtualPad(FULL, NONE);
 		add(virtualPad);
 		#end
@@ -134,7 +135,7 @@ class PlayState2 extends FlxState
 	inCombat = true;
 	player.active = false;
 	enemies.active = false;
-	#if mobile
+		#if MOBILE_CONTROLS_CONTROLS
 	virtualPad.visible = false;
 	#end
 	combatHud.initCombat(health, enemy);
@@ -185,7 +186,7 @@ class PlayState2 extends FlxState
 		inCombat = false;
 		player.active = true;
 		enemies.active = true;
-		#if mobile
+					#if MOBILE_CONTROLS_CONTROLS
 	    virtualPad.visible = true;
     	#end
 	}

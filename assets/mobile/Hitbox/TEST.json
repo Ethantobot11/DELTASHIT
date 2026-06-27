@@ -1,0 +1,32 @@
+{
+  "hitboxes": [
+    {
+      "name": "buttonNote1",
+      "id": "LEFT",
+      "position": [500, 0],
+      "scale": [320, 720],
+      "color": "0xFFC24B99"
+    },
+    {
+      "name": "buttonNote2",
+      "id": "DOWN",
+      "position": [820, 0],
+      "scale": [320, 720],
+      "color": "0xFF00FFFF"
+    },
+    {
+      "name": "buttonNote3",
+      "id": "UP",
+      "position": [1140, 0],
+      "scale": [320, 720],
+      "color": "0xFF12FA05"
+    },
+    {
+      "name": "buttonNote4",
+      "id": "RIGHT",
+      "position": [1460, 0],
+      "scale": [320, 720],
+      "color": "0xFFF9393F"
+    }
+  ]
+}

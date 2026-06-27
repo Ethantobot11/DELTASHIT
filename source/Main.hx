@@ -1,11 +1,11 @@
 package;
 
-import flixel.FlxG;
-import flixel.util.FlxSave;
-import flixel.FlxGame;
-import openfl.display.Sprite;
 import CrashHandler;
 import StorageUtil;
+import flixel.FlxG;
+import flixel.FlxGame;
+import flixel.util.FlxSave;
+import openfl.display.Sprite;
 
 class Main extends Sprite
 {
@@ -13,7 +13,7 @@ class Main extends Sprite
 	{
 		var startFullscreen:Bool = false;
 		var save = new FlxSave();
-		#if mobile
+		#if MOBILE_CONTROLS_CONTROLS
 		#if android
 		StorageUtil.requestPermissions();
 		#end
@@ -22,7 +22,7 @@ class Main extends Sprite
 		CrashHandler.init();
 
 		save.bind("TurnBasedRPG");
-		#if desktop
+		#if PC_CONTROLS_CONTROLS_CONTROLS
 		if (save.data.fullscreen != null)
 		{
 			startFullscreen = save.data.fullscreen;

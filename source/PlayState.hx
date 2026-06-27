@@ -1,19 +1,20 @@
 package;
-import flixel.util.FlxColor;
-import flixel.math.FlxPoint;
-import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.tile.FlxTilemap;
-import flixel.text.FlxText;
-import flixel.FlxState;
-import flixel.sound.FlxSound;
-import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import Coin;
 import Enemy;
-using flixel.util.FlxSpriteUtil;
-import flixel.ui.FlxVirtualPad;
 import PsychOgmoLoader;
+import flixel.FlxG;
+import flixel.FlxSprite;
+import flixel.FlxState;
+import flixel.addons.editors.ogmo.FlxOgmo3Loader;
+import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.math.FlxPoint;
+import flixel.sound.FlxSound;
+import flixel.text.FlxText;
+import flixel.tile.FlxTilemap;
+import flixel.util.FlxColor;
+import mobile.flixel.controls.MobileControls;
+
+using flixel.util.FlxSpriteUtil;
 
 class PlayState extends FlxState
 {
@@ -30,9 +31,17 @@ class PlayState extends FlxState
 	var ending:Bool;
 	var won:Bool;
 	var music:FlxSound;
-	#if mobile
-	public static var virtualPad:FlxVirtualPad;
+	public static var instance:PlayState;
+
+	#if MOBILE_CONTROLS
+	public var manager:MobileControls;
 	#end
+
+	public function new()
+	{
+		super();
+		instance = this;
+	}
 
 	override public function create()
 	{
@@ -65,12 +74,15 @@ class PlayState extends FlxState
 		add(hud);	
 		combatHud = new CombatHUD();
 		add(combatHud);
-		#if mobile
-		virtualPad = new FlxVirtualPad(FULL, NONE);
-		add(virtualPad);
-		#end
 		coins = new FlxTypedGroup<Coin>();
 		add(coins);
+		#if MOBILE_CONTROLS
+		manager = new MobileControls();
+		add(manager);
+
+		manager.addJoyStick('TEST');
+		#end
+
 		music.play();
 		super.create();
 	}
@@ -135,8 +147,8 @@ class PlayState extends FlxState
 	inCombat = true;
 	player.active = false;
 	enemies.active = false;
-	#if mobile
-	virtualPad.visible = false;
+		#if MOBILE_CONTROLS
+		manager.visible = false;
 	#end
 	combatHud.initCombat(health, enemy);
 	}
@@ -149,6 +161,28 @@ class PlayState extends FlxState
 
 	override public function update(elapsed:Float)
 	{
+		#if MOBILE_CONTROLS
+		if (manager.checkState('left', 'pressed'))
+		{
+			trace('hello from holding up (works on dpad, hitbox, OR joystick!)');
+		}
+
+		if (manager.checkState('down', 'pressed'))
+		{
+			trace('hello from holding up (works on dpad, hitbox, OR joystick!)');
+		}
+
+		if (manager.checkState('up', 'pressed'))
+		{
+			trace('hello from holding up (works on dpad, hitbox, OR joystick!)');
+		}
+
+		if (manager.checkState('right', 'pressed'))
+		{
+			trace('hello from holding up (works on dpad, hitbox, OR joystick!)');
+		}
+		#end
+
 		if (inCombat)
 	{
 	if (!combatHud.visible)
@@ -187,8 +221,8 @@ class PlayState extends FlxState
 		inCombat = false;
 		player.active = true;
 		enemies.active = true;
-		#if mobile
-	    virtualPad.visible = true;
+					#if MOBILE_CONTROLS
+					manager.visible = true;
     	#end
 	}
 	}
