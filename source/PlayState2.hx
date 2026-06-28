@@ -74,7 +74,7 @@ class PlayState2 extends FlxState
 		manager = new MobileControls();
 		add(manager);
 
-		manager.addJoyStick('TEST');
+		manager.addJoyStick('TEST_JOYSTICK');
 		#end
 
 		music.play();
