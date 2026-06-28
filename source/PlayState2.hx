@@ -13,6 +13,8 @@ import flixel.tile.FlxTilemap;
 import flixel.ui.FlxVirtualPad;
 import flixel.util.FlxColor;
 
+import mobile.flixel.controls.MobileControls;
+
 using flixel.util.FlxSpriteUtil;
 
 class PlayState2 extends FlxState
