@@ -30,8 +30,9 @@ class PlayState2 extends FlxState
 	var ending:Bool;
 	var won:Bool;
 	var music:FlxSound;
-	#if MOBILE_CONTROLS_CONTROLS
-	public static var virtualPad:FlxVirtualPad;
+	public static var instance:PlayState2;
+	#if MOBILE_CONTROLS
+	public var manager:MobileControls;
 	#end
 
 	override public function create()
@@ -65,12 +66,15 @@ class PlayState2 extends FlxState
 		add(hud);	
 		combatHud = new CombatHUD();
 		add(combatHud);
-		#if MOBILE_CONTROLS_CONTROLS
-		virtualPad = new FlxVirtualPad(FULL, NONE);
-		add(virtualPad);
-		#end
 		coins = new FlxTypedGroup<Coin>();
 		add(coins);
+		#if MOBILE_CONTROLS
+		manager = new MobileControls();
+		add(manager);
+
+		manager.addJoyStick('TEST');
+		#end
+
 		music.play();
 		super.create();
 	}

@@ -21,10 +21,14 @@ class PsychFile {
 		/*#if android
 		return StorageUtil.getExternalStorageDirectory();
 		#else*/
+		#if sys
 		if (path.startsWith(Sys.getCwd()) /*|| path.startsWith(Paths.mods())*/)
 			return path;
 		else
 			return Sys.getCwd() + path;
+		#else
+		return path;
+		#end
         //#end
 	}
 
@@ -74,37 +78,45 @@ class PsychFile {
         #end
 	}
 
+	#if sys
 	public static function read(path:String, binary:Bool = true):Null<FileInput> {
-		#if sys
         return File.read(cwd(path), binary);
-        #else
-        return null;
-        #end
 	}
+	#else
+	public static function read(path:String, binary:Bool = true):Dynamic {
+        return null;
+	}
+	#end
 
+	#if sys
 	public static function write(path:String, binary:Bool = true):Null<FileOutput> {
-		#if sys
         return File.write(cwd(path), binary);
-        #else
-        return null;
-        #end
 	}
+	#else
+	public static function write(path:String, binary:Bool = true):Dynamic {
+        return null;
+	}
+	#end
 
+	#if sys
 	public static function append(path:String, binary:Bool = true):Null<FileOutput> {
-        #if sys
         return File.append(cwd(path), binary);
-        #else
-        return null;
-        #end
 	}
+	#else
+	public static function append(path:String, binary:Bool = true):Dynamic {
+        return null;
+	}
+	#end
 
+	#if sys
 	public static function update(path:String, binary:Bool = true):Null<FileOutput> {
-		#if sys
         return File.update(cwd(path), binary);
-        #else
-        return null;
-        #end
 	}
+	#else
+	public static function update(path:String, binary:Bool = true):Dynamic {
+        return null;
+	}
+	#end
 
 	public static function copy(srcPath:String, dstPath:String):Void {
 		#if sys
