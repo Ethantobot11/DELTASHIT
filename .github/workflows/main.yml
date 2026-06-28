@@ -1,5 +1,7 @@
 name: Release
-on: workflow_dispatch
+on: 
+  push:
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -165,8 +167,8 @@ jobs:
       - name: Publish The Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "DevBuild ${{ needs.get-commit-hash.outputs.commit_hash }}"
-          tag_name: "devbuild-${{ needs.get-commit-hash.outputs.commit_hash }}"
+          name: "DevBuild ${{ needs.get-commit-hash.outputs.commit_hash }}-mobile-V2"
+          tag_name: "devbuild-${{ needs.get-commit-hash.outputs.commit_hash }}-mobile-V2"
           make_latest: false
           files: |
             /home/runner/*.apk
