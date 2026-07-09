@@ -24,7 +24,7 @@ jobs:
 
     - name: Install hmm
       run: |
-        haxelib run hmm install hmm-u.json
+        haxelib install hmm
         haxelib run hmm install hmm-u.json
 
     - name: Restore Haxe Dependencies via HMM
@@ -54,10 +54,7 @@ jobs:
 
     - name: Compile Project to Wii U Binaries
       run: |
-        # Make sure the utility is executable
         chmod +x ./hxCompileU
-        
-        # Run compilation using your project's hxCompileUConfig.json
         ./hxCompileU --compile
 
     - name: Upload Wii U Build Artifacts
