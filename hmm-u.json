@@ -1,0 +1,39 @@
+{
+  "dependencies": [
+    {
+      "name": "reflaxe",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "reflaxe.cpp",
+      "type": "git",
+      "ref": "main",
+      "url": "https://github.com/Slushi-Github/reflaxe.cpp"
+    },
+    {
+      "name": "slushiUtilsU",
+      "type": "git",
+      "ref": "main",
+      "url": "https://github.com/Slushi-Github/slushiUtilsU"
+    },
+    {
+      "name": "leafyEngine",
+      "type": "git",
+      "ref": "main",
+      "url": "https://github.com/Slushi-Github/leafyEngine"
+    },
+    {
+      "name": "hxWUT",
+      "type": "git",
+      "ref": "main",
+      "url": "https://github.com/Slushi-Github/hxWUT"
+    },
+    {
+      "name": "hxSDL2",
+      "type": "git",
+      "ref": "main",
+      "url": "https://github.com/Slushi-Github/hxSDL2"
+    }
+  ]
+}
