@@ -1,16 +1,26 @@
 package;
 
+#if wiiu
+import leafy.core.LeafyGame;
+import leafy.core.LeafyG;
+#else
 import flixel.FlxG;
 import flixel.util.FlxSave;
 import flixel.FlxGame;
 import openfl.display.Sprite;
+#end
 import CrashHandler;
 import StorageUtil;
 
-class Main extends Sprite
+class Main extends #if wiiu LeafyGame #else Sprite #end
 {
 	public function new()
 	{
+		#if wiiu
+		super();
+		CrashHandler.init();
+		LeafyG.initGame(320, 240, new MenuState()); 
+		#else
 		var startFullscreen:Bool = false;
 		var save = new FlxSave();
 		#if mobile
@@ -40,5 +50,6 @@ class Main extends Sprite
 		DiscordClient.prepare();
 		#end
 		save.close();
+		#end
 	}
 }
