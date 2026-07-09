@@ -57,8 +57,8 @@ jobs:
 
     - name: Compile Project to Wii U Binaries
       run: |
-        haxe --cwd BuildTool/src --run Main --prepare
-        haxe -cp BuildTool/src --run Main --compile
+        haxe --cwd BuildTool --run src.Main --prepare
+        haxe -cp BuildTool --run src.Main --compile
 
     - name: Upload Wii U Build Artifacts
       uses: actions/upload-artifact@v4
