@@ -22,22 +22,22 @@ jobs:
     - name: Install System Dependencies
       run: |
         apt-get update
-        apt-get install -y git nodejs npm curl
+        apt-get install -y git nodejs npm curl make
 
     - name: Setup Haxe
       uses: krdlab/setup-haxe@v1
       with:
         haxe-version: 4.3.4
 
-    - name: Install HMM
+    - name: Install HMM (Haxe Module Manager)
       run: |
-        haxelib install hmm --quiet
+        haxelib install hmm
         haxelib run hmm setup
 
-    - name: Swap and Restore Haxe Dependencies
+    - name: Swap and Restore Haxe Dependencies (Wii U Setup)
       run: |
         cp hmm-u.json hmm.json
-        haxelib run hmm install --quiet
+        haxelib run hmm install
 
     - name: Install Wii U Development Environment
       run: |
@@ -50,43 +50,25 @@ jobs:
         echo "DEVKITPPC=/opt/devkitpro/devkitPPC" >> $GITHUB_ENV
         echo "PATH=/opt/devkitpro/devkitPPC/bin:/opt/devkitpro/tools/bin:$PATH" >> $GITHUB_ENV
 
-    - name: Build hxCompileU Compiler Utility
+    - name: Step 1 - Generate C++ Source via Reflaxe
       run: |
-        haxelib install hxcpp --quiet
-        git clone https://github.com/Slushi-Github/hxCompileU.git BuildTool
-        cd BuildTool
         haxe build.hxml
-        find export/ -maxdepth 1 -type f -executable -exec mv {} ../hxCompileU \;
-        cd ..
 
-    - name: Create Base Wii U Configuration File
+    - name: Step 2 - Compile C++ to Wii U Binaries via Make
       run: |
-        echo '{
-          "haxeConfig": {
-            "hxmlPath": "build.hxml"
-          },
-          "wiiuConfig": {
-            "outputFolder": "output",
-            "wiiuFilesFolder": "wiiuFiles",
-            "convertToWUHB": false,
-            "wuhbConfig": {
-              "name": "DELTASHIT",
-              "author": "Ethantobot",
-              "version": "1.4.0"
-            }
-          }
-        }' > hxCompileUConfig.json
+        if [ -f Makefile ]; then
+          make
+        else
+          echo "No root Makefile found. Ensure your project has a Makefile matching devkitPro structures."
+          exit 1
+        fi
 
-    - name: Compile Project to Wii U Binaries
-      run: |
-        chmod +x ./hxCompileU
-        ./hxCompileU --compile
-        
     - name: Upload Wii U Build Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: wiiu-homebrew-release
         path: |
-          output/wiiuFiles/*.rpx
-          output/wiiuFiles/*.elf
-          output/wiiuFiles/*.wuhb
+          *.rpx
+          *.elf
+          *.wuhb
+          wiiuFiles/*
