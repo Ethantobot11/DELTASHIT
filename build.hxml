@@ -1,4 +1,4 @@
--cp src
+-cp source
 -main Main
 -lib reflaxe.cpp
 -D cpp-output=cpp_src
