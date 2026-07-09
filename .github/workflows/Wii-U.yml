@@ -33,10 +33,10 @@ jobs:
 
     - name: Install DevKitPro & WUT
       run: |
-        sudo apt-get update && sudo apt-get install -y curl
-        curl -L -o devkitpro-pacman.deb -H "User-Agent: Mozilla/5.0" https://apt.devkitpro.org/devkitpro-pacman.deb
-        sudo dpkg -i devkitpro-pacman.deb
-        sudo apt-get install -f -y
+        sudo apt-get update && sudo apt-get install -y curl apt-transport-https
+        curl -L -O -H "User-Agent: Mozilla/5.0" https://apt.devkitpro.org/install-devkitpro-pacman
+        chmod +x ./install-devkitpro-pacman
+        sudo ./install-devkitpro-pacman
         sudo dkp-pacman -Syy --noconfirm
         sudo dkp-pacman -S wiiu-dev --noconfirm
 
