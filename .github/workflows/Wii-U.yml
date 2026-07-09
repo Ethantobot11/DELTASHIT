@@ -10,6 +10,8 @@ on:
 jobs:
   build-wiiu:
     runs-on: ubuntu-latest
+    container:
+      image: devkitpro/devkitppc:latest
 
     steps:
     - name: Checkout Repository
@@ -17,30 +19,32 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Install System Dependencies
+      run: |
+        apt-get update
+        apt-get install -y git nodejs npm curl
+
     - name: Setup Haxe
       uses: krdlab/setup-haxe@v1
       with:
         haxe-version: 4.3.4
 
-    - name: Install hmm
+    - name: Install HMM (Haxe Module Manager)
       run: |
-        haxelib install hmm --quiet
+        haxelib install hmm
+        haxelib run hmm setup
 
-    - name: Wii-U
+    - name: Swap and Restore Haxe Dependencies (Wii U Setup)
       run: |
         cp hmm-u.json hmm.json
-        haxelib run hmm install --quiet
+        haxelib run hmm install
 
-    - name: Install DevKitPro & WUT
+    - name: Install Wii U Development Environment
       run: |
-        sudo apt-get update && sudo apt-get install -y curl apt-transport-https
-        curl -L -O -H "User-Agent: Mozilla/5.0" https://apt.devkitpro.org/install-devkitpro-pacman
-        chmod +x ./install-devkitpro-pacman
-        sudo ./install-devkitpro-pacman
-        sudo dkp-pacman -Syy --noconfirm
-        sudo dkp-pacman -S wiiu-dev --noconfirm
+        dkp-pacman -Syy --noconfirm
+        dkp-pacman -S wiiu-dev --noconfirm
 
-    - name: Set Environment Variables
+    - name: Configure DevKitPro Environment Paths
       run: |
         echo "DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
         echo "DEVKITPPC=/opt/devkitpro/devkitPPC" >> $GITHUB_ENV
