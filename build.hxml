@@ -1,0 +1,5 @@
+-cp src
+-main Main
+-lib reflaxe.cpp
+-D cpp-output=cpp_src
+--no-output
