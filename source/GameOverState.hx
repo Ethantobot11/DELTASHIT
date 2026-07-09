@@ -1,5 +1,11 @@
 package;
 
+#if wiiu
+import leafy.core.LeafyState;
+import leafy.core.LeafyG;
+import leafy.core.LeafySprite;
+import leafy.text.LeafyText;
+#else
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -7,21 +13,25 @@ import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxAxes;
 import flixel.util.FlxColor;
+#end
 
-class GameOverState extends FlxState
+class GameOverState extends #if wiiu LeafyState #else FlxState #end
 {
-	var titleText:FlxText; // the title text
-	var messageText:FlxText; // the final score message text
-	var scoreIcon:FlxSprite; // sprite for a coin icon
-	var scoreText:FlxText; // text of the score
-	var highscoreText:FlxText; // text to show the highscore
-	var mainMenuButton:FlxButton; // button to go to main menu
+	#if wiiu
+	var titleText:LeafyText;
+	var messageText:LeafyText;
+	var scoreIcon:LeafySprite;
+	var scoreText:LeafyText;
+	var highscoreText:LeafyText;
+	#else
+	var titleText:FlxText;
+	var messageText:FlxText;
+	var scoreIcon:FlxSprite;
+	var scoreText:FlxText;
+	var highscoreText:FlxText;
+	var mainMenuButton:FlxButton;
+	#end
 
-	/**
-	 * Called from PlayState, this will set our win and score variables
-	 * @param	win		true if the player beat the boss, false if they died
-	 * @param	score	the number of coins collected
-	 */
 	public function new(win:Bool, score:Int)
 	{
 		super();
@@ -30,16 +40,31 @@ class GameOverState extends FlxState
 		DiscordClient.changePresence("XD BRO LOST : GameOverState ;-;", null);
 		#end
 
-		#if FLX_MOUSE
+		#if (FLX_MOUSE && !wiiu)
 		FlxG.mouse.visible = true;
 		#end
 
-		if (FlxG.sound.music == null) // don't restart the music if it's already playing
-		{
-		FlxG.sound.playMusic(AssetPaths.LOSE__ogg, 1, true);
-		}
+		#if wiiu
+		titleText = new LeafyText(0, 20, 0, if (win) "You Win!" else "Game Over!", 22);
+		add(titleText);
 
-		// create and add each of our items
+		messageText = new LeafyText(0, 100, 0, "Final Score:", 8);
+		add(messageText);
+
+		scoreIcon = new LeafySprite(100, 100, "assets/images/coin.png");
+		add(scoreIcon);
+
+		scoreText = new LeafyText(120, 100, 0, Std.string(score), 8);
+		add(scoreText);
+
+		var highscore = checkHighscore(score);
+		highscoreText = new LeafyText(0, 140, 0, "Highscore: " + highscore, 8);
+		add(highscoreText);
+		#else
+		if (FlxG.sound.music == null)
+		{
+			FlxG.sound.playMusic(AssetPaths.LOSE__ogg, 1, true);
+		}
 
 		titleText = new FlxText(0, 20, 0, if (win) "You Win!" else "Game Over!", 22);
 		titleText.alignment = CENTER;
@@ -59,7 +84,6 @@ class GameOverState extends FlxState
 		scoreText.screenCenter(FlxAxes.Y);
 		add(scoreText);
 
-		// we want to see what the highscore is
 		var highscore = checkHighscore(score);
 
 		highscoreText = new FlxText(0, (FlxG.height / 2) + 10, 0, "Highscore: " + highscore, 8);
@@ -73,37 +97,36 @@ class GameOverState extends FlxState
 		add(mainMenuButton);
 
 		FlxG.camera.fade(FlxColor.BLACK, 0.33, true);
+		#end
 	}
 
-	/**
-	 * This function will compare the new score with the saved highscore.
-	 * If the new score is higher, it will save it as the new highscore, otherwise, it will return the saved highscore.
-	 * @param	score	The new score
-	 * @return	the highscore
-	 */
 	function checkHighscore(score:Int):Int
 	{
 		var highscore:Int = score;
+		#if wiiu
+		return highscore;
+		#else
 		if (FlxG.save.data.highscore != null && FlxG.save.data.highscore > highscore)
 		{
 			highscore = FlxG.save.data.highscore;
 		}
 		else
 		{
-			// data is less or there is no data; save current score
 			FlxG.save.data.highscore = highscore;
 		}
 		return highscore;
+		#end
 	}
 
-	/**
-	 * When the user hits the main menu button, it should fade out and then take them back to the MenuState
-	 */
 	function switchToMainMenu():Void
 	{
+		#if wiiu
+		LeafyG.switchState(new MenuState());
+		#else
 		FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
 		{
 			FlxG.switchState(MenuState.new);
 		});
+		#end
 	}
 }
