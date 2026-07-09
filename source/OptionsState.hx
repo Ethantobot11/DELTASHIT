@@ -1,5 +1,10 @@
 package;
 
+#if wiiu
+import leafy.core.LeafyState;
+import leafy.core.LeafyG;
+import leafy.text.LeafyText;
+#else
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.text.FlxText;
@@ -8,11 +13,16 @@ import flixel.ui.FlxButton;
 import flixel.util.FlxAxes;
 import flixel.util.FlxColor;
 import flixel.util.FlxSave;
+#end
 import StorageUtil;
 
-class OptionsState extends FlxState
+class OptionsState extends #if wiiu LeafyState #else FlxState #end
 {
-	// define our screen elements
+	#if wiiu
+	var titleText:LeafyText;
+	var volumeText:LeafyText;
+	var volumeAmountText:LeafyText;
+	#else
 	var titleText:FlxText;
 	var volumeBar:FlxBar;
 	var volumeText:FlxText;
@@ -23,6 +33,8 @@ class OptionsState extends FlxState
 	var volumeUpButton:FlxButton;
 	var clearDataButton:FlxButton;
 	var backButton:FlxButton;
+	#end
+
 	#if android
 	public var storageTypes:Array<String> = ["EXTERNAL_DATA", "EXTERNAL", "EXTERNAL_OBB", "EXTERNAL_MEDIA"];
 	public var externalPaths:Array<String> = StorageUtil.checkExternalPaths(true);
@@ -35,17 +47,17 @@ class OptionsState extends FlxState
 	#if desktop
 	var fullscreenButton:FlxButton;
 	#end
+
 	public function new()
 	{
 		#if android
-		storageTypes = storageTypes.concat(externalPaths); //SD Card
+		storageTypes = storageTypes.concat(externalPaths);
 		#end
 		super();
 	}
 
 	override public function create():Void
 	{
-
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("CURRENTLY CHANGING THE FUKING OPTIONS AHHHHHHHHHHHHHHHHHHHHHHHHHHH\nHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", null);
 		#end
@@ -54,7 +66,16 @@ class OptionsState extends FlxState
 		loadPrefs();
 		#end
 
-		// setup and add our objects to the screen
+		#if wiiu
+		titleText = new LeafyText(0, 20, 0, "Options", 22);
+		add(titleText);
+
+		volumeText = new LeafyText(0, 60, 0, "Volume", 8);
+		add(volumeText);
+
+		volumeAmountText = new LeafyText(0, 100, 200, "100%", 8);
+		add(volumeAmountText);
+		#else
 		titleText = new FlxText(0, 20, 0, "Options", 22);
 		titleText.alignment = CENTER;
 		titleText.screenCenter(FlxAxes.X);
@@ -65,9 +86,7 @@ class OptionsState extends FlxState
 		volumeText.screenCenter(FlxAxes.X);
 		add(volumeText);
 
-		// the volume buttons will be smaller than 'default' buttons
-		volumeDownButton = new FlxButton(8, volumeText.y + volumeText.height + 2, "-",
-			clickVolumeDown);
+		volumeDownButton = new FlxButton(8, volumeText.y + volumeText.height + 2, "-", clickVolumeDown);
 		volumeDownButton.loadGraphic(AssetPaths.button__png, true, 20, 20);
 		volumeDownButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
 		add(volumeDownButton);
@@ -109,8 +128,7 @@ class OptionsState extends FlxState
 		add(androidButton);
 		#end
 
-		clearDataButton = new FlxButton((FlxG.width / 2) - 90, FlxG.height - 28, "Clear Data",
-			clickClearData);
+		clearDataButton = new FlxButton((FlxG.width / 2) - 90, FlxG.height - 28, "Clear Data", clickClearData);
 		clearDataButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
 		add(clearDataButton);
 
@@ -118,36 +136,39 @@ class OptionsState extends FlxState
 		backButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
 		add(backButton);
 
-		// update our bar to show the current volume level
 		updateVolume();
-
 		FlxG.camera.fade(FlxColor.BLACK, 0.33, true);
+		#end
 
 		super.create();
 	}
 
 	public static function saveSettings() {
-	#if android
-	FlxG.save.data.storageType = storageType;
-	#end
-	FlxG.save.data.discordRPC = discordRPC;
+		#if android
+		FlxG.save.data.storageType = storageType;
+		#end
+		#if !wiiu
+		FlxG.save.data.discordRPC = discordRPC;
+		#end
 	}
 
 	public static function loadPrefs() {
-	#if android
-	if(FlxG.save.data.storageType != null)
-        storageType = FlxG.save.data.storageType;
-	#end
-	if(FlxG.save.data.discordRPC != null)
-        discordRPC = FlxG.save.data.discordRPC;
-	var save = new FlxSave();
-	save.bind("Settings","TurnBasedRPG");
+		#if android
+		if(FlxG.save.data.storageType != null)
+			storageType = FlxG.save.data.storageType;
+		#end
+		#if !wiiu
+		if(FlxG.save.data.discordRPC != null)
+			discordRPC = FlxG.save.data.discordRPC;
+		var save = new FlxSave();
+		save.bind("Settings","TurnBasedRPG");
+		#end
 	}
 
 	#if android
 	function onStorageChange():Void
 	{
-		File.saveContent(lime.system.System.applicationStorageDirectory + 'storagetype.txt', OptionsState.storageType);
+		sys.io.File.saveContent(lime.system.System.applicationStorageDirectory + 'storagetype.txt', OptionsState.storageType);
 	}
 	#end
 
@@ -160,6 +181,7 @@ class OptionsState extends FlxState
 	}
 	#end
 
+	#if !wiiu
 	function ClickDiscordRPCButton()
 	{
 		discordRPC = !discordRPC;
@@ -180,6 +202,7 @@ class OptionsState extends FlxState
 			trace("turned on rpc ?");
 		}
 	}
+	#end
 
 	#if android
 	function androidButtonClick()
@@ -194,9 +217,7 @@ class OptionsState extends FlxState
 	}
 	#end
 
-	/**
-	 * The user wants to clear the saved data - we just call erase on our save object and then reset the volume to .5
-	 */
+	#if !wiiu
 	function clickClearData()
 	{
 		FlxG.save.erase();
@@ -204,9 +225,6 @@ class OptionsState extends FlxState
 		updateVolume();
 	}
 
-	/**
-	 * The user clicked the back button - close our save object, and go back to the MenuState
-	 */
 	function clickBack()
 	{
 		FlxG.save.flush();
@@ -217,9 +235,6 @@ class OptionsState extends FlxState
 		});
 	}
 
-	/**
-	 * The user clicked the down button for volume - we reduce the volume by 10% and update the bar
-	 */
 	function clickVolumeDown()
 	{
 		FlxG.sound.volume -= 0.1;
@@ -227,9 +242,6 @@ class OptionsState extends FlxState
 		updateVolume();
 	}
 
-	/**
-	 * The user clicked the up button for volume - we increase the volume by 10% and update the bar
-	 */
 	function clickVolumeUp()
 	{
 		FlxG.sound.volume += 0.1;
@@ -237,13 +249,11 @@ class OptionsState extends FlxState
 		updateVolume();
 	}
 
-	/**
-	 * Whenever we want to show the value of volume, we call this to change the bar and the amount text
-	 */
 	function updateVolume()
 	{
 		var volume:Int = Math.round(FlxG.sound.volume * 100);
 		volumeBar.value = volume;
 		volumeAmountText.text = volume + "%";
 	}
+	#end
 }
