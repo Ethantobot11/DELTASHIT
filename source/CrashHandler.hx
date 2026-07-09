@@ -1,16 +1,20 @@
 package;
 
+#if !wiiu
 import openfl.events.UncaughtErrorEvent;
 import openfl.events.ErrorEvent;
 import openfl.errors.Error;
+#end
+
 #if sys
 import sys.FileSystem;
 import sys.io.File;
 #end
 
 using StringTools;
-
+#if !wiiu
 using flixel.util.FlxArrayUtil;
+#end
 
 /**
  * Crash Handler.
@@ -20,14 +24,18 @@ class CrashHandler
 {
 	public static function init():Void
 	{
+		#if wiiu
+		#else
 		openfl.Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 		#if cpp
 		untyped __global__.__hxcpp_set_critical_error_handler(onError);
 		#elseif hl
 		hl.Api.setErrorHandler(onError);
 		#end
+		#end
 	}
 
+	#if !wiiu
 	private static function onUncaughtError(e:UncaughtErrorEvent):Void
 	{
 		e.preventDefault();
@@ -87,8 +95,9 @@ class CrashHandler
 		lime.system.System.exit(1);
 		#end
 	}
+	#end
 
-	#if (cpp || hl)
+	#if ((cpp || hl) && !wiiu)
 	private static function onError(message:Dynamic):Void
 	{
 		throw Std.string(message);
