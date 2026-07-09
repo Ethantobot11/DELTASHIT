@@ -8,7 +8,7 @@
     {
       "name": "reflaxe.cpp",
       "type": "git",
-      "ref": "main",
+      "ref": "nightly",
       "url": "https://github.com/Slushi-Github/reflaxe.cpp"
     },
     {
