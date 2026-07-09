@@ -29,15 +29,15 @@ jobs:
       with:
         haxe-version: 4.3.4
 
-    - name: Install HMM (Haxe Module Manager)
+    - name: Install HMM
       run: |
-        haxelib install hmm
+        haxelib install hmm --quiet
         haxelib run hmm setup
 
-    - name: Swap and Restore Haxe Dependencies (Wii U Setup)
+    - name: Swap and Restore Haxe Dependencies
       run: |
         cp hmm-u.json hmm.json
-        haxelib run hmm install
+        haxelib run hmm install --quiet
 
     - name: Install Wii U Development Environment
       run: |
@@ -52,6 +52,7 @@ jobs:
 
     - name: Build hxCompileU Compiler Utility
       run: |
+        haxelib install hxcpp --quiet
         git clone https://github.com/Slushi-Github/hxCompileU.git BuildTool
         cd BuildTool
         haxe build.hxml
