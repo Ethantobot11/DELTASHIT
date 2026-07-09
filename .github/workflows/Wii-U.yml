@@ -1,0 +1,70 @@
+name: Build Wii U Homebrew
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-wiiu:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup Haxe
+      uses: krdlab/setup-haxe@v1
+      with:
+        haxe-version: 4.3.4
+
+    - name: Install hmm
+      run: |
+        haxelib run hmm install hmm-u.json
+        haxelib run hmm install hmm-u.json
+
+    - name: Restore Haxe Dependencies via HMM
+      run: hmm install
+
+    - name: Install DevKitPro & WUT
+      run: |
+        sudo apt-get update && sudo apt-get install -y wget gdebi-core
+        wget https://apt.devkitpro.org/devkitpro-pacman.deb
+        sudo gdebi -n devkitpro-pacman.deb
+        sudo dkp-pacman -Syy --noconfirm
+        sudo dkp-pacman -S wiiu-dev --noconfirm
+
+    - name: Set Environment Variables
+      run: |
+        echo "DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
+        echo "DEVKITPPC=/opt/devkitpro/devkitPPC" >> $GITHUB_ENV
+        echo "PATH=/opt/devkitpro/devkitPPC/bin:/opt/devkitpro/tools/bin:$PATH" >> $GITHUB_ENV
+
+    - name: Build hxCompileU Compiler Utility
+      run: |
+        git clone https://github.com/Slushi-Github/hxCompileU.git BuildTool
+        cd BuildTool
+        haxe build.hxml
+        mv export/hxCompileU ../hxCompileU
+        cd ..
+
+    - name: Compile Project to Wii U Binaries
+      run: |
+        # Make sure the utility is executable
+        chmod +x ./hxCompileU
+        
+        # Run compilation using your project's hxCompileUConfig.json
+        ./hxCompileU --compile
+
+    - name: Upload Wii U Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wiiu-homebrew-release
+        path: |
+          output/wiiuFiles/*.rpx
+          output/wiiuFiles/*.elf
+          output/wiiuFiles/*.wuhb
