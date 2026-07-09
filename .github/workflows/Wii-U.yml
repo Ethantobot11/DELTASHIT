@@ -25,7 +25,7 @@ jobs:
     - name: Install hmm
       run: |
         haxelib install hmm --quiet
-        haxelib run hmm-u install --quiet
+        haxelib run hmm install --file hmm-u.json
 
     - name: Restore Haxe Dependencies via HMM
       run: hmm install
