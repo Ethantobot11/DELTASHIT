@@ -25,10 +25,11 @@ jobs:
     - name: Install hmm
       run: |
         haxelib install hmm --quiet
-        haxelib run hmm install --file hmm-u.json
 
-    - name: Restore Haxe Dependencies via HMM
-      run: hmm install
+    - name: Wii-U
+      run: |
+        cp hmm-u.json hmm.json
+        haxelib run hmm install
 
     - name: Install DevKitPro & WUT
       run: |
