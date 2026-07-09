@@ -29,7 +29,7 @@ jobs:
     - name: Wii-U
       run: |
         cp hmm-u.json hmm.json
-        haxelib run hmm install
+        haxelib run hmm install --quiet
 
     - name: Install DevKitPro & WUT
       run: |
