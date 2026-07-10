@@ -49,7 +49,27 @@ jobs:
           dkp-pacman -S ppc-jansson ppc-zlib ppc-libvorbis ppc-libopus ppc-libogg ppc-libjpeg-turbo ppc-freetype ppc-bzip2 ppc-libpng --noconfirm
           dkp-pacman -S wiiu-curl --noconfirm
 
+      - name: Install Wii U Development Environment
+        run: |
+          dkp-pacman -Syy --noconfirm
+          dkp-pacman -S wiiu-dev --noconfirm
+      - name: Configure DevKitPro Environment Paths
+        run: |
+          echo "DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
+          echo "DEVKITPPC=/opt/devkitpro/devkitPPC" >> $GITHUB_ENV
+          echo "PATH=/opt/devkitpro/devkitPPC/bin:/opt/devkitpro/tools/bin:$PATH" >> $GITHUB_ENV
+    
+      - name: Build hxCompileU Compiler Utility
+        run: |
+          haxelib install hxcpp --quiet
+          git clone https://github.com/Slushi-Github/hxCompileU.git BuildTool
+          cd BuildTool
+          haxe build.hxml
+          find export/ -maxdepth 1 -type f -executable -exec mv {} ../hxCompileU \;
+          cd ..
+        
       - name: Initialize Leafy Configuration and Compile
         run: |
+          chmod +x ./hxCompileU
           ./haxeCompileU --import leafyEngine
           ./haxeCompileU --compile
