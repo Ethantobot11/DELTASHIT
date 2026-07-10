@@ -52,7 +52,7 @@ jobs:
 
     - name: Step 1 - Generate C++ Source via Reflaxe
       run: |
-        haxe build.hxml
+        haxe build.hxml -D wiiu
 
     - name: Step 2 - Compile C++ to Wii U Binaries via Make
       run: |
