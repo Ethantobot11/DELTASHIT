@@ -18,8 +18,10 @@ class Main extends #if wiiu LfState #else Sprite #end
 	{
 		#if wiiu
 		super();
+		LfEngine.onEngineInitFinished = function() {
 		CrashHandler.init();
-		LeafyG.initGame(320, 240, new MenuState()); 
+        }
+		LfEngine.initEngine("DELTASHIT", DRC, new MenuState());
 		#else
 		var startFullscreen:Bool = false;
 		var save = new FlxSave();
