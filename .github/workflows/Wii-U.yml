@@ -64,8 +64,10 @@ jobs:
     - name: Create Base Wii U Configuration File
       run: |
         echo '{          "haxeConfig": {            "hxmlPath": "build.hxml"          },          "wiiuConfig": {            "outputFolder": "output",            "wiiuFilesFolder": "wiiuFiles",            "convertToWUHB": false,            "wuhbConfig": {              "name": "DELTASHIT",              "author": "Ethantobot",              "version": "1.4.0"            }          }        }' > hxCompileUConfig.json
+        
     - name: Compile Project to Wii U Binaries
       run: |
+        cp -r source src
         chmod +x ./hxCompileU
         ./hxCompileU --compile
         
