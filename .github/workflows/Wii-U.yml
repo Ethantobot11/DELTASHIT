@@ -56,19 +56,19 @@ jobs:
         git clone https://github.com/Slushi-Github/hxCompileU.git BuildTool
         cd BuildTool
         sed -i 's/var exitCode:Int = null;/var exitCode:Null<Int> = null;/g' src/compilers/HaxeCompiler.hx
+        sed -i '/Sys.command("haxe",/i \        trace("HXCOMPILEU RUNNING HAXE WITH ARGS: " + args);' src/compilers/HaxeCompiler.hx
         echo '#!/bin/bash' > ../hxCompileU
-        echo 'haxe -cp '"$(pwd)"'/source --run Main "$@"' >> ../hxCompileU
+        echo 'haxe -cp '"$(pwd)"' --run src.Main "$@"' >> ../hxCompileU
+        
         cd ..
         chmod +x ./hxCompileU
         
     - name: Create Base Wii U Configuration File
       run: |
-        echo '{          "haxeConfig": {            "hxmlPath": null          },          "wiiuConfig": {            "outputFolder": "output",            "wiiuFilesFolder": "wiiuFiles",            "convertToWUHB": false,            "wuhbConfig": {              "name": "DELTASHIT",              "author": "Ethantobot",              "version": "1.4.0"            }          }        }' > hxCompileUConfig.json
+        echo '{          "haxeConfig": {            "hxmlPath": null,            "sourceDir": "source"          },          "wiiuConfig": {            "outputFolder": "output",            "wiiuFilesFolder": "wiiuFiles",            "convertToWUHB": false,            "wuhbConfig": {              "name": "DELTASHIT",              "author": "Ethantobot",              "version": "1.4.0"            }          }        }' > hxCompileUConfig.json
         
     - name: Compile Project to Wii U Binaries
       run: |
-        rm -rf src
-        cp -r source src
         chmod +x ./hxCompileU
         ./hxCompileU --compile
         
