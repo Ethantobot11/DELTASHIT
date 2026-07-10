@@ -2,7 +2,7 @@ package;
 
 #if wiiu
 import leafy.LfEngine;
-import leafy.states.LeafyState;
+import leafy.states.LfState;
 #else
 import flixel.FlxG;
 import flixel.util.FlxSave;
