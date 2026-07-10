@@ -1,11 +1,6 @@
-name: Build Wii U Homebrew
+name: Build Wii U Port
 
-on:
-  push:
-    branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
   build-wiiu:
@@ -14,61 +9,36 @@ jobs:
       image: devkitpro/devkitppc:latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Install System Dependencies
-      run: |
-        apt-get update
-        apt-get install -y git nodejs npm curl make
+      - name: Install System Utilities & Haxe
+        run: |
+          apt-get update && apt-get install -y haxe staticx git
 
-    - name: Setup Haxe
-      uses: krdlab/setup-haxe@v1
-      with:
-        haxe-version: 4.3.4
+      - name: Setup Haxe Modules
+        run: |
+          haxelib setup ~/haxelib
+          haxelib install hmm
+          hmm install
 
-    - name: Install HMM (Haxe Module Manager)
-      run: |
-        haxelib install hmm
-        haxelib run hmm setup
+      - name: Build HxCompileU Compiler Utility
+        run: |
+          git clone https://github.com/Slushi-Github/hxCompileU.git
+          cd hxCompileU
+          haxe build.hxml
+          cp export/haxeCompileU ../haxeCompileU
+          cd ..
 
-    - name: Swap and Restore Haxe Dependencies (Wii U Setup)
-      run: |
-        cp hmm-u.json hmm.json
-        haxelib run hmm install
+      - name: Install Missing Native Wii U OS Libraries
+        run: |
+          dkp-pacman -Sy --noconfirm
+          dkp-pacman -S --needed wiiu-dev --noconfirm
+          dkp-pacman -S wiiu-sdl2 wiiu-sdl2_gfx wiiu-sdl2_image wiiu-sdl2_mixer wiiu-sdl2_ttf --noconfirm
+          dkp-pacman -S ppc-jansson ppc-zlib ppc-libvorbis ppc-libopus ppc-libogg ppc-libjpeg-turbo ppc-freetype ppc-bzip2 ppc-libpng --noconfirm
+          dkp-pacman -S wiiu-curl --noconfirm
 
-    - name: Install Wii U Development Environment
-      run: |
-        dkp-pacman -Sy --noconfirm
-        dkp-pacman -S wiiu-dev --noconfirm
-
-    - name: Configure DevKitPro Environment Paths
-      run: |
-        echo "DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
-        echo "DEVKITPPC=/opt/devkitpro/devkitPPC" >> $GITHUB_ENV
-        echo "PATH=/opt/devkitpro/devkitPPC/bin:/opt/devkitpro/tools/bin:$PATH" >> $GITHUB_ENV
-
-    - name: Step 1 - Generate C++ Source via Reflaxe
-      run: |
-        haxe build.hxml
-
-    - name: Step 2 - Compile C++ to Wii U Binaries via Make
-      run: |
-        if [ -f Makefile ]; then
-          make
-        else
-          echo "No root Makefile found. Ensure your project has a Makefile matching devkitPro structures."
-          exit 1
-        fi
-
-    - name: Upload Wii U Build Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: wiiu-homebrew-release
-        path: |
-          *.rpx
-          *.elf
-          *.wuhb
-          wiiuFiles/*
+      - name: Initialize Leafy Configuration and Compile
+        run: |
+          ./haxeCompileU --import leafyEngine
+          ./haxeCompileU --compile
