@@ -1,9 +1,11 @@
-name: Build Wii U Port
+name: Build Wii U Homebrew
 
-on: [push, pull_request]
-
-env:
-  HAXE_VERSION: 4.2.5
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build-wiiu:
@@ -12,64 +14,78 @@ jobs:
       image: devkitpro/devkitppc:latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
-      - name: Install System Utilities & Haxe
-        run: |
-          apt-get update && apt-get install -y patchelf python3-pip python3-setuptools
-          pip3 install staticx --break-system-packages
+    - name: Install System Dependencies
+      run: |
+        apt-get update
+        apt-get install -y git nodejs npm curl
+    - name: Setup Haxe
+      uses: krdlab/setup-haxe@v1
+      with:
+        haxe-version: 4.3.4
 
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
-        with:
-          haxe-version: ${{ env.HAXE_VERSION }}
-
-      - name: Install HMM (Haxe Module Manager)
-        run: |
-          haxelib setup ~/haxelib
-          haxelib install hmm
-          haxelib run hmm setup
-          cp hmm-u.json hmm.json
-          haxelib run hmm install
-
-      - name: Build HxCompileU Compiler Utility
-        run: |
-          git clone https://github.com/Slushi-Github/hxCompileU.git
-          cd hxCompileU
-          haxe build.hxml
-          cp export/haxeCompileU ../haxeCompileU
-          cd ..
-
-      - name: Install Missing Native Wii U OS Libraries
-        run: |
-          dkp-pacman -Sy --noconfirm
-          dkp-pacman -S --needed wiiu-dev --noconfirm
-          dkp-pacman -S wiiu-sdl2 wiiu-sdl2_gfx wiiu-sdl2_image wiiu-sdl2_mixer wiiu-sdl2_ttf --noconfirm
-          dkp-pacman -S ppc-jansson ppc-zlib ppc-libvorbis ppc-libopus ppc-libogg ppc-libjpeg-turbo ppc-freetype ppc-bzip2 ppc-libpng --noconfirm
-          dkp-pacman -S wiiu-curl --noconfirm
-
-      - name: Install Wii U Development Environment
-        run: |
-          dkp-pacman -Syy --noconfirm
-          dkp-pacman -S wiiu-dev --noconfirm
-      - name: Configure DevKitPro Environment Paths
-        run: |
-          echo "DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
-          echo "DEVKITPPC=/opt/devkitpro/devkitPPC" >> $GITHUB_ENV
-          echo "PATH=/opt/devkitpro/devkitPPC/bin:/opt/devkitpro/tools/bin:$PATH" >> $GITHUB_ENV
-    
-      - name: Build hxCompileU Compiler Utility
-        run: |
-          haxelib install hxcpp --quiet
-          git clone https://github.com/Slushi-Github/hxCompileU.git BuildTool
-          cd BuildTool
-          haxe build.hxml
-          find export/ -maxdepth 1 -type f -executable -exec mv {} ../hxCompileU \;
-          cd ..
+    - name: Install HMM
+      run: |
+        haxelib install hmm --quiet
+        haxelib run hmm setup
+    - name: Swap and Restore Haxe Dependencies
+      run: |
+        cp hmm-u.json hmm.json
+        haxelib run hmm install --quiet
+    - name: Install Wii U Development Environment
+      run: |
+        dkp-pacman -Syy --noconfirm
+        dkp-pacman -S wiiu-dev --noconfirm
+        dkp-pacman -Sy --noconfirm
+        dkp-pacman -S --needed wiiu-dev --noconfirm
+        dkp-pacman -S wiiu-sdl2 wiiu-sdl2_gfx wiiu-sdl2_image wiiu-sdl2_mixer wiiu-sdl2_ttf --noconfirm
+        dkp-pacman -S ppc-jansson ppc-zlib ppc-libvorbis ppc-libopus ppc-libogg ppc-libjpeg-turbo ppc-freetype ppc-bzip2 ppc-libpng --noconfirm
+        dkp-pacman -S wiiu-curl --noconfirm
         
-      - name: Initialize Leafy Configuration and Compile
-        run: |
-          chmod +x ./hxCompileU
-          ./haxeCompileU --import leafyEngine
-          ./haxeCompileU --compile
+    - name: Configure DevKitPro Environment Paths
+      run: |
+        echo "DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
+        echo "DEVKITPPC=/opt/devkitpro/devkitPPC" >> $GITHUB_ENV
+        echo "PATH=/opt/devkitpro/devkitPPC/bin:/opt/devkitpro/tools/bin:$PATH" >> $GITHUB_ENV
+    - name: Build hxCompileU Compiler Utility
+      run: |
+        haxelib install hxcpp --quiet
+        git clone https://github.com/Slushi-Github/hxCompileU.git BuildTool
+        cd BuildTool
+        haxe build.hxml
+        find export/ -maxdepth 1 -type f -executable -exec mv {} ../hxCompileU \;
+        cd ..
+    - name: Create Base Wii U Configuration File
+      run: |
+        echo '{
+          "haxeConfig": {
+            "hxmlPath": "build.hxml"
+          },
+          "wiiuConfig": {
+            "outputFolder": "output",
+            "wiiuFilesFolder": "wiiuFiles",
+            "convertToWUHB": false,
+            "wuhbConfig": {
+              "name": "DELTASHIT",
+              "author": "Ethantobot",
+              "version": "1.4.0"
+            }
+          }
+        }' > hxCompileUConfig.json
+    - name: Compile Project to Wii U Binaries
+      run: |
+        chmod +x ./hxCompileU
+        ./hxCompileU --compile
+        
+    - name: Upload Wii U Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wiiu-homebrew-release
+        path: |
+          output/wiiuFiles/*.rpx
+          output/wiiuFiles/*.elf
+          output/wiiuFiles/*.wuhb
