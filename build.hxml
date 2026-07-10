@@ -1,16 +1,16 @@
--D wiiu
--D no-compilation
--cp source
+#-D wiiu
+#-D no-compilation
+#-cp source
 
--lib reflaxe
--lib reflaxe.cpp
--lib slushiUtilsU
--lib hxWUT
--lib hxSDL2
--lib hxVorbis
--lib hxJansson
--lib leafyEngine
+#-lib reflaxe
+#-lib reflaxe.cpp
+#-lib slushiUtilsU
+#-lib hxWUT
+#-lib hxSDL2
+#-lib hxVorbis
+#-lib hxJansson
+#-lib leafyEngine
 
--main Main
+#-main Main
 
--D cpp-output=export/wiiu
+#-D cpp-output=export/wiiu
