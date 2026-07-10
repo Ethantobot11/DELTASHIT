@@ -3,7 +3,7 @@
     {
       "name": "reflaxe",
       "type": "git",
-      "ref": "nightly",
+      "ref": "main",
       "url": "https://github.com/SomeRanDev/reflaxe"
     },
     {
