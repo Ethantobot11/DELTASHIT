@@ -57,27 +57,13 @@ jobs:
         cd BuildTool
         sed -i 's/var exitCode:Int = null;/var exitCode:Null<Int> = null;/g' src/compilers/HaxeCompiler.hx
         echo '#!/bin/bash' > ../hxCompileU
-        echo 'haxe -cp '"$(pwd)"'/src --run Main "$@"' >> ../hxCompileU
+        echo 'haxe -cp '"$(pwd)"'/source --run Main "$@"' >> ../hxCompileU
         cd ..
         chmod +x ./hxCompileU
         
     - name: Create Base Wii U Configuration File
       run: |
-        echo '{
-          "haxeConfig": {
-            "hxmlPath": "build.hxml"
-          },
-          "wiiuConfig": {
-            "outputFolder": "output",
-            "wiiuFilesFolder": "wiiuFiles",
-            "convertToWUHB": false,
-            "wuhbConfig": {
-              "name": "DELTASHIT",
-              "author": "Ethantobot",
-              "version": "1.4.0"
-            }
-          }
-        }' > hxCompileUConfig.json
+        echo '{          "haxeConfig": {            "hxmlPath": "build.hxml",            "sourceDir": "source"          },          "wiiuConfig": {            "outputFolder": "output",            "wiiuFilesFolder": "wiiuFiles",            "convertToWUHB": false,            "wuhbConfig": {              "name": "DELTASHIT",              "author": "Ethantobot",              "version": "1.4.0"            }          }        }' > hxCompileUConfig.json
     - name: Compile Project to Wii U Binaries
       run: |
         chmod +x ./hxCompileU
