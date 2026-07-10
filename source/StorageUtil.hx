@@ -1,5 +1,6 @@
 package;
 
+#if !wiiu
 import lime.system.System as LimeSystem;
 import haxe.io.Path;
 import haxe.Exception;
@@ -229,4 +230,5 @@ enum abstract StorageType(String) from String to String
 		}
 	}
 }
+#end
 #end
