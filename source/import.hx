@@ -1,3 +1,4 @@
+#if !wiiu
 #if !macro
 #if DISCORD_ALLOWED
 import Discord;
@@ -6,5 +7,6 @@ import Discord;
 #if sys
 import sys.*;
 import sys.io.*;
+#end
 #end
 #end
