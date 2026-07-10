@@ -3,6 +3,11 @@
 -cp source
 -lib reflaxe
 -lib reflaxe.cpp
+-lib slushiUtilsU
+-lib hxWUT
+-lib hxSDL2
+-lib hxVorbis
+-lib hxJansson
 -lib leafyEngine
 -main Main
 --cpp export/wiiu
