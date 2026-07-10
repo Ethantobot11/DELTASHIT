@@ -1,5 +1,6 @@
 package flixel.addons.editors.ogmo;
 
+#if !wiiu
 import flixel.FlxG;
 import flixel.addons.tile.FlxTileSpecial;
 import flixel.addons.tile.FlxTilemapExt;
@@ -24,38 +25,17 @@ class FlxOgmo3Loader
 	var project:ProjectData;
 	var level:LevelData;
 
-	/**
-	 * Creates a new instance of `FlxOgmo3Loader` and prepares the level and project data to be used in other methods
-	 *
-	 * @param	projectData	The path to your project data (`.ogmo`).
-	 * @param	levelData	The path to your level data (`.json`).
-	 */
 	public function new(projectData:String, levelData:String)
 	{
 		project = Assets.getText(projectData).parseProjectJSON();
 		level = Assets.getText(levelData).parseLevelJSON();
 	}
 
-	/**
-	 * Get a custom value for the loaded level.
-	 * Returns `null` if no value is present.
-	 */
 	public function getLevelValue(value:String):Dynamic
 	{
 		return Reflect.field(level.values, value);
 	}
 
-	/**
-	 * Load a Tilemap.
-	 * Collision with entities should be handled with the reference returned from this function.
-	 *
-	 * IMPORTANT: Tile layers must export using IDs, not Coords!
-	 *
-	 * @param	tileGraphic		A String or Class representing the location of the image asset for the tilemap.
-	 * @param	tileLayer		The name of the layer the tilemap data is stored in Ogmo editor, usually `"tiles"` or `"stage"`.
-	 * @param	tilemap			(optional) A tilemap to load tilemap data into. If not specified, new `FlxTilemap` instance is created.
-	 * @return	A `FlxTilemap`, where you can collide your entities against.
-	 */
 	public function loadTilemap(tileGraphic:FlxTilemapGraphicAsset, tileLayer:String = "tiles", ?tilemap:FlxTilemap):FlxTilemap
 	{
 		if (tilemap == null)
@@ -73,19 +53,6 @@ class FlxOgmo3Loader
 		return tilemap;
 	}
 
-	/**
-	 * Load a `FlxTilemapExt`, which supports additional features such as flipped and rotated tiles.
-	 * Collision with entities should be handled with the reference returned from this function.
-	 *
-	 * IMPORTANT: Tile layers must export using IDs, not Coords!
-	 *
-	 * @param	tileGraphic		A String or Class representing the location of the image asset for the tilemap.
-	 * @param	tileLayer		The name of the layer the tilemap data is stored in Ogmo editor, usually `"tiles"` or `"stage"`.
-	 * @param	tilemap			(optional) A tilemap to load tilemap data into. If not specified, new `FlxTilemapExt` instance is created.
-	 * @return	A `FlxTilemapExt`, where you can collide your entities against.
-	 * 
-	 * @since 2.10.0
-	 */
 	public function loadTilemapExt(tileGraphic:FlxTilemapGraphicAsset, tileLayer:String = "tiles", ?tilemap:FlxTilemapExt):FlxTilemapExt
 	{
 		if (tilemap == null)
@@ -112,15 +79,6 @@ class FlxOgmo3Loader
 		return tilemap;
 	}
 
-	/**
-	 * Loads a Map of `FlxPoint` arrays from a grid layer. For example:
-	 *
-	 * ```haxe
-	 * var gridData = myOgmoData.loadGridMap('my grid layer');
-	 * for (point in gridData['e'])
-	 *     addSpawnPoint(point.x, point.y);
-	 * ```
-	 */
 	public function loadGridMap(gridLayer:String = "grid"):Map<String, Array<FlxPoint>>
 	{
 		var gridLayer = level.getGridLayer(gridLayer);
@@ -147,42 +105,12 @@ class FlxOgmo3Loader
 		return out;
 	}
 
-	/**
-	 * Parse every entity in the specified layer and call a function that will spawn game objects based on its entity data.
-	 * Here's an example that reads the position of an object:
-	 *
-	 * ```haxe
-	 * function loadEntity(entity:EntityData)
-	 * {
-	 *     switch (entity.name)
-	 *     {
-	 *         case "player":
-	 *             player.x = entity.x;
-	 *             player.y = entity.y;
-	 *             player.custom_value = entity.values.custom_value;
-	 *         default:
-	 *             throw 'Unrecognized actor type ${entity.name}';
-	 *     }
-	 * }
-	 * ```
-	 *
-	 * @param	entityLoadCallback		A function with the signature `(name:String, data:Xml):Void` and spawns entities based on their name.
-	 * @param	entityLayer				The name of the layer the entities are stored in Ogmo editor. Usually `"entities"` or `"actors"`.
-	 */
 	public function loadEntities(entityLoadCallback:EntityData->Void, entityLayer:String = "entities"):Void
 	{
 		for (entity in level.getEntityLayer(entityLayer).entities)
 			entityLoadCallback(entity);
 	}
 
-	/**
-	 * Loads every decal in a decal layer into a FlxGroup.
-	 *
-	 * IMPORTANT: All decals must be included in one directory!
-	 *
-	 * @param decalLayer	The name of the layer the decals are stored in Ogmo editor. Usually `"decals"`.
-	 * @param decalsPath	The path to the directory in which your decal assets are stored.
-	 */
 	public function loadDecals(decalLayer:String = 'decals', decalsPath:String):FlxGroup
 	{
 		if (!decalsPath.endsWith('/'))
@@ -203,25 +131,16 @@ class FlxOgmo3Loader
 		return g;
 	}
 
-	/**
-	 * Parse OGMO Editor level .json text
-	 */
 	static function parseLevelJSON(json:String):LevelData
 	{
 		return cast Json.parse(json);
 	}
 
-	/**
-	 * Parse OGMO Editor Project .ogmo text
-	 */
 	static function parseProjectJSON(json:String):ProjectData
 	{
 		return cast Json.parse(json);
 	}
 
-	/**
-	 * Get Tile Layer data matching a given name
-	 */
 	static function getTileLayer(data:LevelData, name:String):TileLayer
 	{
 		for (layer in data.layers)
@@ -230,9 +149,6 @@ class FlxOgmo3Loader
 		return null;
 	}
 
-	/**
-	 * Get Grid Layer data matching a given name
-	 */
 	static function getGridLayer(data:LevelData, name:String):GridLayer
 	{
 		for (layer in data.layers)
@@ -241,9 +157,6 @@ class FlxOgmo3Loader
 		return null;
 	}
 
-	/**
-	 * Get Entity Layer data matching a given name
-	 */
 	static function getEntityLayer(data:LevelData, name:String):EntityLayer
 	{
 		for (layer in data.layers)
@@ -252,9 +165,6 @@ class FlxOgmo3Loader
 		return null;
 	}
 
-	/**
-	 * Get Decal Layer data matching a given name
-	 */
 	static function getDecalLayer(data:LevelData, name:String):DecalLayer
 	{
 		for (layer in data.layers)
@@ -263,9 +173,6 @@ class FlxOgmo3Loader
 		return null;
 	}
 
-	/**
-	 * Get matching Tileset data from a given name
-	 */
 	static function getTilesetData(data:ProjectData, name:String):ProjectTilesetData
 	{
 		for (tileset in data.tilesets)
@@ -274,9 +181,6 @@ class FlxOgmo3Loader
 		return null;
 	}
 
-	/**
-	 * Apply flags for flipping and rotating tiles to a FlxTilemapExt
-	 */
 	static function applyFlagsToTilemapExt(tileFlags:Array<Int>, tilemap:FlxTilemapExt)
 	{
 		var specialTiles = new Array<FlxTileSpecial>();
@@ -284,7 +188,7 @@ class FlxOgmo3Loader
 		for (i in 0...tileFlags.length)
 		{
 			var flag = tileFlags[i];
-			#if (flixel <version( "5.9.0"))
+			#if (flixel < version("5.9.0"))
 			var specialTile = new FlxTileSpecial(tilemap.getTileByIndex(i), false, false, 0);
 			#else
 			var specialTile = new FlxTileSpecial(tilemap.getTileIndex(i), false, false, 0);
@@ -313,9 +217,6 @@ class FlxOgmo3Loader
 	}
 }
 
-/**
- * Parsed .OGMO Project data
- */
 typedef ProjectData =
 {
 	name:String,
@@ -335,9 +236,6 @@ typedef ProjectData =
 	tilesets:Array<ProjectTilesetData>,
 }
 
-/**
- * Project Layer
- */
 typedef ProjectLayerData =
 {
 	definition:String,
@@ -357,9 +255,6 @@ typedef ProjectLayerData =
 	?legend:Dynamic,
 }
 
-/**
- * Project Entity
- */
 typedef ProjectEntityData =
 {
 	exportID:String,
@@ -391,9 +286,6 @@ typedef ProjectEntityData =
 	values:Array<Dynamic>,
 }
 
-/**
- * Project Tileset
- */
 typedef ProjectTilesetData =
 {
 	label:String,
@@ -405,9 +297,6 @@ typedef ProjectTilesetData =
 	tileSeparationY:Int,
 }
 
-/**
- * Parsed .JSON Level data
- */
 typedef LevelData =
 {
 	width:Int,
@@ -418,9 +307,6 @@ typedef LevelData =
 	?values:Dynamic,
 }
 
-/**
- * Level Layer data
- */
 typedef LayerData =
 {
 	name:String,
@@ -441,9 +327,6 @@ typedef LayerData =
 	?arrayMode:Int,
 }
 
-/**
- * Tile subset of LayerData
- */
 typedef TileLayer =
 {
 	name:String,
@@ -466,9 +349,6 @@ typedef TileLayer =
 	?dataCoords2D:Array<Array<Array<Int>>>,
 }
 
-/**
- * Grid subset of LayerData
- */
 typedef GridLayer =
 {
 	name:String,
@@ -484,9 +364,6 @@ typedef GridLayer =
 	?grid2D:Array<Array<String>>,
 }
 
-/**
- * Entity subset of LayerData
- */
 typedef EntityLayer =
 {
 	name:String,
@@ -500,9 +377,6 @@ typedef EntityLayer =
 	entities:Array<EntityData>,
 }
 
-/**
- * Individual Entity data
- */
 typedef EntityData =
 {
 	name:String,
@@ -521,9 +395,6 @@ typedef EntityData =
 	?values:Dynamic,
 }
 
-/**
- * Decal subset of LayerData
- */
 typedef DecalLayer =
 {
 	name:String,
@@ -537,9 +408,6 @@ typedef DecalLayer =
 	decals:Array<DecalData>,
 }
 
-/**
- * Individual Decal data
- */
 typedef DecalData =
 {
 	x:Int,
@@ -555,3 +423,4 @@ typedef Point =
 	x:Int,
 	y:Int
 }
+#end
