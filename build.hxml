@@ -2,6 +2,7 @@
 -D no-compilation
 -cp source
 -lib reflaxe
--lib leafy
+-lib reflaxe.cpp
+-lib leafyEngine
 -main Main
 --cpp export/wiiu
