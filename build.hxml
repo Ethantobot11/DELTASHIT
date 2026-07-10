@@ -1,5 +1,7 @@
+-D wiiu
+-D no-compilation
 -cp source
+-lib reflaxe (or whatever bindings you are using)
+-lib leafy
 -main Main
--lib reflaxe.cpp
--D cpp-output=cpp_src
---no-output
+--cpp export/wiiu
