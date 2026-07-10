@@ -29,7 +29,7 @@ jobs:
         run: |
           git clone https://github.com/Slushi-Github/hxCompileU.git
           cd hxCompileU
-          haxe build.hxml
+          haxe build.hxml -D loose-null-checks
           cp export/haxeCompileU ../haxeCompileU
           cd ..
 
