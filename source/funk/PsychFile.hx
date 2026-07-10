@@ -1,5 +1,5 @@
 package funk;
-
+#if !wiiu
 import openfl.Assets;
 import StorageUtil;
 #if sys
@@ -124,3 +124,4 @@ class PsychFile {
         #end
 	}
 }
+#end
