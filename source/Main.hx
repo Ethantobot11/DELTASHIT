@@ -1,8 +1,8 @@
 package;
 
 #if wiiu
-import leafy.core.LeafyGame;
-import leafy.core.LeafyG;
+import leafy.LfEngine;
+import leafy.states.LeafyState;
 #else
 import flixel.FlxG;
 import flixel.util.FlxSave;
@@ -12,7 +12,7 @@ import openfl.display.Sprite;
 import CrashHandler;
 import StorageUtil;
 
-class Main extends #if wiiu LeafyGame #else Sprite #end
+class Main extends #if wiiu LfState #else Sprite #end
 {
 	public function new()
 	{
