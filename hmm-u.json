@@ -4,49 +4,43 @@
       "name": "reflaxe",
       "type": "git",
       "ref": "main",
-      "url": "https://github.com/SomeRanDev/reflaxe"
+      "url": "https://github.com/SomeRanDev/reflaxe.git"
     },
     {
       "name": "reflaxe.cpp",
       "type": "git",
       "ref": "nightly",
-      "url": "https://github.com/Slushi-Github/reflaxe.cpp"
-    },
-    {
-      "name": "slushiUtilsU",
-      "type": "git",
-      "ref": "main",
-      "url": "https://github.com/Slushi-Github/slushiUtilsU"
+      "url": "https://github.com/Slushi-Github/reflaxe.CPP.git"
     },
     {
       "name": "leafyEngine",
       "type": "git",
       "ref": "main",
-      "url": "https://github.com/Slushi-Github/leafyEngine"
+      "url": "https://github.com/Slushi-Github/leafyEngine.git"
     },
     {
-      "name": "hxWUT",
+      "name": "hxu_wut",
       "type": "git",
       "ref": "main",
-      "url": "https://github.com/Slushi-Github/hxWUT"
+      "url": "https://github.com/Haxe-WiiU/HxU_WUT.git"
     },
     {
-      "name": "hxSDL2",
+      "name": "hxu_sdl2",
       "type": "git",
       "ref": "main",
-      "url": "https://github.com/Slushi-Github/hxSDL2"
+      "url": "https://github.com/Haxe-WiiU/HxU_SDL2.git"
     },
     {
-      "name": "hxVorbis",
+      "name": "hxu_vorbis",
       "type": "git",
       "ref": "main",
-      "url": "https://github.com/Slushi-Github/hxVorbis"
+      "url": "https://github.com/Haxe-WiiU/HxU_Vorbis.git"
     },
     {
-      "name": "hxJansson",
+      "name": "hxu_jansson",
       "type": "git",
       "ref": "main",
-      "url": "https://github.com/Slushi-Github/hxJansson"
+      "url": "https://github.com/Haxe-WiiU/HxU_Jansson.git"
     }
   ]
 }
