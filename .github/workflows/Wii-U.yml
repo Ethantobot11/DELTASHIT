@@ -14,7 +14,8 @@ jobs:
 
       - name: Install System Utilities & Haxe
         run: |
-          apt-get update && apt-get install -y haxe staticx git
+          apt-get update && apt-get install -y haxe git patchelf python3-pip python3-setuptools
+          pip3 install staticx --break-system-packages
 
       - name: Setup Haxe Modules
         run: |
