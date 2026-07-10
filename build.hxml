@@ -1,5 +1,7 @@
 -D wiiu
 -D no-compilation
+-D native
+-D cpp
 -cp source
 -lib reflaxe
 -lib reflaxe.cpp
