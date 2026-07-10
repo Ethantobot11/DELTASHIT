@@ -12,6 +12,12 @@
       "url": "https://github.com/Slushi-Github/reflaxe.cpp"
     },
     {
+      "name": "reflaxe",
+      "type": "git",
+      "ref": "nightly",
+      "url": " https://github.com/SomeRanDev/reflaxe"
+    },
+    {
       "name": "slushiUtilsU",
       "type": "git",
       "ref": "main",
