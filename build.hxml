@@ -1,8 +1,7 @@
 -D wiiu
 -D no-compilation
--D native
--D reflaxe_cpp
 -cp source
+
 -lib reflaxe
 -lib reflaxe.cpp
 -lib slushiUtilsU
@@ -11,5 +10,7 @@
 -lib hxVorbis
 -lib hxJansson
 -lib leafyEngine
+
 -main Main
---cpp export/wiiu
+
+-D cpp-output=export/wiiu
