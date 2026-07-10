@@ -41,7 +41,7 @@ jobs:
 
     - name: Install Wii U Development Environment
       run: |
-        dkp-pacman -Syy --noconfirm
+        dkp-pacman -Sy --noconfirm
         dkp-pacman -S wiiu-dev --noconfirm
 
     - name: Configure DevKitPro Environment Paths
