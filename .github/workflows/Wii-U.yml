@@ -55,13 +55,9 @@ jobs:
       run: |
         git clone https://github.com/Slushi-Github/hxCompileU.git BuildTool
         cd BuildTool
-        echo "-cp src" > jsbuild.hxml
-        echo "-main Main" >> jsbuild.hxml
-        echo "-js haxeCompileU.js" >> jsbuild.hxml
-        haxe jsbuild.hxml
+        sed -i 's/var exitCode:Int = null;/var exitCode:Null<Int> = null;/g' src/compilers/HaxeCompiler.hx
         echo '#!/bin/bash' > ../hxCompileU
-        echo 'node "$(dirname "$0")/haxeCompileU.js" "$@"' >> ../hxCompileU
-        cp haxeCompileU.js ../
+        echo 'haxe -cp '"$(pwd)"'/src --run Main "$@"' >> ../hxCompileU
         cd ..
         chmod +x ./hxCompileU
         
