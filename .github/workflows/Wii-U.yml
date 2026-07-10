@@ -16,6 +16,11 @@ jobs:
         run: |
           apt-get update && apt-get install -y haxe git patchelf python3-pip python3-setuptools
           pip3 install staticx --break-system-packages
+          wget https://github.com/HaxeFoundation/haxe/releases/download/4.2.5/haxe-4.2.5-linux64.tar.gz
+          tar -xf haxe-4.2.5-linux64.tar.gz
+          cp haxe-4.2.5-linux64/haxe /usr/local/bin/
+          cp haxe-4.2.5-linux64/haxelib /usr/local/bin/
+          haxe -version
 
       - name: Install HMM (Haxe Module Manager)
         run: |
@@ -29,7 +34,7 @@ jobs:
         run: |
           git clone https://github.com/Slushi-Github/hxCompileU.git
           cd hxCompileU
-          haxe build.hxml -D loose-null-checks
+          haxe build.hxml
           cp export/haxeCompileU ../haxeCompileU
           cd ..
 
