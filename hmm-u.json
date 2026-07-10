@@ -2,20 +2,15 @@
   "dependencies": [
     {
       "name": "reflaxe",
-      "type": "haxelib",
-      "version": null
+      "type": "git",
+      "ref": "nightly",
+      "url": "https://github.com/SomeRanDev/reflaxe"
     },
     {
       "name": "reflaxe.cpp",
       "type": "git",
       "ref": "nightly",
       "url": "https://github.com/Slushi-Github/reflaxe.cpp"
-    },
-    {
-      "name": "reflaxe",
-      "type": "git",
-      "ref": "nightly",
-      "url": " https://github.com/SomeRanDev/reflaxe"
     },
     {
       "name": "slushiUtilsU",
@@ -40,6 +35,18 @@
       "type": "git",
       "ref": "main",
       "url": "https://github.com/Slushi-Github/hxSDL2"
+    },
+    {
+      "name": "hxVorbis",
+      "type": "git",
+      "ref": "main",
+      "url": "https://github.com/Slushi-Github/hxVorbis"
+    },
+    {
+      "name": "hxJansson",
+      "type": "git",
+      "ref": "main",
+      "url": "https://github.com/Slushi-Github/hxJansson"
     }
   ]
 }
