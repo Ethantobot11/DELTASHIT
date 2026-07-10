@@ -17,11 +17,13 @@ jobs:
           apt-get update && apt-get install -y haxe git patchelf python3-pip python3-setuptools
           pip3 install staticx --break-system-packages
 
-      - name: Setup Haxe Modules
+      - name: Install HMM (Haxe Module Manager)
         run: |
           haxelib setup ~/haxelib
           haxelib install hmm
-          hmm install
+          haxelib run hmm setup
+          cp hmm-u.json hmm.json
+          haxelib run hmm install
 
       - name: Build HxCompileU Compiler Utility
         run: |
