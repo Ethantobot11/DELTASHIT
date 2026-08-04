@@ -40,9 +40,9 @@ class Enemy extends #if wiiu LeafySprite #else FlxSprite #end
 		super(x, y);
 		this.type = type;
 
-		#if wiiu
+		#if haxe3ds
 		// Wii U asset path definition via direct file target mapping strings
-		var graphic = if (type == BOSS) "assets/images/boss.png" else "assets/images/enemy.png";
+		var graphic = if (type == BOSS) "romfs:/assets/images/boss.png" else "romfs:/assets/images/enemy.png";
 		if (type == BOSS)        
 		{
 			loadGraphic(graphic, true, 25, 46);
@@ -158,8 +158,8 @@ class Enemy extends #if wiiu LeafySprite #else FlxSprite #end
 		if (this.type != type)
 		{
 			this.type = type;
-			#if wiiu
-			var graphic = if (type == BOSS) "assets/images/boss.png" else "assets/images/enemy.png";
+			#if haxe3ds
+			var graphic = if (type == BOSS) "romfs:/assets/images/boss.png" else "romfs:/assets/images/enemy.png";
 			if (type == BOSS)        
 			{
 				loadGraphic(graphic, true, 25, 46);
