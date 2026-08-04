@@ -84,6 +84,29 @@ jobs:
         artifactName: ${{ matrix.artifactName }}
         artifactPath: ${{ matrix.artifactPath }}
 
+  Build-Consoles:
+    name: ${{ matrix.name }}
+    strategy:
+      matrix:
+        include:
+          - name: Nintendo 3DS
+            os: ubuntu-latest
+            buildArgs: "3ds -D haxe3ds -D final"
+            artifactName: 3DSBuild
+            artifactPath: "buildFiles/*.cia"
+         #- name: Wii U
+         #  os: ubuntu-latest
+         #  buildArgs: "wiiu -D final -D cafe"
+         #  artifactName: WiiUBuild
+         #  artifactPath: "export/release/wiiu/bin/*.wuhb"
+    uses: ./.github/workflows/consoles.yml
+    with:
+      name: ${{ matrix.name }}
+      os: ${{ matrix.os }}
+      buildArgs: ${{ matrix.buildArgs }}
+      artifactName: ${{ matrix.artifactName }}
+      artifactPath: ${{ matrix.artifactPath }}
+
   Releaser:
     needs: [get-commit-hash,build]
     runs-on: ubuntu-latest
@@ -162,6 +185,15 @@ jobs:
           cd /home/runner/html5
           zip -r "/home/runner/${{ env.PROJECT_NAME }}-HTML5.zip" .
 
+      - name: Download 3DS Build
+        uses: actions/download-artifact@main
+        with:
+          name: 3DSBuild
+          path: /buildFiles/
+
+      - name: Move iOS File
+        run: mv /buildFiles/*.cia /buildFiles/DELTASHIT.cia
+
       - name: Publish The Release
         uses: softprops/action-gh-release@v2
         with:
@@ -171,5 +203,6 @@ jobs:
           files: |
             /home/runner/*.apk
             /home/runner/*.ipa
+            /buildFiles/DELTASHIT.cia
             /home/runner/*.tar
             /home/runner/*.zip
