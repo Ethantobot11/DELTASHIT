@@ -38,8 +38,8 @@ class Main extends #if wiiu LfState #else Sprite #end
 		var statusSuccess = true;
 
 		try {
-			if (!sys.FileSystem.exists("sdmc:/Chart-Editor/Logs")) {
-				sys.FileSystem.createDirectory("sdmc:/Chart-Editor/Logs");
+			if (!sys.FileSystem.exists("sdmc:/DELTASHIT/Logs")) {
+				sys.FileSystem.createDirectory("sdmc:/DELTASHIT/Logs");
 				Sys.println("2. Created directory: sdmc:/Chart-Editor/Logs");
 			} else {
 				Sys.println("2. Log directory already exists.");
@@ -47,18 +47,12 @@ class Main extends #if wiiu LfState #else Sprite #end
 		} catch(e:Dynamic) {
 			Sys.println("2. Warning/Error creating dir: " + e);
 			statusSuccess = false;
-			try {
-			} catch(err:Dynamic) {}
 		}
 
 		if (statusSuccess) {
 			Sys.println("3. Boot test successful!");
-			try {
-			} catch(err:Dynamic) {}
 		} else {
 			Sys.println("3. Boot completed with warnings.");
-			try {
-			} catch(err:Dynamic) {}
 		}
 
 		Sys.println("Press [START] to exit application.");
@@ -100,6 +94,5 @@ class Main extends #if wiiu LfState #else Sprite #end
 		DiscordClient.prepare();
 		#end
 		save.close();
-		#end
 	}
 }
