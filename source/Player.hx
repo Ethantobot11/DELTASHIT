@@ -28,7 +28,7 @@ class Player extends #if wiiu LeafySprite #else FlxSprite #end
 		#end
 
 		#if wiiu
-		loadGraphic("assets/images/player.png", true, 19, 38);
+		loadGraphic("romfs:/assets/images/player.png", true, 19, 38);
 		setSize(19, 38);
 		#else
 		loadGraphic(AssetPaths.player__png, true, 19, 38);
