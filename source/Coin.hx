@@ -16,8 +16,8 @@ class Coin extends #if wiiu LeafySprite #else FlxSprite #end
 	{
 		super(x, y);
 		
-		#if wiiu
-		loadGraphic("assets/images/coin.png", false, 16, 16);
+		#if haxe3ds
+		loadGraphic("romfs:/assets/images/coin.png", false, 16, 16);
 		#else
 		loadGraphic(AssetPaths.coin__png, false, 16, 16);
 		#end
