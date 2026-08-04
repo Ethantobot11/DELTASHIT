@@ -1,0 +1,27 @@
+{
+	"settings": {
+		"linkOptions": {
+			"ip": "",
+			"openEmuIfTransferFailed": false,
+			"link3dsToConsole": true
+		},
+		"libraries": [
+			"haxe3ds",
+			"flixel",
+      "openfl",
+      "lime"
+		],
+		"defines": [],
+		"compileAsCIA": false,
+		"optimizations": {
+			"o2Flag": false,
+			"gFlag": false
+		},
+		"deleteTempFiles": true
+	},
+	"metadata": {
+		"title": "Chart Editor",
+		"description": "Chart Editor port for Nintendo 3DS... FUCK YOU IT'S FREE : )",
+		"author": "ArkoeLabs ?"
+	}
+}
