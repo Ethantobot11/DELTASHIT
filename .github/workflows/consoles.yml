@@ -1,0 +1,170 @@
+name: Build Consoles
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      buildArgs:
+        required: true
+        type: string
+      artifactName:
+        required: true
+        type: string
+      artifactPath:
+        required: true
+        type: string
+
+env:
+  HAXE_VERSION: 4.3.6
+
+jobs:
+  build-console:
+    name: Build
+    runs-on: ${{ inputs.os }}
+    container:
+      image: ${{ inputs.name == 'Nintendo 3DS' && 'devkitpro/devkitarm:latest' || 'devkitpro/devkitppc:latest' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+
+      - name: Install System Dependencies (Wii U)
+        if: inputs.name == 'Wii U'
+        run: |
+          apt-get update && apt-get install -y build-essential git wget curl
+
+      - name: Install Libraries & Fix Hxcpp
+        run: |
+          haxelib install hmm --quiet
+          haxelib run hmm install --quiet
+          
+          if [ "${{ inputs.name }}" = "Nintendo 3DS" ]; then
+            haxelib remove hxcpp
+            haxelib git hxcpp https://github.com/PsychEngine-report/hxcpp --quiet --always
+            haxelib remove flixel
+            haxelib git flixel https://github.com/Ethantobot11/flixel-3DS --quiet --always
+            haxelib git haxe3ds https://github.com/Ethantobot11/Haxe3DS.git --quiet --always
+            haxelib git reflaxe https://github.com/SomeRanDev/reflaxe --quiet
+            haxelib git reflaxe.cpp https://github.com/SomeRanDev/reflaxe.cpp --quiet
+          elif [ "${{ inputs.name }}" = "Wii U" ]; then
+            haxelib git hxu_wut https://github.com/Haxe-WiiU/HxU_WUT --quiet || true
+            haxelib git hxu_libnotifications https://github.com/Haxe-WiiU/HxU_LibNotifications --quiet || true
+            haxelib git hxu_libmappedmemory https://github.com/Haxe-WiiU/HxU_LibMappedMemory --quiet || true
+            haxelib git slushiutilsU https://github.com/Haxe-WiiU/SlushiUtilsU --quiet || true
+            haxelib git hxu_sdl2 https://github.com/Haxe-WiiU/HxU_SDL2 --quiet || true
+            haxelib git hxu_sdl_fontcache https://github.com/Haxe-WiiU/HxU_SDL_FontCache --quiet || true
+            haxelib git hxu_jansson https://github.com/Haxe-WiiU/HxU_Jansson --quiet || true
+            haxelib git hxu_vorbis https://github.com/Haxe-WiiU/HxU_Vorbis --quiet || true
+            haxelib git reflaxe https://github.com/SomeRanDev/reflaxe --quiet
+            haxelib git reflaxe.cpp https://github.com/Ethantobot11/reflaxe.CPP --quiet
+            haxelib dev reflaxe .haxelib/reflaxe/git
+            haxelib dev reflaxe.cpp .haxelib/reflaxe.cpp/git
+          fi          
+
+      - name: Inject HxCU_Meta.json for Haxelibs
+        if: inputs.name == 'Wii U'
+        run: |
+          for libDir in .haxelib/*/; do
+            if [ -d "$libDir" ] && [ ! -f "${libDir}HxCU_Meta.json" ]; then
+              libName=$(basename "$libDir")
+              echo "{
+                \"libVersion\": \"1.0.0\",
+                \"customUDPPort\": \"\",
+                \"haxeLibs\": [],
+                \"wiiuLibs\": [],
+                \"mainDefines\": [],
+                \"cDefines\": [],
+                \"cppDefines\": []
+              }" > "${libDir}HxCU_Meta.json"
+            fi
+          done
+
+      - name: Install Console Toolchains
+        run: |
+          if [ "${{ inputs.name }}" = "Nintendo 3DS" ]; then
+            dkp-pacman -S --noconfirm --needed 3ds-dev citro3d citro2d general-tools
+            mkdir -p /opt/devkitpro/tools/bin
+            wget -q https://github.com/diasurgical/bannertool/releases/download/1.2.0/bannertool.zip -O bannertool.zip
+            unzip -q bannertool.zip -d bannertool_extracted
+            find bannertool_extracted -type f -name "bannertool" -exec cp {} /opt/devkitpro/tools/bin/ \;
+            chmod +x /opt/devkitpro/tools/bin/bannertool
+            wget -q https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.16/makerom-linux_x86_64-v0.16.zip -O makerom.zip
+            unzip -q makerom.zip -d makerom_extracted
+            find makerom_extracted -type f -name "makerom" -exec cp {} /opt/devkitpro/tools/bin/ \;
+            chmod +x /opt/devkitpro/tools/bin/makerom
+          elif [ "${{ inputs.name }}" = "Wii U" ]; then
+            dkp-pacman -S --noconfirm --needed devkitppc-gcc wut wut-tools general-tools
+          fi
+          
+      - name: Build Hxcpp Tooling (For 3DS)
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          cd .haxelib/hxcpp/git/tools/hxcpp
+          haxe compile.hxml
+          cd ../../../../
+
+      - name: Build HXCPP Runner and Tools
+        run: |
+          cd .haxelib/hxcpp/git/tools/run
+          haxe compile.hxml
+          cd ../hxcpp
+          haxe compile.hxml
+          cd ../../../../
+
+      - name: Create Missing 3DS Romfs Directory
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          mkdir -p assets/romfs/haxe3ds
+          touch assets/romfs/haxe3ds/version
+
+      - name: Compile for 3DS via Haxe3DS (Safe Check)
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITARM=${DEVKITPRO}/devkitARM
+          export PATH=${DEVKITARM}/bin:${DEVKITPRO}/tools/bin:$PATH
+          export CXX=arm-none-eabi-g++
+          export CC=arm-none-eabi-gcc
+          export AR=arm-none-eabi-ar
+          export RANLIB=arm-none-eabi-ranlib
+          
+          haxelib run haxe3ds -c -Dnx -Dno_pch
+
+      - name: Archive and Upload Workspace for Inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-debug-zip
+          path: |
+            buildFiles/
+          if-no-files-found: ignore
+          
+      - name: Compile for Wii U via HxCompileU
+        if: inputs.name == 'Wii U'
+        run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITPPC=${DEVKITPRO}/devkitPPC
+          export PATH=${DEVKITPPC}/bin:${DEVKITPRO}/tools/bin:$PATH
+          git clone https://github.com/PsychEngine-report/hxCompileU.git
+          cd hxCompileU
+          haxe build.hxml
+          cp export/haxeCompileU ../haxeCompileU
+          cd ..
+          ./haxeCompileU --prepare
+          ./haxeCompileU --compile
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ inputs.artifactName }}
+          path: ${{ inputs.artifactPath }}
+          if-no-files-found: error
