@@ -1,6 +1,6 @@
 package;
 
-#if !wiiu
+#if (!wiiu || haxe3ds)
 import Sys.sleep;
 import lime.app.Application;
 import hxdiscord_rpc.Discord;
