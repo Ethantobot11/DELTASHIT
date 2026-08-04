@@ -12,17 +12,65 @@ import openfl.display.Sprite;
 import CrashHandler;
 import StorageUtil;
 
+#if haxe3ds
+import haxe3ds.Console;
+import haxe3ds.services.APT;
+import haxe3ds.services.GFX;
+import haxe3ds.services.HID;
+import haxe3ds.services.RomFS;
+import haxe3ds.services.News;
+#end
+
+#if haxe3ds
+@:headerInclude("3ds.h")
+#end
 class Main extends #if wiiu LfState #else Sprite #end
 {
 	public function new()
 	{
-		#if wiiu
-		super();
-		LfEngine.onEngineInitFinished = function() {
-		CrashHandler.init();
-        }
-		LfEngine.initEngine("DELTASHIT", DRC, new MenuState());
-		#else
+		#if haxe3ds
+		Console.init(TOP);
+		RomFS.init();
+		GFX.init();
+
+		Sys.println("1. Services initialized.");
+
+		var statusSuccess = true;
+
+		try {
+			if (!sys.FileSystem.exists("sdmc:/Chart-Editor/Logs")) {
+				sys.FileSystem.createDirectory("sdmc:/Chart-Editor/Logs");
+				Sys.println("2. Created directory: sdmc:/Chart-Editor/Logs");
+			} else {
+				Sys.println("2. Log directory already exists.");
+			}
+		} catch(e:Dynamic) {
+			Sys.println("2. Warning/Error creating dir: " + e);
+			statusSuccess = false;
+			try {
+			} catch(err:Dynamic) {}
+		}
+
+		if (statusSuccess) {
+			Sys.println("3. Boot test successful!");
+			try {
+			} catch(err:Dynamic) {}
+		} else {
+			Sys.println("3. Boot completed with warnings.");
+			try {
+			} catch(err:Dynamic) {}
+		}
+
+		Sys.println("Press [START] to exit application.");
+
+		while (APT.mainLoop()) {
+			if (HID.keyPressed(HIDKey.START)) {
+				break;
+			}
+		}
+
+		GFX.exit();
+		#end
 		var startFullscreen:Bool = false;
 		var save = new FlxSave();
 		#if mobile
