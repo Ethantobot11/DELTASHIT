@@ -38,18 +38,21 @@ class MenuState extends CitroState
 		playButton = new CitroButton(0, 0, 100, 30, "Play", clickPlay);
 		playButton.screenCenter();
 		playButton.y = CitroG.HEIGHT - playButton.height - 10;
+		playButton.bottom = true;
 		add(playButton);
 
 		optionsButton = new CitroButton(0, 0, 100, 30, "Options", clickOptions);
 		optionsButton.screenCenter();
 		optionsButton.x += 120;
 		optionsButton.y = CitroG.HEIGHT - optionsButton.height - 10;
+		optionsButton.bottom = true;
 		add(optionsButton);
 
 		creditButton = new CitroButton(0, 0, 100, 30, "Credit", creditSwitch);
 		creditButton.screenCenter();
 		creditButton.x -= 120;
 		creditButton.y = CitroG.HEIGHT - creditButton.height - 10;
+		creditButton.bottom = true;
 		add(creditButton);
 
 		super.create();

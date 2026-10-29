@@ -26,6 +26,7 @@ class OptionsState extends CitroState {
         titleText = new CitroText(0, 20, "Options");
         titleText.alignment = CENTER;
         titleText.screenCenter();
+        titleText.bottom = true;
         add(titleText);
 
         volumeText = new CitroText(0, titleText.y + 30, "Volume");
@@ -36,14 +37,17 @@ class OptionsState extends CitroState {
         volumeDownButton = new CitroButton(0, volumeText.y + 30, 40, 30, "-", clickVolumeDown);
         volumeDownButton.screenCenter();
         volumeDownButton.x -= 100;
+        volumeDownButton.bottom = true;
         add(volumeDownButton);
 
         volumeUpButton = new CitroButton(0, volumeText.y + 30, 40, 30, "+", clickVolumeUp);
         volumeUpButton.screenCenter();
         volumeUpButton.x += 100;
+        volumeUpButton.bottom = true;
         add(volumeUpButton);
 
         volumeBar = new CitroBar(volumeDownButton.x + 50, volumeDownButton.y, CitroG.WIDTH - 140, 30);
+        volumeBar.bottom = true;
         add(volumeBar);
 
         volumeAmountText = new CitroText(0, 0, "100%");
@@ -60,6 +64,7 @@ class OptionsState extends CitroState {
         backButton = new CitroButton(0, CitroG.HEIGHT - 60, 120, 30, "Back", clickBack);
         backButton.screenCenter();
         backButton.x += 70;
+        backButton.bottom = true;
         add(backButton);
 
         updateVolume();

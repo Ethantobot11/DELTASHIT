@@ -17,6 +17,7 @@ class CreditState extends CitroState {
         add(text2);
         
         backButton = new CitroButton(0, 0, 100, 30, "back", backB);
+        backButton.bottom = true;
         add(backButton);
 
         text2.screenCenter();

@@ -47,6 +47,7 @@ class GameOverState extends CitroState {
 
         mainMenuButton = new CitroButton(0, CitroG.HEIGHT - 32, 100, 30, "Main Menu", switchToMainMenu);
         mainMenuButton.screenCenter();
+        mainMenuButton.bottom = true;
         add(mainMenuButton);
     }
 
