@@ -16,7 +16,7 @@ import haxe3ds.services.FS;
 import haxe3ds.services.HID;
 import haxe3ds.types.Result;
 
-extern abstract VoidPtr(Star<Void>) {}
+extern abstract VoidPtr(cpp.Star<Void>) {}
 
 /**
  * The main class for all of your Game Utility Needs and Handlings.

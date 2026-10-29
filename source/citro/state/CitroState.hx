@@ -26,11 +26,6 @@ class CitroState {
 	 * Constructor called when state is ready to be created.
 	 */
 	public function create() {
-	if (fpsText != null)
-	{
-		fpsText = new FPS();
-		add(fpsText);
-	}
 	};
 
 	/**
@@ -39,8 +34,11 @@ class CitroState {
 	 * @param delta Delta Time in MS.
 	 */
 	public function update(delta:Int) {
-		CrashHandler.protect(function() {
-		}, new ThreeDSMainMenuState());
+		for (member in members) {
+			if (member != null && member.exists) {
+				member.update(delta);
+			}
+		}
 	}
 
 	/**

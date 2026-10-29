@@ -67,7 +67,7 @@ class OptionsState extends CitroState {
     }
 
     function clickClearData() {
-        CitroG.save.erase();
+        CitroG.save.data = {};
         updateVolume();
     }
 

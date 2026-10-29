@@ -21,14 +21,14 @@ class CitroButton extends CitroSprite
         hoverColor = 0xFFFFD700;
         
         label = new CitroText(X + (Width / 2), Y + (Height / 2), LabelText);
-        label.alignment = Center;
+        label.alignment = CENTER;
         
         onClicked = OnClick;
     }
 
     override public function update():Bool 
     {
-        if (isHovered && HID.keyPressed(HIDKey.A || HIDKey.TOUCH)) {
+        if (isHovered && (HID.keyPressed(HIDKey.A) || HID.keyPressed(HIDKey.TOUCH))) {
             if (onClicked != null) onClicked();
         }
         return super.update();

@@ -2,7 +2,7 @@ package;
 
 import citro.object.CitroAnimate;
 import citro.CitroG;
-import haxe3ds.types.CitroVector2D;
+import citro.object.CitroVector2D;
 
 enum EnemyType { REGULAR; BOSS; }
 

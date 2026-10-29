@@ -2,7 +2,6 @@ package citro.editors.ogmo;
 
 import citro.object.CitroTilemap;
 import haxe.Json;
-import openfl.Assets;
 #if sys
 import sys.io.File;
 import sys.FileSystem;
@@ -17,14 +16,22 @@ class CitroOgmoLoader {
         var levelText = "";
         
         #if sys
-        if (FileSystem.exists(projectDataPath)) projectText = File.getContent(projectDataPath);
-        else #end
-        projectText = Assets.getText(projectDataPath);
+        if (FileSystem.exists(projectDataPath)) 
+            projectText = File.getContent(projectDataPath);
+        else 
+            projectText = "";
+        #else
+        projectText = "";
+        #end
 
         #if sys
-        if (FileSystem.exists(levelDataPath)) levelText = File.getContent(levelDataPath);
-        else #end
-        levelText = Assets.getText(levelDataPath);
+        if (FileSystem.exists(levelDataPath)) 
+            levelText = File.getContent(levelDataPath);
+        else 
+            levelText = "";  // Or handle error
+        #else
+        levelText = "";  // No sys access
+        #end
 
         project = Json.parse(projectText);
         level = Json.parse(levelText);
@@ -71,12 +78,22 @@ class CitroOgmoLoader {
     }
 
     static function getTileLayer(data:Dynamic, name:String):Dynamic {
-        for (layer in data.layers) if (layer.name == name) return layer;
+        var layers:Array<Dynamic> = Reflect.field(data, "layers");
+        if (layers != null) {
+            for (layer in layers) 
+                if (Reflect.field(layer, "name") == name) 
+                    return layer;
+        }
         return null;
     }
 
     static function getEntityLayer(data:Dynamic, name:String):Dynamic {
-        for (layer in data.layers) if (layer.name == name) return layer;
+        var layers:Array<Dynamic> = Reflect.field(data, "layers");
+        if (layers != null) {
+            for (layer in layers) 
+                if (Reflect.field(layer, "name") == name) 
+                    return layer;
+        }
         return null;
     }
 }

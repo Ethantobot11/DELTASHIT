@@ -2,6 +2,8 @@ package citro.backend;
 
 import haxe3ds.OS;
 import citro.math.CitroMath;
+import citro.CitroG;
+import citro.backend.CitroColor;
 
 enum abstract CitroEase(Int) {
 	var LINEAR;
@@ -70,6 +72,11 @@ typedef CitroTweenOptions = {
 	 * Callback function per frame called, if it's by a number then it returns the number, else returns as a percentage (0 - 1).
 	 */
 	var ?onUpdate:Float->Void;
+
+	/**
+	 * Delay before the tween starts, in seconds.
+	 */
+	var ?startDelay:Float;
 }
 
 private typedef CitroTweenArray = {
@@ -79,7 +86,8 @@ private typedef CitroTweenArray = {
 	length:Float,
 	state:Bool,
 	tweenType:CTTypes,
-	options:CitroTweenOptions
+	options:CitroTweenOptions,
+	delay:Float
 }
 
 /**
@@ -112,6 +120,8 @@ class CitroTween {
 			return false;
 		}
 
+		var delay = options.startDelay != null ? options.startDelay * 1000 : 0;
+
 		return cta.push({
 			variable: null,
 			props: [{
@@ -123,7 +133,8 @@ class CitroTween {
 			length: Std.int(duration * 1000),
 			state: CitroG.substate == null,
 			tweenType: VARIABLE,
-			options: options
+			options: options,
+			delay: delay
 		}) != 0;
 	}
 
@@ -174,6 +185,9 @@ class CitroTween {
 			return false;
 		}
 
+		var opts = createOptions(options);
+		var delay = opts.startDelay != null ? opts.startDelay * 1000 : 0;
+
 		return cta.push({
 			variable: object,
 			props: propStates,
@@ -181,7 +195,8 @@ class CitroTween {
 			length: duration * 1000,
 			state: CitroG.substate == null,
 			tweenType: OBJECT,
-			options: createOptions(options)
+			options: opts,
+			delay: delay
 		}) != 0;
 	}
 
@@ -192,49 +207,65 @@ class CitroTween {
 	 * @param toColor The destination CitroColor.
 	 * @param duration How long in seconds.
 	 * @param options Tween options (ease, onComplete, etc.).
-	 *
+	 */
 	public static function tweenColor(object:Dynamic, prop:String, toColor:CitroColor, duration:Float = 1, options:Null<CitroTweenOptions> = null):Bool {
 		if (object == null || !Reflect.isObject(object)) return false;
-
-		final currentColor:CitroColor = Reflect.getProperty(object, prop);
-		
+		final currentColor:CitroColor = Reflect.getProperty(object, prop);	
 		final startR = currentColor.red;
 		final startG = currentColor.green;
 		final startB = currentColor.blue;
 		final startA = currentColor.alpha;
-
 		final endR = toColor.red;
 		final endG = toColor.green;
 		final endB = toColor.blue;
 		final endA = toColor.alpha;
+		var opts = createOptions(options);
+		opts.onUpdate = function(t:Float) {
+			final newR = Std.int(startR + (endR - startR) * t);
+			final newG = Std.int(startG + (endG - startG) * t);
+			final newB = Std.int(startB + (endB - startB) * t);
+			final newA = Std.int(startA + (endA - startA) * t);
+			Reflect.setProperty(object, prop, CitroColor.fromRGB(newR, newG, newB, newA));
+		};
 
+		var delay = opts.startDelay != null ? opts.startDelay * 1000 : 0;
 		return cta.push({
 			variable: object,
 			props: [{
 				variableToUse: prop,
 				destination: 1,
 				oldValue: 0,
-				prop: { startR: startR, startG: startG, startB: startB, startA: startA, endR: endR, endG: endG, endB: endB, endA: endA, targetObj: object, targetProp: prop }
+				prop: object
 			}],
 			oldTime: OS.time.toInt(),
 			length: Std.int(duration * 1000),
 			state: CitroG.substate == null,
 			tweenType: OBJECT,
-			options: {
-				ease: options != null && options.ease != null ? options.ease : LINEAR,
-				onComplete: options != null ? options.onComplete : null,
-				onUpdate: function(t:Float) {
-					final p = prop.prop;
-					final newR = Std.int(p.startR + (p.endR - p.startR) * t);
-					final newG = Std.int(p.startG + (p.endG - p.startG) * t);
-					final newB = Std.int(p.startB + (p.endB - p.startB) * t);
-					final newA = Std.int(p.startA + (p.endA - p.startA) * t);
-					
-					Reflect.setProperty(p.targetObj, p.targetProp, CitroColor.fromRGB(newR, newG, newB, newA));
-				}
-			}
+			options: opts,
+			delay: delay
 		}) != 0;
-	}*/
+	}
+
+	/**
+	 * Alias for tweenObject to match FlxTween.tween
+	 */
+	public static inline function tween(object:Dynamic, props:Dynamic, duration:Float = 1, options:Null<CitroTweenOptions> = null):Bool {
+		return tweenObject(object, props, duration, options);
+	}
+
+	/**
+	 * Alias for tweenNumber to match FlxTween.num
+	 */
+	public static inline function num(from:Float, to:Float, duration:Float = 1, options:Null<CitroTweenOptions> = null):Bool {
+		return tweenNumber(from, to, duration, options);
+	}
+
+	/**
+	 * Alias for cancelTweensFrom to match FlxTween.cancelTweensOf
+	 */
+	public static inline function cancelTweensOf(object:Dynamic):Void {
+		cancelTweensFrom(object);
+	}
 
 	/**
 	 * Updates all tweens, should not be used.
@@ -246,7 +277,12 @@ class CitroTween {
 				continue;
 			}
 
-			final progress:Float = CitroMath.clamp((OS.time.toInt() - spr.oldTime) / spr.length, 0, 1);
+			var currentTime = OS.time.toInt() - spr.oldTime;
+			if (currentTime < spr.delay) {
+				continue;
+			}
+
+			final progress:Float = CitroMath.clamp((currentTime - spr.delay) / spr.length, 0, 1);
 			var useVar:Float = progress;
 			for (prop in spr.props) {
 				final res:Float = CitroMath.lerp(prop.oldValue, prop.destination, applyEase(spr.options.ease, progress));

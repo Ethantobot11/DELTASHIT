@@ -4,6 +4,8 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import sys.FileSystem;
 
+using StringTools;
+
 class CitroAssets {
     macro public static function buildFileReferences(localDir:String = "assets/", subDirectories:Bool = true):Array<Field> {
         var fields = Context.getBuildFields();

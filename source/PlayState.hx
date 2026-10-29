@@ -57,8 +57,18 @@ class PlayState extends CitroState {
         switch (entity.name) {
             case "player": player.x = x; player.y = y;
             case "coin": coins.add(new Coin(x + 4, y + 4));
-            case "enemy": enemies.add(new Enemy(x + 4, y, REGULAR));
-            case "boss": enemies.add(new Enemy(x + 4, y, BOSS));
+            case "enemy": 
+                var e = new Enemy();
+                e.x = x + 4;
+                e.y = y;
+                e.type = REGULAR;
+                enemies.add(e);
+            case "boss": 
+                var b = new Enemy();
+                b.x = x + 4;
+                b.y = y;
+                b.type = BOSS;
+                enemies.add(b);
         }
     }
 
@@ -99,7 +109,7 @@ class PlayState extends CitroState {
         combatHud.initCombat(health, enemy);
     }
 
-    override public function update():Bool {
+    override public function update(delta:Int):Bool {
         if (inCombat) {
             if (!combatHud.exists) {
                 health = combatHud.playerHealth;
@@ -139,6 +149,6 @@ class PlayState extends CitroState {
             enemies.forEach(function(e:Dynamic) { if(e.exists) checkEnemyVision(cast e); });
         }
         
-        return super.update();
+        return super.update(delta);
     }
 }
