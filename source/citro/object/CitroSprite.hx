@@ -29,6 +29,8 @@ class CitroSprite extends CitroObject {
     public var totalFrames(default, null):Int = 0;
     public var sheetWidth:Float = 0;
     public var sheetHeight:Float = 0;
+    public var flipX:Bool = false;
+    public var flipY:Bool = false;
 
     public function new(x:Float = 0, y:Float = 0) {
         super();
@@ -46,8 +48,6 @@ class CitroSprite extends CitroObject {
         width  = Width;
         height = Height;
         color  = Col;
-        sheetWidth = Width;
-        sheetHeight = Height;
         return this;
     }
 
@@ -144,7 +144,8 @@ class CitroSprite extends CitroObject {
         srcWidth = Sprite.srcWidth;
         srcHeight = Sprite.srcHeight;
         useSrcRect = Sprite.useSrcRect;
-        
+        flipX = Sprite.flipX;
+        flipY = Sprite.flipY;
         return true;
     }
 
@@ -153,17 +154,16 @@ class CitroSprite extends CitroObject {
         
         untyped __cpp__('
             Float sw = this->scale->x, sh = this->scale->y;
-
+            Float drawSw = this->flipX ? -fabs(sw) : fabs(sw);
+            Float drawSh = this->flipY ? -fabs(sh) : fabs(sh);
             C3D_Mtx matrix;
             Mtx_Diagonal(&matrix, 1.0f, 1.0f, 1.0f, 1.0f);
-
             C2D_ViewSave(&matrix);
             C2D_ViewTranslate(this->x, this->y);
-            C2D_ViewTranslate(this->width * sw / 2.0, this->height * sh / 2.0);
+            C2D_ViewTranslate((this->width * fabs(sw)) / 2.0, (this->height * fabs(sh)) / 2.0);
             C2D_ViewRotateDegrees(this->angle);
-            C2D_ViewScale(sw, sh);
+            C2D_ViewScale(drawSw, drawSh);
             C2D_ViewTranslate(-this->width / 2.0, -this->height / 2.0);
-
             if (this->image.tex == NULL || this->image.subtex == NULL) {
                 CONVERT_TO_COMPATIBLE_COLOR(this->color)
                 C2D_DrawRectSolid(0, 0, 0, this->width, this->height, finalColor);

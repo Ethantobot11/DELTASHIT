@@ -59,11 +59,11 @@ class Player extends CitroAnimate {
             } else if (left) {
                 newAngle = 180;
                 facing = "left";
-                flipX = true;
+                if (atlasSprite != null) atlasSprite.flipX = true;
             } else if (right) {
                 newAngle = 0;
                 facing = "right";
-                flipX = false;
+                if (atlasSprite != null) atlasSprite.flipX = false;
             }
 
             var radians = newAngle * (Math.PI / 180);
@@ -83,15 +83,6 @@ class Player extends CitroAnimate {
         
         if (curAnim != animName) {
             play(animName);
-            if (atlasSprite != null) {
-                untyped __cpp__('
-                    if ({0}) {
-                        this->image->flipX = true;
-                    } else {
-                        this->image->flipX = false;
-                    }
-                ', flipX);
-            }
         }
     }
 

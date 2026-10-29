@@ -150,6 +150,14 @@ class Enemy extends CitroAnimate {
         if (curAnim != animName) {
             play(animName);
         }
+
+        if (atlasSprite != null) {
+            if (acceleration.x < 0) {
+                atlasSprite.flipX = true;
+            } else if (acceleration.x > 0) {
+                atlasSprite.flipX = false;
+            }
+        }
         
         brain.update(CitroG.deltaTime / 1000);
         return super.update();
