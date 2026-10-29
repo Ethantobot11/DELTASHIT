@@ -12,12 +12,10 @@ import citro.backend.CitroColor;
 ')
 
 @:headerInclude("citro/object/CitroVector2D.h")
-
 @:headerClassCode('
     C2D_SpriteSheet ss;
     C2D_Image image;
     int currentFrame;
-    int totalFrames;
 ')
 
 class CitroSprite extends CitroObject {
@@ -27,11 +25,7 @@ class CitroSprite extends CitroObject {
     public var srcWidth:Float = 0;
     public var srcHeight:Float = 0;
     public var useSrcRect:Bool = false;
-    
-    /** Current frame index */
     public var frame(default, set):Int = 0;
-    
-    /** Total frames in atlas */
     public var totalFrames(default, null):Int = 0;
 
     public function new(x:Float = 0, y:Float = 0) {
