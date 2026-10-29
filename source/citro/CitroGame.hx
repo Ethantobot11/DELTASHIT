@@ -35,14 +35,13 @@ class CitroGame {
 	static function renderObjectsForScreen(state:CitroState, bottom:Bool) {
 		for (member in state.members) {
 			if (member == null) continue;
-			
 			if (member.isDestroyed) {
 				state.members.remove(member);
 				continue;
 			}
 
-			if (member.bottom != bottom) continue;
-			member.update();
+			if (member.bottom != bottom) continue; 
+			member.update(); 
 		}
 	}
 

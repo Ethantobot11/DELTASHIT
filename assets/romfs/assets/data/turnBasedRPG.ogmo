@@ -19,7 +19,7 @@
   "layers": [
     {
       "definition": "tile",
-      "name": "Walls",
+      "name": "walls",
       "gridSize": {"x": 16, "y": 16},
       "exportID": "86973179",
       "exportMode": 0,
