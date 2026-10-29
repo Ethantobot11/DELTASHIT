@@ -23,13 +23,17 @@ class CitroButton extends CitroSprite
         label = new CitroText(X + (Width / 2), Y + (Height / 2), LabelText);
         label.alignment = CENTER;
         label.bottom = this.bottom;
-        add(label);
         
         onClicked = OnClick;
     }
 
     override public function update():Bool 
     {
+        label.x = this.x + (width / 2);
+        label.y = this.y + (height / 2);
+        label.bottom = this.bottom;
+        label.update();
+
         if (bottom && HID.keyHeld(HIDKey.TOUCH)) {
             var touch = HID.touch;
             isHovered = (touch.px >= x && touch.px <= x + width && 
