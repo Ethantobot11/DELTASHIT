@@ -36,6 +36,7 @@ class CitroOgmoLoader {
 
         if (projectText != null && projectText.length > 0) {
             try {
+                projectText = cleanJsonKeys(projectText);
                 project = Json.parse(projectText);
             } catch (e:Dynamic) {
                 trace("ERROR parsing project JSON: " + e);
@@ -49,6 +50,7 @@ class CitroOgmoLoader {
 
         if (levelText != null && levelText.length > 0) {
             try {
+                levelText = cleanJsonKeys(levelText);
                 level = Json.parse(levelText);
             } catch (e:Dynamic) {
                 trace("ERROR parsing level JSON: " + e);
@@ -59,6 +61,14 @@ class CitroOgmoLoader {
             trace("ERROR: Level file is empty or missing: " + levelDataPath);
             level = {};
         }
+    }
+
+    static function cleanJsonKeys(json:String):String {
+        var result = json;
+        var regex = ~/("([^"]+)")\s*:/g;
+        return regex.map(result, function(r) {
+            return r.matched(1) + ":";
+        });
     }
 
     public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
