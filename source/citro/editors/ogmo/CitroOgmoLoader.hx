@@ -9,6 +9,8 @@ import sys.io.File;
 import openfl.Assets;
 #end
 
+using StringTools;
+
 class CitroOgmoLoader {
     public var project:Dynamic;
     public var level:Dynamic;
