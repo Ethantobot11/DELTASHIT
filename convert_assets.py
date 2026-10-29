@@ -11,13 +11,6 @@ except ImportError:
     HAS_PILLOW = False
     print("WARNING: Pillow not installed. Auto-resize disabled. Run: pip install Pillow")
 
-SPRITE_SHEETS = {
-    "player": {"w": 19, "h": 38},
-    "enemy": {"w": 21, "h": 40},
-    "boss": {"w": 25, "h": 46},
-    "tiles": {"w": 16, "h": 16}
-}
-
 def get_tool_path(tool_name: str) -> str:
     tool_path = shutil.which(tool_name)
     if tool_path: return tool_path
@@ -128,10 +121,6 @@ def main():
         abs_png = os.path.abspath(png_path)
         abs_t3x = os.path.abspath(t3x_path)
         cmd = [tex3ds_path, abs_png, "-o", abs_t3x, "-f", "rgba8"]
-        
-        if name in SPRITE_SHEETS:
-            cmd.extend(["-w", str(SPRITE_SHEETS[name]["w"]), "-h", str(SPRITE_SHEETS[name]["h"])])
-            print(f"  [INFO] Treating as sprite sheet with frame size: {SPRITE_SHEETS[name]['w']}x{SPRITE_SHEETS[name]['h']}")
         
         try:
             subprocess.run(cmd, check=True, env=os.environ)

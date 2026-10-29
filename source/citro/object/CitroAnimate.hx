@@ -129,11 +129,10 @@ class CitroAnimate extends CitroObject {
             trace("ERROR: Failed to load T3X file: " + t3xPath);
             return;
         }
-        
-        var maxFrames:Int = untyped __cpp__('C2D_SpriteSheetCount({0}->ss)', atlasSprite);
+
         var framesPerRow:Int = Std.int(atlasSprite.width / frameWidth);
-        if (framesPerRow == 0) framesPerRow = 1;
-        
+        var framesPerCol:Int = Std.int(atlasSprite.height / frameHeight);
+        var maxFrames:Int = framesPerRow * framesPerCol;     
         for (i in 0...maxFrames) {
             final frameKey:String = 'frame-$i';
             var frameX:Int = i % framesPerRow;
