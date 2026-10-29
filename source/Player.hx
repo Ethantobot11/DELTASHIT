@@ -27,7 +27,7 @@ class Player extends CitroAnimate {
         
         trace("[Player] Loading graphic: " + AssetPaths.player__t3x);
         loadFromT3XWithAnims(AssetPaths.player__t3x, 19, 38, anims);
-        framerate = 6;
+        framerate = 12;
         looped = true;
         
         if (atlasSprite == null) {
@@ -59,9 +59,11 @@ class Player extends CitroAnimate {
             } else if (left) {
                 newAngle = 180;
                 facing = "left";
+                flipX = true;
             } else if (right) {
                 newAngle = 0;
                 facing = "right";
+                flipX = false;
             }
 
             var radians = newAngle * (Math.PI / 180);
@@ -79,7 +81,18 @@ class Player extends CitroAnimate {
             else animName = "lr_idle";
         }
         
-        if (curAnim != animName) play(animName);
+        if (curAnim != animName) {
+            play(animName);
+            if (atlasSprite != null) {
+                untyped __cpp__('
+                    if ({0}) {
+                        this->image->flipX = true;
+                    } else {
+                        this->image->flipX = false;
+                    }
+                ', flipX);
+            }
+        }
     }
 
     override public function update():Bool {

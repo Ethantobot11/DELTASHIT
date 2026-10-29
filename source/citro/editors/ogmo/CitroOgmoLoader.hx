@@ -35,15 +35,19 @@ class CitroOgmoLoader {
 
         if (projectText != null && projectText.length > 0) {
             try {
+                projectText = projectText.replace("\r", "").replace("\n", "");
                 project = Json.parse(projectText);
             } catch (e:Dynamic) {
                 trace("ERROR parsing project JSON: " + e);
-                trace("Content preview: " + projectText.substr(0, 100));
+                trace("Trying to find invalid character...");
+                for (i in 0...projectText.length) {
+                    var char = projectText.charCodeAt(i);
+                    if (char < 32 && char != 10 && char != 13) {
+                        trace('Invalid char ${char} at position ${i}');
+                    }
+                }
                 project = {};
             }
-        } else {
-            trace("Error: Project file is empty or missing: " + projectDataPath);
-            project = {};
         }
 
         if (levelText != null && levelText.length > 0) {
