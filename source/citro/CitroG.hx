@@ -3,7 +3,7 @@ package citro;
 #if (!wiiu || !cafe)
 
 import citro.backend.CitroCache;
-import citro.backend.CitroG.sound.loadSystem;
+import citro.backend.CitroSoundSystem;
 import citro.backend.CitroTimer;
 import citro.backend.CitroTween;
 import citro.math.CitroRandom;
@@ -91,7 +91,7 @@ class CitroG {
      * Use this to load and play sounds globally.
      * Example: CitroG.sound.play("romfs:/assets/sounds/select.cwav");
      */
-    public static var sound:CitroG.sound.loadSystem = new CitroG.sound.loadSystem();
+    public static var sound:CitroSoundSystem = new CitroSoundSystem();
 
 	/**
 	 * Function to check if both of the objects are overlapping or not.

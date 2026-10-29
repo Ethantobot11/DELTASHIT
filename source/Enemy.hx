@@ -24,7 +24,7 @@ class Enemy extends CitroAnimate {
         this.y = y;
         this.type = type;
 
-        var graphic = if (type == BOSS) "romfs:/assets/images/boss.t3x" else "romfs:/assets/images/enemy.t3x";
+        var graphic = if (type == BOSS) AssetPaths.boss__t3x else AssetPaths.enemy__t3x;
         var frameW = if (type == BOSS) 25 else 21;
         var frameH = if (type == BOSS) 46 else 40;
         var anims = new Map<String, Array<Int>>();
@@ -90,7 +90,7 @@ class Enemy extends CitroAnimate {
     public function changeType(type:EnemyType) {
         if (this.type != type) {
             this.type = type;
-            var graphic = if (type == BOSS) "romfs:/assets/images/boss.t3x" else "romfs:/assets/images/enemy.t3x";
+            var graphic = if (type == BOSS) AssetPaths.boss__t3x else AssetPaths.enemy__t3x;
             var frameW = if (type == BOSS) 25 else 21;
             var frameH = if (type == BOSS) 46 else 40;
             var anims = new Map<String, Array<Int>>();

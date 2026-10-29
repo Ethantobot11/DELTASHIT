@@ -2,7 +2,8 @@ package;
 
 import citro.CitroG;
 import citro.backend.CitroColor;
-import citro.backend.CitroG.sound.load;
+import citro.backend.CitroSound;
+import citro.backend.CitroSoundSystem;
 import citro.backend.CitroTween.CitroEase;
 import citro.backend.CitroTween;
 import citro.object.CitroBar;
@@ -155,17 +156,17 @@ class CombatHUD extends CitroGroup
 			member.alpha = 0;
 		}
 
-		vs_susie = new CitroG.sound.load(AssetPaths.vs_susie__ogg);
-		vs_susie.looped = true;
-		fledSound = new CitroG.sound.load(AssetPaths.fled__wav);
-		hurtSound = new CitroG.sound.load(AssetPaths.hurt__wav);
-		loseSound = new CitroG.sound.load(AssetPaths.LOSE__ogg);
-		missSound = new CitroG.sound.load(AssetPaths.miss__wav);
-		selectSound = new CitroG.sound.load(AssetPaths.select__wav);
-		winSound = new CitroG.sound.load(AssetPaths.win__wav);
-		combatSound = new CitroG.sound.load(AssetPaths.combat__wav);
-		battle = new CitroG.sound.load(AssetPaths.battle__ogg);
-		battle.looped = true;
+		vs_susie = CitroG.sound.load(AssetPaths.vs_susie__cwav);
+        vs_susie.looped = true;
+        fledSound = CitroG.sound.load(AssetPaths.fled__cwav);
+        hurtSound = CitroG.sound.load(AssetPaths.hurt__cwav);
+        loseSound = CitroG.sound.load(AssetPaths.LOSE__cwav);
+        missSound = CitroG.sound.load(AssetPaths.miss__cwav);
+        selectSound = CitroG.sound.load(AssetPaths.select__cwav);
+        winSound = CitroG.sound.load(AssetPaths.win__cwav);
+        combatSound = CitroG.sound.load(AssetPaths.combat__cwav);
+        battle = CitroG.sound.load(AssetPaths.battle__cwav);
+        battle.looped = true;
 	}
 
 	public function initCombat(playerHealth:Int, enemy:Enemy)

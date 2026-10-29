@@ -86,7 +86,7 @@ class CitroAnimate extends CitroObject {
 
                     var separatorIndex:Int = fullKey.lastIndexOf("-");
                     if (separatorIndex == -1) separatorIndex = fullKey.lastIndexOf("_");
-                    final animName:String = separatorIndex != -1 ? fullName.substr(0, separatorIndex) : fullKey;
+                    final animName:String = separatorIndex != -1 ? fullKey.substr(0, separatorIndex) : fullKey;
                     if (firstAnimFound == "") firstAnimFound = animName;
 
                     frames.set(fullKey, {

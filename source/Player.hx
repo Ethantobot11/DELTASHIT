@@ -6,19 +6,18 @@ import haxe3ds.services.HID;
 
 class Player extends CitroAnimate {
     static inline var SPEED:Float = 100;
-
     public var up:Bool;
     public var down:Bool;
     public var left:Bool;
     public var right:Bool;
     public var active:Bool = true;
-    
     private var facing:String = "down";
 
     public function new(x:Float = 0, y:Float = 0) {
         super();
         this.x = x;
         this.y = y;
+        
         var anims = new Map<String, Array<Int>>();
         anims.set("d_idle", [1]);
         anims.set("lr_idle", [5]);
@@ -26,7 +25,8 @@ class Player extends CitroAnimate {
         anims.set("d_walk", [0, 1, 2, 3]);
         anims.set("lr_walk", [4, 5, 6, 7]);
         anims.set("u_walk", [8, 9, 10, 11]);
-        loadFromT3XWithAnims("romfs:/assets/images/player.t3x", 19, 38, anims);
+        
+        loadFromT3XWithAnims(AssetPaths.player__t3x, 19, 38, anims);
         framerate = 6;
         looped = true;
     }
@@ -44,13 +44,11 @@ class Player extends CitroAnimate {
             var newAngle:Float = 0;
             if (up) {
                 newAngle = -90;
-                if (left) newAngle -= 45;
-                else if (right) newAngle += 45;
+                if (left) newAngle -= 45; else if (right) newAngle += 45;
                 facing = "up";
             } else if (down) {
                 newAngle = 90;
-                if (left) newAngle += 45;
-                else if (right) newAngle -= 45;
+                if (left) newAngle += 45; else if (right) newAngle -= 45;
                 facing = "down";
             } else if (left) {
                 newAngle = 180;
@@ -75,9 +73,7 @@ class Player extends CitroAnimate {
             else animName = "lr_idle";
         }
         
-        if (curAnim != animName) {
-            play(animName);
-        }
+        if (curAnim != animName) play(animName);
     }
 
     override public function update():Bool {

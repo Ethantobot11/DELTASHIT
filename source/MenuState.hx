@@ -1,7 +1,8 @@
 package;
 
 import citro.CitroG;
-import citro.backend.CitroG.sound.load;
+import citro.backend.CitroSound;
+import citro.backend.CitroSoundSystem;
 import citro.object.CitroButton;
 import citro.object.CitroText;
 import citro.state.CitroState;
@@ -14,7 +15,7 @@ class MenuState extends CitroState
 	var creditButton:CitroButton;
 	var titleText:CitroText;
 	var optionsButton:CitroButton;
-	var music:CitroG.sound.load;
+	var music:CitroSound;
 
 	override public function create()
 	{
@@ -22,9 +23,9 @@ class MenuState extends CitroState
 		DiscordClient.changePresence("WHOA SINCE WHEN THERE A MENU AND DISCORD RPC HERE ?", null);
 		#end
 
-		music = new CitroG.sound.load(AssetPaths.AUDIO_STORY__ogg);
-		music.looped = true;
-		music.play();
+		music = CitroG.sound.load(AssetPaths.AUDIO_STORY__cwav);
+        music.looped = true;
+        music.play();
 
 		var text = new CitroText(30, 60, "DELTARUNE : CHAPTER 7");
 		add(text);
