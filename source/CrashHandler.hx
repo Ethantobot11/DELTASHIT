@@ -84,7 +84,7 @@ class CrashHandler {
             logException(e, "Runtime Crash Caught!");
             
             try {
-                var menuState = fallbackState != null ? fallbackState : new ThreeDSMainMenuState();
+                var menuState = fallbackState != null ? fallbackState : new MenuState();
                 CitroG.switchState(menuState);
             } catch (switchErr:Dynamic) {
                 appendGeneralLog("Critical Error: Failed to switch back to menu state: " + switchErr);

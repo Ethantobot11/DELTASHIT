@@ -61,7 +61,7 @@ class CitroOgmoLoader {
         if (layer == null) {
             trace("[OgmoLoader] Warning: Tile layer '" + tileLayer + "' not found in level data. Available layers:");
             if (level != null && Reflect.hasField(level, "layers")) {
-                var layers:Array<Dynamic> = Reflect.field(level, "layers");
+                var layers:Array<Dynamic> = cast Reflect.field(level, "layers");
                 for (l in layers) {
                     trace(" - " + Reflect.field(l, "name"));
                 }
@@ -69,30 +69,43 @@ class CitroOgmoLoader {
             return new CitroTilemap(0, 0, tileSize);
         }
         
-        trace("[OgmoLoader] Found tile layer: '" + tileLayer + "'. ArrayMode: " + layer.arrayMode);
+        var arrayMode:Int = Std.int(Reflect.field(layer, "arrayMode"));
+        var gridCellsX:Int = Std.int(Reflect.field(layer, "gridCellsX"));
+        var gridCellsY:Int = Std.int(Reflect.field(layer, "gridCellsY"));
         
-        var tilemap = new CitroTilemap(layer.gridCellsX, layer.gridCellsY, tileSize);
+        trace("[OgmoLoader] Found tile layer: '" + tileLayer + "'. ArrayMode: " + arrayMode);
+        
+        var tilemap = new CitroTilemap(gridCellsX, gridCellsY, tileSize);
         tilemap.loadGraphic(tileGraphic);
         
-        if (layer.arrayMode == 0 && layer.data != null) {
-            trace("[OgmoLoader] Loading 1D array data, length: " + layer.data.length);
-            for (i in 0...layer.data.length) {
-                var tileIndex = layer.data[i];
-                if (tileIndex < 0) tileIndex = 0;
-                tilemap.data[Math.floor(i / layer.gridCellsX)][i % layer.gridCellsX] = tileIndex;
-            }
-        } else if (layer.arrayMode == 1 && layer.data2D != null) {
-            trace("[OgmoLoader] Loading 2D array data");
-            for (y in 0...layer.data2D.length) {
-                for (x in 0...layer.data2D[y].length) {
-                    var tileIndex = layer.data2D[y][x];
+        if (arrayMode == 0) {
+            var data:Array<Int> = cast Reflect.field(layer, "data");
+            if (data != null) {
+                trace("[OgmoLoader] Loading 1D array data, length: " + data.length);
+                for (i in 0...data.length) {
+                    var tileIndex = data[i];
                     if (tileIndex < 0) tileIndex = 0;
-                    tilemap.data[y][x] = tileIndex;
+                    tilemap.data[Math.floor(i / gridCellsX)][i % gridCellsX] = tileIndex;
                 }
             }
-        } else if (layer.dataCSV != null) {
-            trace("[OgmoLoader] Loading CSV data");
-            tilemap.loadMapFromCSV(layer.dataCSV, tileSize);
+        } else if (arrayMode == 1) {
+            var data2D:Array<Array<Int>> = cast Reflect.field(layer, "data2D");
+            if (data2D != null) {
+                trace("[OgmoLoader] Loading 2D array data");
+                for (y in 0...data2D.length) {
+                    for (x in 0...data2D[y].length) {
+                        var tileIndex = data2D[y][x];
+                        if (tileIndex < 0) tileIndex = 0;
+                        tilemap.data[y][x] = tileIndex;
+                    }
+                }
+            }
+        } else {
+            var dataCSV:String = cast Reflect.field(layer, "dataCSV");
+            if (dataCSV != null) {
+                trace("[OgmoLoader] Loading CSV data");
+                tilemap.loadMapFromCSV(dataCSV, tileSize);
+            }
         }
         
         return tilemap;
@@ -100,20 +113,24 @@ class CitroOgmoLoader {
 
     public function loadEntities(entityLoadCallback:Dynamic->Void, entityLayer:String = "entities"):Void {
         var layer = getEntityLayer(level, entityLayer);
-        if (layer != null && layer.entities != null) {
-            trace("[OgmoLoader] Found entity layer: '" + entityLayer + "'. Entities count: " + layer.entities.length);
-            var entities:Array<Dynamic> = layer.entities;
-            for (entity in entities) {
-                entityLoadCallback(entity);
+        if (layer != null) {
+            var entities:Array<Dynamic> = cast Reflect.field(layer, "entities");
+            if (entities != null) {
+                trace("[OgmoLoader] Found entity layer: '" + entityLayer + "'. Entities count: " + entities.length);
+                for (entity in entities) {
+                    entityLoadCallback(entity);
+                }
+            } else {
+                trace("[OgmoLoader] Warning: Entity layer '" + entityLayer + "' has no entities.");
             }
         } else {
-            trace("[OgmoLoader] Warning: Entity layer '" + entityLayer + "' not found or has no entities.");
+            trace("[OgmoLoader] Warning: Entity layer '" + entityLayer + "' not found.");
         }
     }
 
     static function getTileLayer(data:Dynamic, name:String):Dynamic {
         if (data == null || !Reflect.hasField(data, "layers")) return null;
-        var layers:Array<Dynamic> = Reflect.field(data, "layers");
+        var layers:Array<Dynamic> = cast Reflect.field(data, "layers");
         if (layers != null) {
             for (layer in layers) {
                 if (Reflect.field(layer, "name") == name) {
@@ -126,7 +143,7 @@ class CitroOgmoLoader {
 
     static function getEntityLayer(data:Dynamic, name:String):Dynamic {
         if (data == null || !Reflect.hasField(data, "layers")) return null;
-        var layers:Array<Dynamic> = Reflect.field(data, "layers");
+        var layers:Array<Dynamic> = cast Reflect.field(data, "layers");
         if (layers != null) {
             for (layer in layers) {
                 if (Reflect.field(layer, "name") == name) {
