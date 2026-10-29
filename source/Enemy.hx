@@ -45,9 +45,16 @@ class Enemy extends CitroAnimate {
             anims.set("u_walk", [0, 1, 2, 3]);
         }
         
+        trace("[Enemy] Loading graphic: " + graphic);
         loadFromT3XWithAnims(graphic, frameW, frameH, anims);
         framerate = type == BOSS ? 4 : 5;
         looped = true;
+        
+        if (atlasSprite == null) {
+            trace("[Enemy] ERROR: atlasSprite is NULL! Graphic failed to load.");
+        } else {
+            trace("[Enemy] Successfully loaded. Total frames: " + atlasSprite.totalFrames);
+        }
         
         playerPosition = {x: 0, y: 0};
         brain = new FSM(idle);

@@ -12,7 +12,6 @@ class Player extends CitroAnimate {
     public var right:Bool;
     public var active:Bool = true;
     private var facing:String = "down";
-
     public function new(x:Float = 0, y:Float = 0) {
         super();
         this.x = x;
@@ -26,9 +25,16 @@ class Player extends CitroAnimate {
         anims.set("lr_walk", [4, 5, 6, 7]);
         anims.set("u_walk", [8, 9, 10, 11]);
         
+        trace("[Player] Loading graphic: " + AssetPaths.player__t3x);
         loadFromT3XWithAnims(AssetPaths.player__t3x, 19, 38, anims);
         framerate = 6;
         looped = true;
+        
+        if (atlasSprite == null) {
+            trace("[Player] ERROR: atlasSprite is NULL! Graphic failed to load.");
+        } else {
+            trace("[Player] Successfully loaded. Total frames: " + atlasSprite.totalFrames);
+        }
     }
 
     function updateMovement() {

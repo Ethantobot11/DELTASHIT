@@ -16,7 +16,7 @@ enum CitroSaveStatus {
 class CitroSave {
 	public var status(default, null):CitroSaveStatus;
 	public var data:Dynamic = {};
-	private var savePath:String = "sdmc:/DELTASHIT/saves/save.json";
+	private var savePath:String = "sdmc:/DELTASHIT/save.json";
 
 	public function new(files:Int = 16, dirs:Int = 1) {
 		#if IS_3DSX

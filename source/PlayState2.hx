@@ -28,7 +28,7 @@ class PlayState extends CitroState {
         DiscordClient.changePresence("...", null);
         #end
 
-        map = new CitroOgmoLoader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_002__json);
+        map = new CitroOgmoLoader(AssetPaths.turnBasedRPG2__ogmo, AssetPaths.room_002__json);
 		walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
         add(walls);
 

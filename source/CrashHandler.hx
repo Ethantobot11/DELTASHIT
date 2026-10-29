@@ -1,79 +1,96 @@
 package;
 
-#if sys
-import sys.FileSystem;
-import sys.io.File;
-#end
-#if haxe3ds
-import haxe3ds.Console;
-import citro.CitroG;
-#end
+#if (!wiiu || !cafe)
 
-using StringTools;
+import haxe.CallStack;
+import sys.io.File;
+import sys.io.FileOutput;
+import sys.FileSystem;
+import citro.CitroG;
+import citro.state.CitroState;
 
 class CrashHandler {
-    public static function init():Void {
-        #if cpp
-        untyped __global__.__hxcpp_set_critical_error_handler(onError);
-        #elseif hl
-        hl.Api.setErrorHandler(onError);
-        #end
+    private static var baseDir:String = "sdmc:/DELTASHIT";
+    private static var logsDir:String = "sdmc:/DELTASHIT/logs";
+    private static var crashDir:String = "sdmc:/DELTASHIT/crash";
+    
+    private static var logPath:String = "sdmc:/DELTASHIT/logs/haxe_session.log";
+    private static var crashPath:String = "sdmc:/DELTASHIT/crash/haxe_exception.log";
+    
+    private static var originalTrace:Dynamic;
+    private static var logOutput:FileOutput = null;
+
+    public static function init() {
+        try {
+            if (!FileSystem.isDirectory(baseDir)) FileSystem.createDirectory(baseDir);
+            if (!FileSystem.isDirectory(logsDir)) FileSystem.createDirectory(logsDir);
+            if (!FileSystem.isDirectory(crashDir)) FileSystem.createDirectory(crashDir);
+
+            logOutput = File.append(logPath, false);
+            logOutput.writeString("--- Citro Engine 3DS Haxe Session Started ---\n");
+            logOutput.flush();
+        } catch (e:Dynamic) {
+            trace("CRITICAL: Failed to initialize CrashHandler files: " + e);
+        }
+
+        originalTrace = haxe.Log.trace;
+        haxe.Log.trace = function(v:Dynamic, ?infos:haxe.PosInfos) {
+            originalTrace(v, infos);
+
+            var fileName = (infos != null && infos.fileName != null) ? infos.fileName : "Unknown";
+            var lineNumber = (infos != null) ? infos.lineNumber : 0;
+            var msg = '[HAXE LOG] [$fileName:$lineNumber]: $v\n';
+            
+            appendGeneralLog(msg);
+        };
     }
 
-    public static function protect(func:Void->Void, fallbackState:Dynamic):Void {
+    public static function appendGeneralLog(text:String) {
         try {
-            func();
+            if (logOutput != null) {
+                logOutput.writeString(text);
+                logOutput.flush();
+            } else {
+                var file = File.append(logPath, false);
+                file.writeString(text);
+                file.flush();
+                file.close();
+            }
         } catch (e:Dynamic) {
-            onError(e);
+            originalTrace("Failed to write to general log: " + e);
+        }
+    }
+
+    public static function logException(e:Dynamic, ?customMessage:String = "") {
+        var stack = CallStack.toString(CallStack.exceptionStack());
+        var fullLog = '\n[HAXE CRASH/ERROR] $customMessage\nException: $e\nCallStack:\n$stack\n-------------------\n';
+
+        try {
+            var file = File.write(crashPath, false);
+            file.writeString(fullLog);
+            file.flush();
+            file.close();
+        } catch (err:Dynamic) {
+            originalTrace("Failed to write crash file: " + err);
+        }
+
+        appendGeneralLog(fullLog);
+    }
+
+    public static function protect(action:Void->Void, ?fallbackState:CitroState) {
+        try {
+            action();
+        } catch (e:Dynamic) {
+            logException(e, "Runtime Crash Caught!");
+            
             try {
-                if (fallbackState != null) {
-                    CitroG.switchState(Type.createInstance(fallbackState, []));
-                }
-            } catch (e2:Dynamic) {
-                #if haxe3ds
-                Sys.println("Failed to recover to fallback state");
-                #end
+                var menuState = fallbackState != null ? fallbackState : new ThreeDSMainMenuState();
+                CitroG.switchState(menuState);
+            } catch (switchErr:Dynamic) {
+                appendGeneralLog("Critical Error: Failed to switch back to menu state: " + switchErr);
             }
         }
     }
-
-    private static function onError(message:Dynamic):Void {
-        final log:Array<String> = [];
-        if (message != null) log.push(Std.string(message));
-        log.push(haxe.CallStack.toString(haxe.CallStack.exceptionStack(true)));
-        var fullLog = log.join('\n');
-
-        #if sys
-        saveErrorMessage(fullLog);
-        #end
-
-        #if haxe3ds
-        Sys.println("\nCRITICAL ERROR:\n" + fullLog);
-        #else
-        trace("Critical Error: " + fullLog);
-        #end
-        
-        #if (!haxe3ds)
-        Sys.exit(1);
-        #end
-    }
-
-    #if sys
-    private static function saveErrorMessage(message:String):Void {
-        try {
-            #if haxe3ds
-            var folder:String = "sdmc:/DELTASHIT/Logs/";
-            #else
-            var cwd:String = "";
-            try { cwd = Sys.getCwd(); } catch(e:Dynamic) { cwd = ""; }
-            final folder:String = cwd + 'logs/';
-            #end
-
-            if (!FileSystem.exists(folder)) FileSystem.createDirectory(folder);
-            File.saveContent(folder + 'crash_' + Date.now().toString().replace(' ', '-').replace(':', "'") + '.txt', message);
-        } catch (e:Dynamic) {
-            trace('Couldn\'t save error message. (${e})');
-        }
-    }
-    #end
 }
+
+#end
