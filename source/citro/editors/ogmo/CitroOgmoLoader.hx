@@ -3,42 +3,38 @@ package citro.editors.ogmo;
 import citro.object.CitroTilemap;
 import haxe.Json;
 #if sys
-import sys.FileSystem;
 import sys.io.File;
-#else
-import openfl.Assets;
+import sys.FileSystem;
 #end
-
-using StringTools;
 
 class CitroOgmoLoader {
     public var project:Dynamic;
     public var level:Dynamic;
 
     public function new(projectDataPath:String, levelDataPath:String) {
-        var projectText:String = "";
-        var levelText:String = "";
+        var projectText = "";
+        var levelText = "";
 
         #if sys
-        if (FileSystem.exists(projectDataPath)) {
-            projectText = File.getContent(projectDataPath);
-        } else {
-            trace("Warning: Project file does not exist at: " + projectDataPath);
+        try {
+            if (FileSystem.exists(projectDataPath)) {
+                projectText = File.getContent(projectDataPath);
+            } else {
+                trace("Warning: Project file does not exist at: " + projectDataPath);
+            }
+            
+            if (FileSystem.exists(levelDataPath)) {
+                levelText = File.getContent(levelDataPath);
+            } else {
+                trace("Warning: Level file does not exist at: " + levelDataPath);
+            }
+        } catch (e:Dynamic) {
+            trace("Error loading Ogmo files: " + e);
         }
-        
-        if (FileSystem.exists(levelDataPath)) {
-            levelText = File.getContent(levelDataPath);
-        } else {
-            trace("Warning: Level file does not exist at: " + levelDataPath);
-        }
-        #else
-        projectText = Assets.getText(projectDataPath);
-        levelText = Assets.getText(levelDataPath);
         #end
 
         if (projectText != null && projectText.length > 0) {
             try {
-                projectText = cleanJsonKeys(projectText);
                 project = Json.parse(projectText);
             } catch (e:Dynamic) {
                 trace("ERROR parsing project JSON: " + e);
@@ -46,13 +42,12 @@ class CitroOgmoLoader {
                 project = {};
             }
         } else {
-            trace("ERROR: Project file is empty or missing: " + projectDataPath);
+            trace("Error: Project file is empty or missing: " + projectDataPath);
             project = {};
         }
 
         if (levelText != null && levelText.length > 0) {
             try {
-                levelText = cleanJsonKeys(levelText);
                 level = Json.parse(levelText);
             } catch (e:Dynamic) {
                 trace("ERROR parsing level JSON: " + e);
@@ -60,17 +55,9 @@ class CitroOgmoLoader {
                 level = {};
             }
         } else {
-            trace("ERROR: Level file is empty or missing: " + levelDataPath);
+            trace("Error: Level file is empty or missing: " + levelDataPath);
             level = {};
         }
-    }
-
-    static function cleanJsonKeys(json:String):String {
-        var result = json;
-        var regex = ~/("([^"]+)")\s*:/g;
-        return regex.map(result, function(r) {
-            return r.matched(1) + ":";
-        });
     }
 
     public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
@@ -93,27 +80,21 @@ class CitroOgmoLoader {
         }
 
         var arrayMode:Int = Std.int(Reflect.field(layer, "arrayMode"));
-        if (arrayMode == 0) {
+        if (arrayMode == 0 && layer.data != null) {
             var data:Array<Int> = cast Reflect.field(layer, "data");
-            if (data != null) {
-                for (i in 0...data.length) {
-                    tilemap.data[Math.floor(i / tilemap.widthInTiles)][i % tilemap.widthInTiles] = data[i];
-                }
+            for (i in 0...data.length) {
+                tilemap.data[Math.floor(i / tilemap.widthInTiles)][i % tilemap.widthInTiles] = data[i];
             }
-        } else if (arrayMode == 1) {
+        } else if (arrayMode == 1 && layer.data2D != null) {
             var data2D:Array<Array<Int>> = cast Reflect.field(layer, "data2D");
-            if (data2D != null) {
-                for (y in 0...data2D.length) {
-                    for (x in 0...data2D[y].length) {
-                        tilemap.data[y][x] = data2D[y][x];
-                    }
+            for (y in 0...data2D.length) {
+                for (x in 0...data2D[y].length) {
+                    tilemap.data[y][x] = data2D[y][x];
                 }
             }
-        } else {
+        } else if (layer.dataCSV != null) {
             var dataCSV:String = cast Reflect.field(layer, "dataCSV");
-            if (dataCSV != null) {
-                tilemap.loadMapFromCSV(dataCSV, tileSize);
-            }
+            tilemap.loadMapFromCSV(dataCSV, tileSize);
         }
         
         return tilemap;
@@ -135,15 +116,13 @@ class CitroOgmoLoader {
         }
     }
 
-	static function getTileLayer(data:Dynamic, name:String):Dynamic
-	{
+    static function getTileLayer(data:Dynamic, name:String):Dynamic {
         if (data == null || !Reflect.hasField(data, "layers")) return null;
         var layers:Array<Dynamic> = cast Reflect.field(data, "layers");
         if (layers != null) {
             for (layer in layers) {
-				var layerName:String = Std.string(Reflect.field(layer, "name"));
-				if (layerName != null && layerName.trim() == name)
-				{
+                var layerName:String = Std.string(Reflect.field(layer, "name"));
+                if (layerName != null && layerName.trim() == name) {
                     return layer;
                 }
             }
@@ -156,9 +135,8 @@ class CitroOgmoLoader {
         var layers:Array<Dynamic> = cast Reflect.field(data, "layers");
         if (layers != null) {
             for (layer in layers) {
-				var layerName:String = Std.string(Reflect.field(layer, "name"));
-				if (layerName != null && layerName.trim() == name)
-				{
+                var layerName:String = Std.string(Reflect.field(layer, "name"));
+                if (layerName != null && layerName.trim() == name) {
                     return layer;
                 }
             }

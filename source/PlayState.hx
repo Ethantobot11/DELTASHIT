@@ -2,6 +2,7 @@ package;
 
 import citro.CitroG;
 import citro.editors.ogmo.CitroOgmoLoader;
+import citro.object.CitroCamera;
 import citro.object.CitroGroup;
 import citro.object.CitroSprite;
 import citro.object.CitroTilemap;
@@ -22,25 +23,32 @@ class PlayState extends CitroState {
     var walls:CitroTilemap;
     var coins:CitroGroup;
     var enemies:CitroGroup;
+    var camera:CitroCamera;
 
     override public function create() {
         #if DISCORD_ALLOWED
         DiscordClient.changePresence("WE CALL IT : PLAYSTATE CUZ FUCK YOU", null);
         #end
 
+        camera = new CitroCamera();
+        add(camera);
+
         map = new CitroOgmoLoader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
 		walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
         add(walls);
 
         enemies = new CitroGroup();
-        add(enemies);
+        camera.add(enemies);
 
         coins = new CitroGroup();
-        add(coins);
+        camera.add(coins);
 
         player = new Player();
         map.loadEntities(placeEntities);
-        add(player);
+        camera.add(player);
+
+        camera.follow(player, true);
+        camera.target = player;
 
         hud = new HUD();
         add(hud);    

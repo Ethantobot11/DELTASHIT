@@ -73,7 +73,6 @@ class CitroTilemap extends CitroObject {
             return false;
         }
         
-        var drawCount = 0;
         for (y in 0...heightInTiles) {
             for (x in 0...widthInTiles) {
                 var tileIndex = data[y][x];
@@ -86,15 +85,9 @@ class CitroTilemap extends CitroObject {
                     brush.scale.x = this.scale.x;
                     brush.scale.y = this.scale.y;
                     brush.bottom = this.bottom;
-                    if (brush.update()) {
-                        drawCount++;
-                    }
+                    brush.update();
                 }
             }
-        }
-        
-        if (drawCount > 0) {
-            trace("[CitroTilemap] Drew " + drawCount + " tiles this frame");
         }
         return true;
     }
