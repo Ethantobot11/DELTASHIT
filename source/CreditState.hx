@@ -13,14 +13,16 @@ class CreditState extends CitroState {
         DiscordClient.changePresence("a very awesome guy : Ethantobot", null);
         #end
 
-        var text2 = new CitroText(10, 10, "Ethantobot");
+        var text2 = new CitroText(0, 60, "Ethantobot");
+        text2.alignment = CENTER;
+        text2.screenCenter(X);
         add(text2);
         
-        backButton = new CitroButton(0, 0, 100, 30, "back", backB);
+        backButton = new CitroButton(0, 200, 100, 30, "back", backB);
         backButton.bottom = true;
+        backButton.screenCenter(X);
         add(backButton);
 
-        text2.screenCenter();
         super.create();
     }
 

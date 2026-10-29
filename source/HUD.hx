@@ -15,7 +15,7 @@ class HUD extends CitroGroup {
     public function new() {
         super();
         background = new CitroSprite(0, 0);
-        background.makeGraphic(CitroG.WIDTH, 20, 0xFF000000);
+        background.makeGraphic(400, 20, 0xFF000000);
         
         healthCounter = new CitroText(16, 2, "20 / 20");
         healthCounter.setBorderStyle(0xFF808080, 1, SHADOW);
@@ -27,7 +27,7 @@ class HUD extends CitroGroup {
         healthIcon = new CitroSprite(4, healthCounter.y);
         healthIcon.loadGraphic("romfs:/assets/images/health.t3x");
         
-        moneyIcon = new CitroSprite(CitroG.WIDTH - 12, moneyCounter.y);
+        moneyIcon = new CitroSprite(400 - 12, moneyCounter.y);
         moneyIcon.loadGraphic("romfs:/assets/images/coin.t3x");
         moneyCounter.x = moneyIcon.x - moneyCounter.width - 4;
         

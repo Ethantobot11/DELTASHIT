@@ -22,15 +22,32 @@ class CitroButton extends CitroSprite
         
         label = new CitroText(X + (Width / 2), Y + (Height / 2), LabelText);
         label.alignment = CENTER;
+        label.bottom = this.bottom;
+        add(label);
         
         onClicked = OnClick;
     }
 
     override public function update():Bool 
     {
+        if (bottom && HID.keyHeld(HIDKey.TOUCH)) {
+            var touch = HID.touch;
+            isHovered = (touch.px >= x && touch.px <= x + width && 
+                        touch.py >= y && touch.py <= y + height);
+        } else {
+            isHovered = false;
+        }
+        
         if (isHovered && (HID.keyPressed(HIDKey.A) || HID.keyPressed(HIDKey.TOUCH))) {
             if (onClicked != null) onClicked();
         }
+        
+        if (isHovered) {
+            color = hoverColor;
+        } else {
+            color = baseColor;
+        }
+        
         return super.update();
     }
 

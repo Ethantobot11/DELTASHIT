@@ -22,32 +22,37 @@ class GameOverState extends CitroState {
 
         titleText = new CitroText(0, 20, if (win) "You Win!" else "Game Over!");
         titleText.alignment = CENTER;
-        titleText.screenCenter();
+        titleText.screenCenter(X);
         add(titleText);
 
-        messageText = new CitroText(0, (CitroG.HEIGHT / 2) - 18, "Final Score:");
+        messageText = new CitroText(0, 100, "Final Score:");
         messageText.alignment = CENTER;
-        messageText.screenCenter();
+        messageText.screenCenter(X);
         add(messageText);
 
-        scoreIcon = new CitroSprite((CitroG.WIDTH / 2) - 8, 0);
+        scoreIcon = new CitroSprite(0, 0);
         scoreIcon.loadGraphic("romfs:/assets/images/coin.t3x");
-        scoreIcon.screenCenter();
+        scoreIcon.x = (320 / 2) - 12;
+        scoreIcon.y = 130;
+        scoreIcon.bottom = true;
         add(scoreIcon);
 
-        scoreText = new CitroText((CitroG.WIDTH / 2), 0, Std.string(score));
-        scoreText.screenCenter();
+        scoreText = new CitroText(0, 0, Std.string(score));
+        scoreText.x = (320 / 2) + 12;
+        scoreText.y = 132;
+        scoreText.bottom = true;
         add(scoreText);
 
         var highscore = checkHighscore(score);
-        highscoreText = new CitroText(0, (CitroG.HEIGHT / 2) + 10, "Highscore: " + highscore);
+        highscoreText = new CitroText(0, 160, "Highscore: " + highscore);
         highscoreText.alignment = CENTER;
-        highscoreText.screenCenter();
+        highscoreText.bottom = true;
+        highscoreText.screenCenter(X);
         add(highscoreText);
 
-        mainMenuButton = new CitroButton(0, CitroG.HEIGHT - 32, 100, 30, "Main Menu", switchToMainMenu);
-        mainMenuButton.screenCenter();
+        mainMenuButton = new CitroButton(0, 200, 100, 30, "Main Menu", switchToMainMenu);
         mainMenuButton.bottom = true;
+        mainMenuButton.screenCenter(X);
         add(mainMenuButton);
     }
 
