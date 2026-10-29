@@ -7,7 +7,14 @@ import sys.FileSystem;
 using StringTools;
 
 class CitroAssets {
-    macro public static function buildFileReferences(localDir:String = "assets/", subDirectories:Bool = true):Array<Field> {
+    /**
+     * Reads files from a directory and generates `public static inline` variables.
+     * 
+     * @param localDir The local directory to scan (e.g., "assets/romfs/assets/").
+     * @param subDirectories Whether to include subdirectories.
+     * @param romfsRoot The RomFS prefix to use. If null, defaults to "romfs:/" + localDir.
+     */
+    macro public static function buildFileReferences(localDir:String = "assets/", subDirectories:Bool = true, ?romfsRoot:String):Array<Field> {
         var fields = Context.getBuildFields();
         
         function scan(currentDir:String, romfsPrefix:String) {
@@ -15,6 +22,7 @@ class CitroAssets {
                 Context.warning('Directory "$currentDir" does not exist on host. Asset paths will not be generated.', Context.currentPos());
                 return;
             }
+            
             for (item in FileSystem.readDirectory(currentDir)) {
                 var fullPath = currentDir + item;
                 if (FileSystem.isDirectory(fullPath)) {
@@ -43,7 +51,8 @@ class CitroAssets {
         }
         
         var cleanDir = localDir.endsWith("/") ? localDir : localDir + "/";
-        scan(cleanDir, "romfs:/" + cleanDir);
+        var prefix = romfsRoot != null ? romfsRoot : "romfs:/" + cleanDir;
+        scan(cleanDir, prefix);
         return fields;
     }
 }

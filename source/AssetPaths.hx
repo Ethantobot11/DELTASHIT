@@ -1,5 +1,4 @@
 package;
 
-@:build(citro.backend.CitroAssets.buildFileReferences("assets/", true))
-class AssetPaths {
-}
+@:build(citro.backend.CitroAssets.buildFileReferences("assets/romfs/assets/", true, "romfs:/assets/"))
+class AssetPaths {}
