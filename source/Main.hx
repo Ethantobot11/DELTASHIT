@@ -7,7 +7,7 @@ import haxe3ds.services.RomFS;
 import CrashHandler;
 
 class Main {
-    public function new() {
+    public static function main():Void {
         #if haxe3ds
         GFX.init();
         RomFS.init();
@@ -31,7 +31,6 @@ class Main {
         #if DISCORD_ALLOWED
         DiscordClient.prepare();
         #end
-
         CitroGame.start(new MenuState());
     }
 }
