@@ -2,7 +2,7 @@ package citro.backend;
 
 #if (!wiiu || !cafe)
 import citro.CitroG;
-import citro.VoidPtr;
+import citro.CitroG.VoidPtr;
 
 @:headerInclude("3ds.h")
 @:headerInclude("cwav.h")
