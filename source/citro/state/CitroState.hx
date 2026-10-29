@@ -11,10 +11,6 @@ class CitroState {
     public function new() {};
 
     public function create() {
-        if (fpsText != null) {
-            fpsText = new FPS();
-            add(fpsText);
-        }
     };
 
     public function update(delta:Int) {

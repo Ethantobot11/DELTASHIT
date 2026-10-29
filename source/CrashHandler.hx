@@ -6,6 +6,7 @@ import sys.io.File;
 #end
 #if haxe3ds
 import haxe3ds.Console;
+import citro.CitroG;
 #end
 
 using StringTools;
