@@ -19,7 +19,8 @@ class CitroCache {
 
     public function exists(path:String):Bool {
         return cache.exists(path);
- is 
+ 	}
+	
     public function get(path:String):VoidPtr {
         return cache.get(path);
     }
