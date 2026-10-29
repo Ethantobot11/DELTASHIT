@@ -16,25 +16,46 @@ class CitroOgmoLoader {
         var levelText = "";
         
         #if sys
-        if (FileSystem.exists(projectDataPath)) 
-            projectText = File.getContent(projectDataPath);
-        else 
-            projectText = "";
-        #else
-        projectText = "";
+        try {
+            if (FileSystem.exists(projectDataPath)) {
+                projectText = File.getContent(projectDataPath);
+            } else {
+                trace("Warning: Project file does not exist at: " + projectDataPath);
+            }
+            
+            if (FileSystem.exists(levelDataPath)) {
+                levelText = File.getContent(levelDataPath);
+            } else {
+                trace("Warning: Level file does not exist at: " + levelDataPath);
+            }
+        } catch (e:Dynamic) {
+            trace("Error loading Ogmo files: " + e);
+        }
         #end
 
-        #if sys
-        if (FileSystem.exists(levelDataPath)) 
-            levelText = File.getContent(levelDataPath);
-        else 
-            levelText = "";  // Or handle error
-        #else
-        levelText = "";  // No sys access
-        #end
-
-        project = Json.parse(projectText);
-        level = Json.parse(levelText);
+        if (projectText != null && projectText.length > 0) {
+            try {
+                project = Json.parse(projectText);
+            } catch (e:Dynamic) {
+                trace("Error parsing project JSON: " + e + " | Content preview: " + projectText.substr(0, 50));
+                project = {};
+            }
+        } else {
+            trace("Error: Project file is empty or missing: " + projectDataPath);
+            project = {};
+        }
+        
+        if (levelText != null && levelText.length > 0) {
+            try {
+                level = Json.parse(levelText);
+            } catch (e:Dynamic) {
+                trace("Error parsing level JSON: " + e + " | Content preview: " + levelText.substr(0, 50));
+                level = {};
+            }
+        } else {
+            trace("Error: Level file is empty or missing: " + levelDataPath);
+            level = {};
+        }
     }
 
     public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
@@ -79,6 +100,7 @@ class CitroOgmoLoader {
     }
 
     static function getTileLayer(data:Dynamic, name:String):Dynamic {
+        if (data == null || !Reflect.hasField(data, "layers")) return null;
         var layers:Array<Dynamic> = Reflect.field(data, "layers");
         if (layers != null) {
             for (layer in layers) 
@@ -89,6 +111,7 @@ class CitroOgmoLoader {
     }
 
     static function getEntityLayer(data:Dynamic, name:String):Dynamic {
+        if (data == null || !Reflect.hasField(data, "layers")) return null;
         var layers:Array<Dynamic> = Reflect.field(data, "layers");
         if (layers != null) {
             for (layer in layers) 

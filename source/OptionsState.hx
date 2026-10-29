@@ -23,23 +23,23 @@ class OptionsState extends CitroState {
         DiscordClient.changePresence("CURRENTLY CHANGING THE OPTIONS", null);
         #end
 
-        titleText = new CitroText(0, 20, "Options");
+        titleText = new CitroText(-600, 20, "Options");
         titleText.alignment = CENTER;
         titleText.screenCenter(X);
         add(titleText);
 
-        volumeText = new CitroText(0, titleText.y + 30, "Volume");
+        volumeText = new CitroText(-600, titleText.y + 30, "Volume");
         volumeText.alignment = CENTER;
         volumeText.screenCenter(X);
         add(volumeText);
 
-        volumeDownButton = new CitroButton(0, volumeText.y + 30, 40, 30, "-", clickVolumeDown);
+        volumeDownButton = new CitroButton(-600, volumeText.y + 30, 40, 30, "-", clickVolumeDown);
         volumeDownButton.screenCenter(X);
         volumeDownButton.x -= 100;
         volumeDownButton.bottom = true;
         add(volumeDownButton);
 
-        volumeUpButton = new CitroButton(0, volumeText.y + 30, 40, 30, "+", clickVolumeUp);
+        volumeUpButton = new CitroButton(-200, volumeText.y + 30, 40, 30, "+", clickVolumeUp);
         volumeUpButton.screenCenter(X);
         volumeUpButton.x += 100;
         volumeUpButton.bottom = true;
@@ -49,7 +49,7 @@ class OptionsState extends CitroState {
         volumeBar.bottom = true;
         add(volumeBar);
 
-        volumeAmountText = new CitroText(0, 0, "100%");
+        volumeAmountText = new CitroText(-600, 0, "100%");
         volumeAmountText.alignment = CENTER;
         volumeAmountText.screenCenter(X);
         volumeAmountText.bottom = true;
