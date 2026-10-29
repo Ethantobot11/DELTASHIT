@@ -3,8 +3,8 @@ package citro.editors.ogmo;
 import citro.object.CitroTilemap;
 import haxe.Json;
 #if sys
-import sys.io.File;
 import sys.FileSystem;
+import sys.io.File;
 #else
 import openfl.Assets;
 #end
@@ -133,12 +133,15 @@ class CitroOgmoLoader {
         }
     }
 
-    static function getTileLayer(data:Dynamic, name:String):Dynamic {
+	static function getTileLayer(data:Dynamic, name:String):Dynamic
+	{
         if (data == null || !Reflect.hasField(data, "layers")) return null;
         var layers:Array<Dynamic> = cast Reflect.field(data, "layers");
         if (layers != null) {
             for (layer in layers) {
-                if (Reflect.field(layer, "name") == name) {
+				var layerName:String = Std.string(Reflect.field(layer, "name"));
+				if (layerName != null && layerName.trim() == name)
+				{
                     return layer;
                 }
             }
@@ -151,7 +154,9 @@ class CitroOgmoLoader {
         var layers:Array<Dynamic> = cast Reflect.field(data, "layers");
         if (layers != null) {
             for (layer in layers) {
-                if (Reflect.field(layer, "name") == name) {
+				var layerName:String = Std.string(Reflect.field(layer, "name"));
+				if (layerName != null && layerName.trim() == name)
+				{
                     return layer;
                 }
             }

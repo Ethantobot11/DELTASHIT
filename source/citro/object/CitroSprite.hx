@@ -27,17 +27,27 @@ class CitroSprite extends CitroObject {
     public var useSrcRect:Bool = false;
     public var frame(default, set):Int = 0;
     public var totalFrames(default, null):Int = 0;
+    public var sheetWidth:Float = 0;
+    public var sheetHeight:Float = 0;
 
     public function new(x:Float = 0, y:Float = 0) {
         super();
         this.x = x;
         this.y = y;
+        untyped __cpp__('
+            this->ss = nullptr;
+            this->image.tex = nullptr;
+            this->image.subtex = nullptr;
+            this->currentFrame = 0;
+        ');
     }
 
     inline public function makeGraphic(Width:Float, Height:Float, Col:CitroColor = 0xFFFFFFFF):CitroSprite {
         width  = Width;
         height = Height;
         color  = Col;
+        sheetWidth = Width;
+        sheetHeight = Height;
         return this;
     }
 
@@ -69,28 +79,27 @@ class CitroSprite extends CitroObject {
             CitroG.caches.setMeta(file + "_frames", totalFrames);
         }
 
+        var imageWidth:Float = 0;
+        var imageHeight:Float = 0;
+        untyped __cpp__('
+            C2D_Image firstImg = C2D_SpriteSheetGetImage(this->ss, 0);
+            imageWidth = firstImg.subtex->width;
+            imageHeight = firstImg.subtex->height;
+        ');
+        sheetWidth = imageWidth;
+        sheetHeight = imageHeight;
+
         if (frameWidth > 0 && frameHeight > 0) {
             width = frameWidth;
             height = frameHeight;
-
-            var imageWidth:Float = 0;
-            var imageHeight:Float = 0;
-            untyped __cpp__('
-                C2D_Image firstImg = C2D_SpriteSheetGetImage(this->ss, 0);
-                imageWidth = firstImg.subtex->width;
-                imageHeight = firstImg.subtex->height;
-            ');
             
-            var framesPerRow:Int = Std.int(imageWidth / frameWidth);
-            var framesPerCol:Int = Std.int(imageHeight / frameHeight);
+            var framesPerRow:Int = Std.int(sheetWidth / frameWidth);
+            var framesPerCol:Int = Std.int(sheetHeight / frameHeight);
             totalFrames = framesPerRow * framesPerCol;
             CitroG.caches.setMeta(file + "_frames", totalFrames);
         } else {
-            untyped __cpp__('
-                C2D_Image firstImg = C2D_SpriteSheetGetImage(this->ss, 0);
-                this->width = firstImg.subtex->width;
-                this->height = firstImg.subtex->height;
-            ');
+            width = sheetWidth;
+            height = sheetHeight;
         }
         
         setFrame(0);
@@ -127,6 +136,8 @@ class CitroSprite extends CitroObject {
         
         width = Sprite.width;
         height = Sprite.height;
+        sheetWidth = Sprite.sheetWidth;
+        sheetHeight = Sprite.sheetHeight;
         frame = Sprite.frame;
         srcX = Sprite.srcX;
         srcY = Sprite.srcY;
@@ -138,7 +149,7 @@ class CitroSprite extends CitroObject {
     }
 
     override function update():Bool {
-        if (!visible || alpha <= 0) return false;
+        if (isDestroyed || !visible || alpha <= 0) return false;
         
         untyped __cpp__('
             Float sw = this->scale->x, sh = this->scale->y;

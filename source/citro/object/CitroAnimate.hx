@@ -123,16 +123,17 @@ class CitroAnimate extends CitroObject {
         atlasPath = t3xPath;
         
         atlasSprite = new CitroSprite();
-        if (!atlasSprite.loadGraphic(t3xPath)) {
+        if (!atlasSprite.loadGraphic(t3xPath, frameWidth, frameHeight)) {
             atlasSprite.destroy();
             atlasSprite = null;
             trace("ERROR: Failed to load T3X file: " + t3xPath);
             return;
         }
 
-        var framesPerRow:Int = Std.int(atlasSprite.width / frameWidth);
-        var framesPerCol:Int = Std.int(atlasSprite.height / frameHeight);
+        var framesPerRow:Int = Std.int(atlasSprite.sheetWidth / frameWidth);
+        var framesPerCol:Int = Std.int(atlasSprite.sheetHeight / frameHeight);
         var maxFrames:Int = framesPerRow * framesPerCol;     
+        
         for (i in 0...maxFrames) {
             final frameKey:String = 'frame-$i';
             var frameX:Int = i % framesPerRow;
@@ -197,11 +198,6 @@ class CitroAnimate extends CitroObject {
         play(animPrefix);
     }
 
-    /**
-     * Add an animation sequence
-     * @param name Animation name
-     * @param frames Array of frame indices
-     */
     public function addAnim(name:String, frames:Array<Int>):Void {
         animations.set(name, frames);
     }
