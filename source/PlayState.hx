@@ -1,11 +1,11 @@
 package;
 
-import citro.state.CitroState;
-import citro.object.CitroSprite;
-import citro.object.CitroGroup;
 import citro.CitroG;
 import citro.editors.ogmo.CitroOgmoLoader;
+import citro.object.CitroGroup;
+import citro.object.CitroSprite;
 import citro.object.CitroTilemap;
+import citro.state.CitroState;
 import haxe3ds.services.HID;
 
 class PlayState extends CitroState {
@@ -29,7 +29,7 @@ class PlayState extends CitroState {
         #end
 
         map = new CitroOgmoLoader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
-        walls = map.loadTilemap(AssetPaths.tiles__png, "walls", 16);
+		walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
         add(walls);
 
         enemies = new CitroGroup();
