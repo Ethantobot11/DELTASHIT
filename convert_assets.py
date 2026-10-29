@@ -126,10 +126,10 @@ def main():
             tex3ds_success = True
         except Exception as e:
             print(f"  ERROR: tex3ds failed on {png_path}. ({e})")
-
+        cea_generated = (xml_path is None)
+        
         if xml_path:
             print(f"  [2/2] Generating 10-column {cea_path} from {xml_path}...")
-            cea_generated = False
             try:
                 tree = ET.parse(xml_path)
                 root_elem = tree.getroot()
@@ -188,7 +188,7 @@ def main():
         print(f"  Cleaning up...")
         if tex3ds_success:
             try:
-                if cea_generated or xml_path is None:
+                if cea_generated:
                     if os.path.exists(png_path): os.remove(png_path)
                     if xml_path and os.path.exists(xml_path): os.remove(xml_path)
                     print(f"  SUCCESS: {name} fully converted and cleaned up.")

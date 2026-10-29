@@ -3,32 +3,8 @@ package citro.backend;
 #if (!wiiu || !cafe)
 import citro.CitroG;
 import citro.CitroG.VoidPtr;
-
 @:headerInclude("3ds.h")
 @:headerInclude("cwav.h")
-@:headerInclude("ncsnd.h")
-class CWAVHelper {
-    public static inline function useEnvironment(envMode:Int):Void {
-        untyped __cpp__("cwavUseEnvironment({0})", envMode);
-    }
-
-    public static inline function fileLoad(out:VoidPtr, filename:String, maxSPlays:Int):Void {
-        untyped __cpp__("cwavFileLoad({0}, {1}, {2})", out, filename, maxSPlays);
-    }
-
-    public static inline function play(cwav:VoidPtr, leftChannel:Int, rightChannel:Int):Void {
-        untyped __cpp__("cwavPlay({0}, {1}, {2})", cwav, leftChannel, rightChannel);
-    }
-
-    public static inline function stop(cwav:VoidPtr, leftChannel:Int, rightChannel:Int):Void {
-        untyped __cpp__("cwavStop({0}, {1}, {2})", cwav, leftChannel, rightChannel);
-    }
-
-    public static inline function fileFree(cwav:VoidPtr):Void {
-        untyped __cpp__("cwavFileFree({0})", cwav);
-    }
-}
-
 class CitroSound {
     public var volume:Float = 1.0;
     public var looped:Bool = false;
@@ -46,7 +22,7 @@ class CitroSound {
     private function init():Void {
         if (initialized) return;
         untyped __cpp__("ndspInit()");
-        CWAVHelper.useEnvironment(0);
+        untyped __cpp__("cwavUseEnvironment(0)");
         initialized = true;
         trace("CitroSound initialized with NDSP.");
     }
@@ -62,7 +38,7 @@ class CitroSound {
         }
 
         this.cwavPtr = cast untyped __cpp__("calloc(1, sizeof(CWAV))");
-        CWAVHelper.fileLoad(this.cwavPtr, path, 4);
+        untyped __cpp__("cwavFileLoad({0}, {1}, 4)", this.cwavPtr, path);
 
         var status:Int = untyped __cpp__("((CWAV*){0})->loadStatus", this.cwavPtr);
         if (status == 1) {
@@ -81,14 +57,14 @@ class CitroSound {
         }
         if (cwavPtr != null) {
             untyped __cpp__("((CWAV*){0})->volume = {1}", this.cwavPtr, this.volume);
-            CWAVHelper.play(this.cwavPtr, 0, -1);
+            untyped __cpp__("cwavPlay({0}, 0, -1)", this.cwavPtr);
             this.isPlaying = true;
         }
     }
 
     public function stop():Void {
         if (cwavPtr != null) {
-            CWAVHelper.stop(this.cwavPtr, -1, -1);
+            untyped __cpp__("cwavStop({0}, -1, -1)", this.cwavPtr);
             this.isPlaying = false;
         }
     }
