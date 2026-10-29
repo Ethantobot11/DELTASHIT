@@ -29,11 +29,13 @@ class MenuState extends CitroState
         var titleText1 = new CitroText(0, 30, "DELTARUNE : CHAPTER 7");
         titleText1.alignment = CENTER;
         titleText1.screenCenter(X);
+        titleText1.bottom = false;
         add(titleText1);
 
         titleText = new CitroText(0, 80, "HaxeFlixel\nTutorial\nGame");
         titleText.alignment = CENTER;
         titleText.screenCenter(X);
+        titleText.bottom = false;
         add(titleText);
 
         playButton = new CitroButton(0, 180, 100, 30, "Play", clickPlay);

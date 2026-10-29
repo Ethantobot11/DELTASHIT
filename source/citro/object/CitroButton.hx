@@ -19,11 +19,8 @@ class CitroButton extends CitroSprite
         makeGraphic(Width, Height, 0xFF444444);
         baseColor = 0xFF444444;
         hoverColor = 0xFFFFD700;
-        
         label = new CitroText(X + (Width / 2), Y + (Height / 2), LabelText);
-        label.alignment = CENTER;
-        label.bottom = this.bottom;
-        
+        label.alignment = CENTER;        
         onClicked = OnClick;
     }
 

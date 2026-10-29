@@ -19,6 +19,23 @@ class CrashHandler {
         #end
     }
 
+    public static function protect(func:Void->Void, fallbackState:Dynamic):Void {
+        try {
+            func();
+        } catch (e:Dynamic) {
+            onError(e);
+            try {
+                if (fallbackState != null) {
+                    CitroG.switchState(Type.createInstance(fallbackState, []));
+                }
+            } catch (e2:Dynamic) {
+                #if haxe3ds
+                Sys.println("Failed to recover to fallback state");
+                #end
+            }
+        }
+    }
+
     private static function onError(message:Dynamic):Void {
         final log:Array<String> = [];
         if (message != null) log.push(Std.string(message));
