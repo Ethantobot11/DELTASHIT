@@ -36,7 +36,7 @@ class CitroState {
 	public function update(delta:Int) {
 		for (member in members) {
 			if (member != null && member.exists) {
-				member.update(delta);
+				member.update();
 			}
 		}
 	}

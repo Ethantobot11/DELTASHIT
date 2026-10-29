@@ -48,7 +48,7 @@ class Enemy extends CitroAnimate {
         framerate = type == BOSS ? 4 : 5;
         looped = true;
         
-        playerPosition = new CitroVector2D();
+        playerPosition = {x: 0, y: 0};
         brain = new FSM(idle);
         idleTimer = 0;
     }
@@ -88,11 +88,11 @@ class Enemy extends CitroAnimate {
     }
 
     public function changeType(type:EnemyType) {
-        if (this.type != type) {
-            this.type = type;
-            var graphic = if (type == BOSS) AssetPaths.boss__t3x else AssetPaths.enemy__t3x;
-            var frameW = if (type == BOSS) 25 else 21;
-            var frameH = if (type == BOSS) 46 else 40;
+        if (this.type != newType) {
+            this.type = newType;
+            var graphic = if (newType == BOSS) AssetPaths.boss__t3x else AssetPaths.enemy__t3x;
+            var frameW = if (newType == BOSS) 25 else 21;
+            var frameH = if (newType == BOSS) 46 else 40;
             var anims = new Map<String, Array<Int>>();
             if (type == BOSS) {
                 anims.set("d_idle", [0]);
@@ -111,7 +111,7 @@ class Enemy extends CitroAnimate {
             }
             
             loadFromT3XWithAnims(graphic, frameW, frameH, anims);
-            framerate = type == BOSS ? 4 : 5;
+            framerate = newType == BOSS ? 4 : 5;
         }
     }
 

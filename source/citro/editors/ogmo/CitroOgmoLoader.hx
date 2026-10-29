@@ -73,7 +73,8 @@ class CitroOgmoLoader {
     public function loadEntities(entityLoadCallback:Dynamic->Void, entityLayer:String = "entities"):Void {
         var layer = getEntityLayer(level, entityLayer);
         if (layer != null && layer.entities != null) {
-            for (entity in layer.entities) entityLoadCallback(entity);
+            var entities:Array<Dynamic> = layer.entities;
+            for (entity in entities) entityLoadCallback(entity);
         }
     }
 

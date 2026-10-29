@@ -63,7 +63,7 @@ class CitroSprite extends CitroObject {
             untyped __cpp__('this->ss = (C2D_SpriteSheet){0}', CitroG.caches.get(file));
             var cachedFrames = CitroG.caches.get(file + "_frames");
             if (cachedFrames != null) {
-                totalFrames = cachedFrames;
+                totalFrames = cast cachedFrames;
             }
         } else {
             untyped __cpp__('
@@ -72,7 +72,7 @@ class CitroSprite extends CitroObject {
                 this->totalFrames = C2D_SpriteSheetCount(this->ss);
             ');
             CitroG.caches.set(file, untyped __cpp__('this->ss'));
-            CitroG.caches.set(file + "_frames", totalFrames);
+            CitroG.caches.set(file + "_frames", cast totalFrames);
         }
 
         if (frameWidth > 0 && frameHeight > 0) {

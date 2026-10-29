@@ -11,6 +11,7 @@ import citro.object.CitroGroup;
 import citro.object.CitroSprite;
 import citro.object.CitroText;
 import haxe3ds.services.HID;
+import Enemy.EnemyType;
 
 enum Outcome
 {
