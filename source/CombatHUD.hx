@@ -89,10 +89,7 @@ class CombatHUD extends CitroGroup
 		playerSprite.active = false;
 		add(playerSprite);
 
-		enemySprite = new Enemy();
-        enemySprite.x = background.x + 156;
-        enemySprite.y = background.y + 26;
-        enemySprite.type = EnemyType.REGULAR;
+		enemySprite = new Enemy(background.x + 156, background.y + 26, EnemyType.REGULAR);
 		enemySprite.active = false;
 		add(enemySprite);
 
