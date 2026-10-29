@@ -110,70 +110,13 @@ class CitroAnimate extends CitroObject {
     }
     
     /**
-     * Load animation from a T3X atlas with uniform frame sizes
-     * @param t3xPath Path to the T3X file
-     * @param frameWidth Width of each frame
-     * @param frameHeight Height of each frame
-     * @param animName Name for the animation (default: "anim")
-     * @param startFrame First frame index (default: 0)
-     * @param totalFrames Total number of frames (auto-detected if -1)
-     */
-    public function loadFromT3X(t3xPath:String, frameWidth:Float, frameHeight:Float, 
-                                 animName:String = "anim", startFrame:Int = 0, totalFrames:Int = -1):Void {
-        if (atlasSprite != null) { atlasSprite.destroy(); atlasSprite = null; }
-        frames = new Map();
-        animations = new Map();
-        atlasPath = t3xPath;
-        
-        atlasSprite = new CitroSprite();
-        if (!atlasSprite.loadGraphic(t3xPath)) {
-            atlasSprite.destroy();
-            atlasSprite = null;
-            trace("ERROR: Failed to load T3X file: " + t3xPath);
-            return;
-        }
-        
-        var maxFrames:Int = untyped __cpp__('C2D_SpriteSheetCount({0}->ss)', atlasSprite);
-        if (totalFrames == -1) totalFrames = maxFrames;
-        if (startFrame + totalFrames > maxFrames) {
-            totalFrames = maxFrames - startFrame;
-        }
-        
-        for (i in 0...totalFrames) {
-            final frameIndex:Int = startFrame + i;
-            final frameKey:String = '$animName-$i';
-
-            final srcX:Float = (frameIndex % Std.int(maxFrames)) * frameWidth;
-            final srcY:Float = 0;
-            
-            frames.set(frameKey, {
-                srcX: srcX,
-                srcY: srcY,
-                srcWidth: frameWidth,
-                srcHeight: frameHeight,
-                offsetX: 0,
-                offsetY: 0,
-                frameWidth: frameWidth,
-                frameHeight: frameHeight
-            });
-        }
-        
-        var frameIndices:Array<Int> = [];
-        for (i in 0...totalFrames) frameIndices.push(i);
-        animations.set(animName, frameIndices);
-        
-        play(animName);
-    }
-    
-    /**
-     * Load multiple animations from a single T3X atlas
+     * Load multiple animations from a single T3X atlas (Grid-based)
      * @param t3xPath Path to the T3X file
      * @param frameWidth Width of each frame
      * @param frameHeight Height of each frame
      * @param animDefs Animation definitions: [animName => [frameIndices]]
      */
-    public function loadFromT3XWithAnims(t3xPath:String, frameWidth:Float, frameHeight:Float,
-                                          animDefs:Map<String, Array<Int>>):Void {
+    public function loadFromT3XWithAnims(t3xPath:String, frameWidth:Float, frameHeight:Float, animDefs:Map<String, Array<Int>>):Void {
         if (atlasSprite != null) { atlasSprite.destroy(); atlasSprite = null; }
         frames = new Map();
         animations = new Map();
@@ -188,13 +131,20 @@ class CitroAnimate extends CitroObject {
         }
         
         var maxFrames:Int = untyped __cpp__('C2D_SpriteSheetCount({0}->ss)', atlasSprite);
+        var framesPerRow:Int = Std.int(atlasSprite.width / frameWidth);
+        if (framesPerRow == 0) framesPerRow = 1;
+        
         for (i in 0...maxFrames) {
             final frameKey:String = 'frame-$i';
-            final srcX:Float = (i % Std.int(maxFrames)) * frameWidth;
+            var frameX:Int = i % framesPerRow;
+            var frameY:Int = Std.int(i / framesPerRow);
+            
+            final srcX:Float = frameX * frameWidth;
+            final srcY:Float = frameY * frameHeight;
             
             frames.set(frameKey, {
                 srcX: srcX,
-                srcY: 0,
+                srcY: srcY,
                 srcWidth: frameWidth,
                 srcHeight: frameHeight,
                 offsetX: 0,

@@ -16,11 +16,11 @@ class CitroButton extends CitroSprite
     public function new(X:Float, Y:Float, Width:Float, Height:Float, LabelText:String, ?OnClick:Void->Void) 
     {
         super(X, Y);
+        label = new CitroText(X, Y, LabelText);
+        label.alignment = CENTER; 
         makeGraphic(Width, Height, 0xFF444444);
         baseColor = 0xFF444444;
-        hoverColor = 0xFFFFD700;
-        label = new CitroText(X + (Width / 2), Y + (Height / 2), LabelText);
-        label.alignment = CENTER;        
+        hoverColor = 0xFFFFD700;       
         onClicked = OnClick;
     }
 
