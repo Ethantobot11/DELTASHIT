@@ -1,32 +1,15 @@
 package;
 
-#if wiiu
-import leafy.core.LeafySprite;
-import leafy.core.LeafyG;
-import leafy.group.LeafyGroup.LeafyTypedGroup;
-import leafy.text.LeafyText;
-import leafy.tweens.LeafyTween;
-import leafy.tweens.LeafyEase;
-import leafy.sound.LeafySound;
-#else
-import flash.filters.ColorMatrixFilter;
-import flash.geom.Matrix;
-import flash.geom.Point;
-import flixel.math.FlxMath;
-import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.addons.effects.chainable.FlxEffectSprite;
-import flixel.addons.effects.chainable.FlxWaveEffect;
-import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.sound.FlxSound;
-import flixel.text.FlxText;
-import flixel.tweens.FlxEase;
-import flixel.tweens.FlxTween;
-import flixel.ui.FlxBar;
-import flixel.util.FlxColor;
-
-using flixel.util.FlxSpriteUtil;
-#end
+import citro.CitroG;
+import citro.backend.CitroColor;
+import citro.backend.CitroG.sound.load;
+import citro.backend.CitroTween.CitroEase;
+import citro.backend.CitroTween;
+import citro.object.CitroBar;
+import citro.object.CitroGroup;
+import citro.object.CitroSprite;
+import citro.object.CitroText;
+import haxe3ds.services.HID;
 
 enum Outcome
 {
@@ -46,239 +29,152 @@ enum Choice
 	FLEE;
 }
 
-class CombatHUD extends #if wiiu LeafyTypedGroup<LeafySprite> #else FlxTypedGroup<FlxSprite> #end
+class CombatHUD extends CitroGroup
 {
 	public var enemy:Enemy;
 	public var playerHealth(default, null):Int;
 	public var outcome(default, null):Outcome;
 
-	#if wiiu
-	var ACTTEXT:LeafyText;
-	var ITEMTEXT:LeafyText;
-	var SPARETEXT:LeafyText;
-
-	var background:LeafySprite;
+	var ACTTEXT:CitroText;
+	var ITEMTEXT:CitroText;
+	var SPARETEXT:CitroText;
+	var background:CitroSprite;
 	var playerSprite:Player;
 	var enemySprite:Enemy;
-
 	var spareBar:Int;
 	var enemyHealth:Int;
 	var enemyMaxHealth:Int;
-	
-	var playerHealthCounter:LeafyText;
-	var damages:Array<LeafyText>;
-	var spare:Array<LeafyText>;
-	
-	var pointer:LeafySprite;
+	var enemyHealthBar:CitroBar;
+	var spareBarGame:CitroBar;
+	var playerHealthCounter:CitroText;
+	var damages:Array<CitroText>;
+	var spare:Array<CitroText>;
+	var pointer:CitroSprite;
 	var selected:Choice;
-	var choices:Map<Choice, LeafyText>;
-	var results:LeafyText;
-
+	var choices:Map<Choice, CitroText>;
+	var results:CitroText;
 	var alpha:Float = 0;
 	var wait:Bool = true;
 
-	var vs_susie:LeafySound;
-	var fledSound:LeafySound;
-	var hurtSound:LeafySound;
-	var loseSound:LeafySound;
-	var missSound:LeafySound;
-	var selectSound:LeafySound;
-	var winSound:LeafySound;
-	var combatSound:LeafySound;
-	var battle:LeafySound;
-
-	var screen:LeafySprite;
-	#else
-	var ACTTEXT:FlxText;
-	var ITEMTEXT:FlxText;
-	var SPARETEXT:FlxText;
-
-	var background:FlxSprite;
-	var playerSprite:Player;
-	var enemySprite:Enemy;
-
-	var spareBar:Int;
-	var enemyHealth:Int;
-	var enemyMaxHealth:Int;
-	var enemyHealthBar:FlxBar;
-	var spareBarGame:FlxBar;
-	
-	var playerHealthCounter:FlxText;
-	var damages:Array<FlxText>;
-	var spare:Array<FlxText>;
-	
-	var pointer:FlxSprite;
-	var selected:Choice;
-	var choices:Map<Choice, FlxText>;
-	var results:FlxText;
-
-	var alpha:Float = 0;
-	var wait:Bool = true;
-
-	var vs_susie:FlxSound;
-	var fledSound:FlxSound;
-	var hurtSound:FlxSound;
-	var loseSound:FlxSound;
-	var missSound:FlxSound;
-	var selectSound:FlxSound;
-	var winSound:FlxSound;
-	var combatSound:FlxSound;
-	var battle:FlxSound;
-
-	var screen:FlxSprite;
-	#end
+	var vs_susie:CitroSound;
+	var fledSound:CitroSound;
+	var hurtSound:CitroSound;
+	var loseSound:CitroSound;
+	var missSound:CitroSound;
+	var selectSound:CitroSound;
+	var winSound:CitroSound;
+	var combatSound:CitroSound;
+	var battle:CitroSound;
+	var screenFlash:CitroSprite;
 
 	public function new()
 	{
 		super();
-
-		#if wiiu
 		wait = true;
-		active = false;
+		exists = false;
 		visible = false;
-		#else
-		screen = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
-		var waveEffect = new FlxWaveEffect(FlxWaveMode.ALL, 4, -1, 4);
-		var waveSprite = new FlxEffectSprite(screen, [waveEffect]);
-		add(waveSprite);
 
-		background = new FlxSprite().makeGraphic(220, 220, FlxColor.WHITE);
-		background.drawRect(1, 1, 220, 220, FlxColor.BLACK);
-		background.drawRect(1, 46, 220, 220, FlxColor.BLACK);
+		screenFlash = new CitroSprite(0, 0);
+		screenFlash.makeGraphic(CitroG.WIDTH, CitroG.HEIGHT, 0xFFFFFFFF);
+		screenFlash.alpha = 0;
+		add(screenFlash);
+
+		background = new CitroSprite(0, 0);
+		background.makeGraphic(220, 220, 0xFFFFFFFF);
 		background.screenCenter();
 		add(background);
 
-		playerSprite = new Player(background.x + -26, background.y + 26);
-		playerSprite.animation.frameIndex = 3;
+		playerSprite = new Player(background.x - 26, background.y + 26);
 		playerSprite.active = false;
-		playerSprite.facing = RIGHT;
 		add(playerSprite);
 
-		enemySprite = new Enemy(background.x + 156, background.y + 26, REGULAR);
-		enemySprite.animation.frameIndex = 3;
+		enemySprite = new Enemy(background.x + 156, background.y + 26, EnemyType.REGULAR);
 		enemySprite.active = false;
-		enemySprite.facing = DOWN;
 		add(enemySprite);
 
-		playerHealthCounter = new FlxText(0, playerSprite.y + playerSprite.height + 2, 0, "20 / 20", 8);
+		playerHealthCounter = new CitroText(0, playerSprite.y + playerSprite.height + 2, "20 / 20");
 		playerHealthCounter.alignment = CENTER;
-		playerHealthCounter.x = playerSprite.x + 4 - (playerHealthCounter.width / 2);
 		add(playerHealthCounter);
 
-		spareBarGame = new FlxBar(enemySprite.x - 15, playerHealthCounter.y - 40, LEFT_TO_RIGHT, 150, 20);
-		spareBarGame.createFilledBar(FlxColor.RED, FlxColor.YELLOW, true, FlxColor.BLACK);
-		spareBarGame.setRange(0, 100);
+		spareBarGame = new CitroBar(enemySprite.x - 15, playerHealthCounter.y - 40, 150, 20);
+		spareBarGame.min = 0;
+		spareBarGame.max = 100;
+		spareBarGame.value = 0;
 		add(spareBarGame);
 
-		enemyHealthBar = new FlxBar(enemySprite.x - 35, playerHealthCounter.y, LEFT_TO_RIGHT, 150, 20);
-		enemyHealthBar.createFilledBar(0xfffc0000, FlxColor.LIME, true, FlxColor.LIME);
+		enemyHealthBar = new CitroBar(enemySprite.x - 35, playerHealthCounter.y, 150, 20);
+		enemyHealthBar.min = 0;
+		enemyHealthBar.max = 100;
+		enemyHealthBar.value = 100;
 		add(enemyHealthBar);
 
 		choices = new Map();
-		choices[FIGHT] = new FlxText(background.x + 5, background.y + 8, 95, "FIGHT", 22);
-		choices[ACT] = new FlxText(background.x + 5, choices[FIGHT].y + choices[FIGHT].height + 8, 85, "ACT", 22);
-		choices[ITEM] = new FlxText(background.x + 5, choices[ACT].y + choices[ACT].height + 8, 85, "ITEM", 22);
-		choices[SPARE] = new FlxText(background.x + 5, choices[ITEM].y + choices[ITEM].height + 8, 85, "SPARE", 22);
-		choices[FLEE] = new FlxText(background.x + 5, choices[SPARE].y + choices[SPARE].height + 8, 85, "FLEE", 22);
-		add(choices[FIGHT]);
-		add(choices[ACT]);
-		add(choices[ITEM]);
-		add(choices[SPARE]);
-		add(choices[FLEE]);
+		choices[FIGHT] = new CitroText(background.x + 5, background.y + 8, "FIGHT");
+		choices[ACT] = new CitroText(background.x + 5, choices[FIGHT].y + 22, "ACT");
+		choices[ITEM] = new CitroText(background.x + 5, choices[ACT].y + 22, "ITEM");
+		choices[SPARE] = new CitroText(background.x + 5, choices[ITEM].y + 22, "SPARE");
+		choices[FLEE] = new CitroText(background.x + 5, choices[SPARE].y + 22, "FLEE");
+        
+		for (choice in choices)
+			add(choice);
 
-		pointer = new FlxSprite(background.x + 10, choices[FIGHT].y + (choices[FIGHT].height / 2) - 8, AssetPaths.pointer__png);
+		pointer = new CitroSprite(background.x + 10, choices[FIGHT].y);
+		pointer.loadGraphic("romfs:/assets/images/pointer.t3x");
 		pointer.visible = false;
 		add(pointer);
 
-		damages = new Array<FlxText>();
-		damages.push(new FlxText(0, 0, 40));
-		damages.push(new FlxText(0, 0, 40));
+		damages = [new CitroText(0, 0, ""), new CitroText(0, 0, "")];
 		for (d in damages)
 		{
-			d.color = FlxColor.WHITE;
-			d.setBorderStyle(SHADOW, FlxColor.RED);
+			d.color = 0xFFFFFFFF;
+			d.setBorderStyle(0xFFFF0000, 1, SHADOW);
 			d.alignment = CENTER;
 			d.visible = false;
 			add(d);
 		}
 
-		spare = new Array<FlxText>();
-		spare.push(new FlxText(0, 0, 40));
-		spare.push(new FlxText(0, 0, 40));
+		spare = [new CitroText(0, 0, ""), new CitroText(0, 0, "")];
 		for (b in spare)
 		{
-			b.color = FlxColor.YELLOW;
-			b.setBorderStyle(SHADOW, FlxColor.BLACK);
+			b.color = 0xFFFFFF00;
+			b.setBorderStyle(0xFF000000, 1, SHADOW);
 			b.alignment = CENTER;
 			b.visible = false;
 			add(b);
 		}
 
-		results = new FlxText(background.x + 2, background.y + 9, 116, "", 18);
+		results = new CitroText(background.x + 2, background.y + 9, "");
 		results.alignment = CENTER;
-		results.color = FlxColor.YELLOW;
-		results.setBorderStyle(SHADOW, FlxColor.GRAY);
+		results.color = 0xFFFFFF00;
+		results.setBorderStyle(0xFF808080, 1, SHADOW);
 		results.visible = false;
 		add(results);
 
-		forEach(function(sprite:FlxSprite)
+		for (member in members)
 		{
-			sprite.scrollFactor.set();
-			sprite.alpha = 0;
-		});
+			member.alpha = 0;
+		}
 
-		active = false;
-		visible = false;
-
-		vs_susie = FlxG.sound.load(AssetPaths.vs_susie__ogg);
+		vs_susie = new CitroG.sound.load(AssetPaths.vs_susie__ogg);
 		vs_susie.looped = true;
-		fledSound = FlxG.sound.load(AssetPaths.fled__wav);
-		hurtSound = FlxG.sound.load(AssetPaths.hurt__wav);
-		loseSound = FlxG.sound.load(AssetPaths.LOSE__ogg);
-		missSound = FlxG.sound.load(AssetPaths.miss__wav);
-		selectSound = FlxG.sound.load(AssetPaths.select__wav);
-		winSound = FlxG.sound.load(AssetPaths.win__wav);
-		combatSound = FlxG.sound.load(AssetPaths.combat__wav);
-		battle = FlxG.sound.load(AssetPaths.battle__ogg);
+		fledSound = new CitroG.sound.load(AssetPaths.fled__wav);
+		hurtSound = new CitroG.sound.load(AssetPaths.hurt__wav);
+		loseSound = new CitroG.sound.load(AssetPaths.LOSE__ogg);
+		missSound = new CitroG.sound.load(AssetPaths.miss__wav);
+		selectSound = new CitroG.sound.load(AssetPaths.select__wav);
+		winSound = new CitroG.sound.load(AssetPaths.win__wav);
+		combatSound = new CitroG.sound.load(AssetPaths.combat__wav);
+		battle = new CitroG.sound.load(AssetPaths.battle__ogg);
 		battle.looped = true;
-		#end
 	}
 
 	public function initCombat(playerHealth:Int, enemy:Enemy)
 	{
-		#if wiiu
 		this.playerHealth = playerHealth;
 		this.enemy = enemy;
 		this.outcome = NONE;
-		#else
-		screen.drawFrame();
-		var screenPixels = screen.framePixels;
-
-		if (FlxG.renderBlit)
-			screenPixels.copyPixels(FlxG.camera.buffer, FlxG.camera.buffer.rect, new Point());
-		else
-			screenPixels.draw(FlxG.camera.canvas, new Matrix(1, 0, 0, 1, 0, 0));
-
-		var rc:Float = 1 / 3;
-		var gc:Float = 1 / 2;
-		var bc:Float = 1 / 6;
-		screenPixels.applyFilter(screenPixels, screenPixels.rect, new Point(),
-			new ColorMatrixFilter([rc, gc, bc, 0, 0, rc, gc, bc, 0, 0, rc, gc, bc, 0, 0, 0, 0, 0, 1, 0]));
-
-		if (enemy.type == REGULAR)
-		{
-			battle.play(true);
-		}
-		else if (enemy.type == BOSS)
-		{
-			vs_susie.play(true);
-		}
-		this.playerHealth = playerHealth;
-		this.enemy = enemy;
-
 		updatePlayerHealth();
-
-		enemyMaxHealth = enemyHealth = if (enemy.type == REGULAR) 10 else 20;
+		enemyMaxHealth = enemyHealth = (enemy.type == BOSS) ? 20 : 10;
 		enemyHealthBar.value = 100;
 		spareBarGame.value = 0;
 		enemySprite.changeType(enemy.type);
@@ -287,79 +183,55 @@ class CombatHUD extends #if wiiu LeafyTypedGroup<LeafySprite> #else FlxTypedGrou
 		results.text = "";
 		pointer.visible = false;
 		results.visible = false;
-		outcome = NONE;
 		selected = FIGHT;
 		movePointer();
-
 		visible = true;
 
-		FlxTween.num(0, 1, .66, {ease: FlxEase.circOut, onComplete: finishFadeIn}, updateAlpha);
-		#end
+		CitroTween.tweenObject(this, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_OUT, onComplete: finishFadeIn});
+		if (enemy.type == REGULAR)
+			battle.play(true);
+		else if (enemy.type == BOSS)
+			vs_susie.play(true);
 	}
 
 	function updateAlpha(alpha:Float)
 	{
 		this.alpha = alpha;
-		#if !wiiu
-		forEach(function(sprite) sprite.alpha = alpha);
-		#end
+		for (member in members)
+			member.alpha = alpha;
 	}
 
-	function finishFadeIn(_)
+	function finishFadeIn()
 	{
-		#if !wiiu
-		active = true;
+		exists = true;
 		wait = false;
 		pointer.visible = true;
 		selectSound.play();
-		#end
-	}
-
-	function finishFadeOut(_)
-	{
-		active = false;
-		visible = false;
 	}
 
 	function updatePlayerHealth()
 	{
-		#if !wiiu
 		playerHealthCounter.text = playerHealth + " / 20";
-		playerHealthCounter.x = playerSprite.x + 4 - (playerHealthCounter.width / 2);
-		#end
 	}
 
-	override public function update(elapsed:Float)
+	override public function update():Bool
 	{
-		#if !wiiu
 		if (!wait)
 		{
-			updateKeyboardInput();
-			updateTouchInput();
+			updateInput();
 		}
-		super.update(elapsed);
-		#end
+		return super.update();
 	}
 
-	function updateKeyboardInput()
+	function updateInput()
 	{
-		#if (FLX_KEYBOARD && !wiiu)
-		var up:Bool = false;
-		var down:Bool = false;
-		var fire:Bool = false;
-
-		if (FlxG.keys.anyJustReleased([SPACE, Z, ENTER]))
-		{
+		var up = false, down = false, fire = false;
+		if (HID.keyPressed(HIDKey.A | HIDKey.B | HIDKey.START))
 			fire = true;
-		}
-		else if (FlxG.keys.anyJustReleased([W, UP]))
-		{
+		else if (HID.keyPressed(HIDKey.UP))
 			up = true;
-		}
-		else if (FlxG.keys.anyJustReleased([S, DOWN]))
-		{
+		else if (HID.keyPressed(HIDKey.DOWN))
 			down = true;
-		}
 
 		if (fire)
 		{
@@ -368,7 +240,8 @@ class CombatHUD extends #if wiiu LeafyTypedGroup<LeafySprite> #else FlxTypedGrou
 		}
 		else if (up || down)
 		{
-			selected = switch (selected) {
+			selected = switch (selected)
+			{
 				case FIGHT: if (up) FLEE else ACT;
 				case ACT: if (up) FIGHT else ITEM;
 				case ITEM: if (up) ACT else SPARE;
@@ -378,115 +251,91 @@ class CombatHUD extends #if wiiu LeafyTypedGroup<LeafySprite> #else FlxTypedGrou
 			selectSound.play();
 			movePointer();
 		}
-		#end
-	}
-
-	function updateTouchInput()
-	{
-		#if (FLX_TOUCH && !wiiu)
-		for (touch in FlxG.touches.justReleased())
-		{
-			for (choice in choices.keys())
-			{
-				var text = choices[choice];
-				if (touch.overlaps(text))
-				{
-					selectSound.play();
-					selected = choice;
-					movePointer();
-					makeChoice();
-					return;
-				}
-			}
-		}
-		#end
 	}
 
 	function movePointer()
 	{
-		#if !wiiu
-		pointer.y = choices[selected].y + (choices[selected].height / 2) - 8;
-		#end
+		pointer.y = choices[selected].y;
 	}
 
 	function makeChoice()
 	{
-		#if !wiiu
 		pointer.visible = false;
 		switch (selected)
 		{
 			case FIGHT:
-				if (FlxG.random.bool(85))
+				if (Math.random() < 0.85)
 				{
 					damages[1].text = "5";
-					FlxTween.tween(enemySprite, {x: enemySprite.x + 4}, 0.1, {
-						onComplete: function(_) { FlxTween.tween(enemySprite, {x: enemySprite.x - 4}, 0.1); }
+					CitroTween.tweenObject(enemySprite, {x: enemySprite.x + 4}, 0.1, {
+						onComplete: function()
+						{
+							CitroTween.tweenObject(enemySprite, {x: enemySprite.x - 4}, 0.1);
+						}
 					});
 					hurtSound.play();
 					enemyHealth--;
-					enemyHealthBar.value = (enemyHealth / enemyMaxHealth) * 30;
+					enemyHealthBar.value = (enemyHealth / enemyMaxHealth) * 100;
 				}
 				else
 				{
 					damages[1].text = "MISS!";
 					missSound.play();
 				}
-
-				damages[1].x = enemySprite.x + 2 - (damages[1].width / 2);
-				damages[1].y = enemySprite.y + 4 - (damages[1].height / 2);
+				damages[1].x = enemySprite.x + 2;
+				damages[1].y = enemySprite.y + 4;
 				damages[1].alpha = 0;
 				damages[1].visible = true;
-
 				if (enemyHealth > 0)
-				{
 					enemyAttack();
-				}
+				CitroTween.tweenNumber(damages[0].y, damages[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v)
+				{
+					damages[0].y = damages[1].y = v;
+				}});
+				CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneDamageIn, onUpdate: function(v)
+				{
+					damages[0].alpha = damages[1].alpha = v;
+				}});
 
-				FlxTween.num(damages[0].y, damages[0].y - 12, 1, {ease: FlxEase.circOut}, updateDamageY);
-				FlxTween.num(0, 1, .2, {ease: FlxEase.circInOut, onComplete: doneDamageIn}, updateDamageAlpha);
-			
 			case ACT:
 				spareBar++;
 				spareBarGame.value += 15;
-				
-				spare[1].x = enemySprite.x + 2 - (spare[1].width / 2);
-				spare[1].y = enemySprite.y + 4 - (spare[1].height / 2);
+				spare[1].x = enemySprite.x + 2;
+				spare[1].y = enemySprite.y + 4;
 				spare[1].alpha = 0;
 				spare[1].visible = true;
-
 				if (enemyHealth > 0)
-				{
 					enemyAttack();
-				}
+				CitroTween.tweenNumber(spare[0].y, spare[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v)
+				{
+					spare[0].y = spare[1].y = v;
+				}});
+				CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneSpareIn, onUpdate: function(v)
+				{
+					spare[0].alpha = spare[1].alpha = v;
+				}});
 
-				FlxTween.num(spare[0].y, spare[0].y - 12, 1, {ease: FlxEase.circOut}, updateSpareY);
-				FlxTween.num(0, 1, .2, {ease: FlxEase.circInOut, onComplete: doneSpareIn}, updateSpareAlpha);
-			
 			case ITEM:
-				var ITEMTEXT = new flixel.text.FlxText(10, 10, 100, "USED AN ITEM ?");
-				add(ITEMTEXT);
+				var itemText = new CitroText(10, 10, "USED AN ITEM ?");
+				add(itemText);
 				background.visible = false;
-
 				if (enemyHealth > 0)
 				{
 					enemyAttack();
 					background.visible = true;
-					remove(ITEMTEXT);
+					remove(itemText);
 				}
-
 			case SPARE:
-				var SPARETEXT = new flixel.text.FlxText(10, 10, 100, "SPARED ?");
-				add(SPARETEXT);
+				var spareText = new CitroText(10, 10, "SPARED ?");
+				add(spareText);
 				background.visible = false;
-
 				if (enemyHealth > 0)
 				{
 					enemyAttack();
 					background.visible = true;
-					remove(SPARETEXT);
+					remove(spareText);
 				}
-
-				if (spareBar == 100)
+				if (spareBar >= 100)
 				{
 					enemyAttack();
 					outcome = SPARED;
@@ -494,39 +343,43 @@ class CombatHUD extends #if wiiu LeafyTypedGroup<LeafySprite> #else FlxTypedGrou
 					fledSound.play();
 					results.visible = true;
 					results.alpha = 0;
-					FlxTween.tween(results, {alpha: 1}, .66, {ease: FlxEase.circInOut, onComplete: doneResultsIn});
+					CitroTween.tweenObject(results, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_INOUT, onComplete: doneResultsIn});
 				}
-
 			case FLEE:
-				if (FlxG.random.bool(50))
+				if (Math.random() < 0.50)
 				{
-					if (enemy.type == REGULAR) { battle.stop(); }
-					else if (enemy.type == BOSS) { vs_susie.stop(); }
+					battle.stop();
+					vs_susie.stop();
 					outcome = ESCAPE;
 					results.text = "ESCAPED!";
 					fledSound.play();
 					results.visible = true;
 					results.alpha = 0;
-					FlxTween.tween(results, {alpha: 1}, .66, {ease: FlxEase.circInOut, onComplete: doneResultsIn});
+					CitroTween.tweenObject(results, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_INOUT, onComplete: doneResultsIn});
 				}
 				else
 				{
 					enemyAttack();
-					FlxTween.num(damages[0].y, damages[0].y - 12, 1, {ease: FlxEase.circOut}, updateDamageY);
-					FlxTween.num(0, 1, .2, {ease: FlxEase.circInOut, onComplete: doneDamageIn}, updateDamageAlpha);
+					CitroTween.tweenNumber(damages[0].y, damages[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v)
+					{
+						damages[0].y = damages[1].y = v;
+					}});
+					CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneDamageIn, onUpdate: function(v)
+					{
+						damages[0].alpha = damages[1].alpha = v;
+					}});
 				}
 		}
 		wait = true;
-		#end
 	}
 
 	function enemyAttack()
 	{
-		#if !wiiu
-		if (FlxG.random.bool(30))
+		if (Math.random() < 0.30)
 		{
-			FlxG.camera.flash(FlxColor.WHITE, .2);
-			FlxG.camera.shake(0.01, 0.2);
+			screenFlash.alpha = 1;
+			CitroTween.tweenObject(screenFlash, {alpha: 0}, 0.2, {ease: CitroEase.LINEAR});
+
 			hurtSound.play();
 			damages[0].text = "1";
 			playerHealth--;
@@ -537,66 +390,45 @@ class CombatHUD extends #if wiiu LeafyTypedGroup<LeafySprite> #else FlxTypedGrou
 			damages[0].text = "MISS!";
 			missSound.play();
 		}
-
-		damages[0].x = playerSprite.x + 2 - (damages[0].width / 2);
-		damages[0].y = playerSprite.y + 4 - (damages[0].height / 2);
+		damages[0].x = playerSprite.x + 2;
+		damages[0].y = playerSprite.y + 4;
 		damages[0].alpha = 0;
 		damages[0].visible = true;
-		#end
 	}
 
-	function updateDamageY(damageY:Float)
+	function doneDamageIn()
 	{
-		#if !wiiu
-		damages[0].y = damages[1].y = damageY;
-		#end
+		CitroTween.tweenNumber(1, 0, 0.66, {
+			ease: CitroEase.CIRC_INOUT,
+			startDelay: 1,
+			onComplete: doneDamageOut,
+			onUpdate: function(v)
+			{
+				damages[0].alpha = damages[1].alpha = v;
+			}
+		});
 	}
 
-	function updateDamageAlpha(damagesAlpha:Float)
+	function doneSpareIn()
 	{
-		#if !wiiu
-		damages[0].alpha = damages[1].alpha = damagesAlpha;
-		#end
+		CitroTween.tweenNumber(1, 0, 0.66, {
+			ease: CitroEase.CIRC_INOUT,
+			startDelay: 1,
+			onComplete: doneSpareOut,
+			onUpdate: function(v)
+			{
+				spare[0].alpha = spare[1].alpha = v;
+			}
+		});
 	}
 
-	function updateSpareY(spareY:Float)
+	function doneResultsIn()
 	{
-		#if !wiiu
-		spare[0].y = spare[1].y = spareY;
-		#end
+		CitroTween.tweenObject(this, {alpha: 0}, 0.66, {ease: CitroEase.CIRC_OUT, onComplete: finishFadeOut, startDelay: 1});
 	}
 
-	function updateSpareAlpha(spareAlpha:Float)
+	function doneDamageOut()
 	{
-		#if !wiiu
-		spare[0].alpha = spare[1].alpha = spareAlpha;
-		#end
-	}
-
-	function doneDamageIn(_)
-	{
-		#if !wiiu
-		FlxTween.num(1, 0, .66, {ease: FlxEase.circInOut, startDelay: 1, onComplete: doneDamageOut}, updateDamageAlpha);
-		#end
-	}
-
-	function doneSpareIn(_)
-	{
-		#if !wiiu
-		FlxTween.num(1, 0, .66, {ease: FlxEase.circInOut, startDelay: 1, onComplete: doneSpareOut}, updateSpareAlpha);
-		#end
-	}
-
-	function doneResultsIn(_)
-	{
-		#if !wiiu
-		FlxTween.num(1, 0, .66, {ease: FlxEase.circOut, onComplete: finishFadeOut, startDelay: 1}, updateAlpha);
-		#end
-	}
-
-	function doneDamageOut(_)
-	{
-		#if !wiiu
 		damages[0].visible = false;
 		damages[1].visible = false;
 		damages[0].text = "";
@@ -604,43 +436,46 @@ class CombatHUD extends #if wiiu LeafyTypedGroup<LeafySprite> #else FlxTypedGrou
 
 		if (playerHealth <= 0)
 		{
-			if (enemy.type == REGULAR) { battle.stop(); }
-			else if (enemy.type == BOSS) { vs_susie.stop(); }
+			battle.stop();
+			vs_susie.stop();
 			outcome = DEFEAT;
 			loseSound.play();
 			results.text = "DEFEAT!";
 			results.visible = true;
 			results.alpha = 0;
-			FlxTween.tween(results, {alpha: 1}, 0.66, {ease: FlxEase.circInOut, onComplete: doneResultsIn});
+			CitroTween.tweenObject(results, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_INOUT, onComplete: doneResultsIn});
 		}
 		else if (enemyHealth <= 0)
 		{
-			if (enemy.type == REGULAR) { battle.stop(); }
-			else if (enemy.type == BOSS) { vs_susie.stop(); }
+			battle.stop();
+			vs_susie.stop();
 			outcome = VICTORY;
 			winSound.play();
 			results.text = "VICTORY!";
 			results.visible = true;
 			results.alpha = 0;
-			FlxTween.tween(results, {alpha: 1}, 0.66, {ease: FlxEase.circInOut, onComplete: doneResultsIn});
+			CitroTween.tweenObject(results, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_INOUT, onComplete: doneResultsIn});
 		}
 		else
 		{
 			wait = false;
 			pointer.visible = true;
 		}
-		#end
 	}
 
-	function doneSpareOut(_)
+	function doneSpareOut()
 	{
-		#if !wiiu
 		spare[0].visible = false;
 		spare[1].visible = false;
 		spare[0].text = "";
 		spare[1].text = "";
 		wait = false;
 		pointer.visible = true;
-		#end
+	}
+
+	function finishFadeOut()
+	{
+		exists = false;
+		visible = false;
 	}
 }

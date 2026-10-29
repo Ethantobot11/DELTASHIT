@@ -7,12 +7,11 @@
 		},
 		"libraries": [
 			"haxe3ds",
-			"flixel",
-      "openfl",
-      "lime"
+			"libcwav",
+			"libncsnd"
 		],
 		"defines": [],
-		"compileAsCIA": false,
+		"compileAsCIA": true,
 		"optimizations": {
 			"o2Flag": false,
 			"gFlag": false
@@ -20,8 +19,8 @@
 		"deleteTempFiles": true
 	},
 	"metadata": {
-		"title": "Chart Editor",
-		"description": "Chart Editor port for Nintendo 3DS... FUCK YOU IT'S FREE : )",
-		"author": "ArkoeLabs ?"
+		"title": "DELTASHIT",
+		"description": "Uh Wierd name but its a game",
+		"author": "Ethantobot"
 	}
 }

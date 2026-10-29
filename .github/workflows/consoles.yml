@@ -40,59 +40,33 @@ jobs:
       - name: Install System Dependencies (Wii U)
         if: inputs.name == 'Wii U'
         run: |
-          apt-get update && apt-get install -y build-essential git wget curl
+          apt-get update && apt-get install -y build-essential git wget curl       
 
-      - name: Install Libraries & Fix Hxcpp
+      - name: Install Console Toolchains & Dependencies
         run: |
-          haxelib install hmm --quiet
-          haxelib run hmm install --quiet
-          
           if [ "${{ inputs.name }}" = "Nintendo 3DS" ]; then
-            haxelib remove hxcpp
-            haxelib git hxcpp https://github.com/PsychEngine-report/hxcpp --quiet --always
-            haxelib remove flixel
-            haxelib git flixel https://github.com/Ethantobot11/flixel-3DS --quiet --always
-            haxelib git haxe3ds https://github.com/Ethantobot11/Haxe3DS.git --quiet --always
-            haxelib git reflaxe https://github.com/SomeRanDev/reflaxe --quiet
-            haxelib git reflaxe.cpp https://github.com/SomeRanDev/reflaxe.cpp --quiet
-          elif [ "${{ inputs.name }}" = "Wii U" ]; then
-            haxelib git hxu_wut https://github.com/Haxe-WiiU/HxU_WUT --quiet || true
-            haxelib git hxu_libnotifications https://github.com/Haxe-WiiU/HxU_LibNotifications --quiet || true
-            haxelib git hxu_libmappedmemory https://github.com/Haxe-WiiU/HxU_LibMappedMemory --quiet || true
-            haxelib git slushiutilsU https://github.com/Haxe-WiiU/SlushiUtilsU --quiet || true
-            haxelib git hxu_sdl2 https://github.com/Haxe-WiiU/HxU_SDL2 --quiet || true
-            haxelib git hxu_sdl_fontcache https://github.com/Haxe-WiiU/HxU_SDL_FontCache --quiet || true
-            haxelib git hxu_jansson https://github.com/Haxe-WiiU/HxU_Jansson --quiet || true
-            haxelib git hxu_vorbis https://github.com/Haxe-WiiU/HxU_Vorbis --quiet || true
-            haxelib git reflaxe https://github.com/SomeRanDev/reflaxe --quiet
-            haxelib git reflaxe.cpp https://github.com/Ethantobot11/reflaxe.CPP --quiet
-            haxelib dev reflaxe .haxelib/reflaxe/git
-            haxelib dev reflaxe.cpp .haxelib/reflaxe.cpp/git
-          fi          
-
-      - name: Inject HxCU_Meta.json for Haxelibs
-        if: inputs.name == 'Wii U'
-        run: |
-          for libDir in .haxelib/*/; do
-            if [ -d "$libDir" ] && [ ! -f "${libDir}HxCU_Meta.json" ]; then
-              libName=$(basename "$libDir")
-              echo "{
-                \"libVersion\": \"1.0.0\",
-                \"customUDPPort\": \"\",
-                \"haxeLibs\": [],
-                \"wiiuLibs\": [],
-                \"mainDefines\": [],
-                \"cDefines\": [],
-                \"cppDefines\": []
-              }" > "${libDir}HxCU_Meta.json"
+            dkp-pacman -S --noconfirm --needed 3ds-dev citro3d citro2d 3ds-portlibs general-tools
+            git clone https://github.com/PabloMK7/libcwav.git --recursive
+            cd libcwav
+            make install
+            cp lib/libcwav.a /opt/devkitpro/portlibs/3ds/lib/libcwav.a
+            cp include/cwav.h /opt/devkitpro/portlibs/3ds/include/
+            if [ -f "libncsnd/lib/libncsnd.a" ]; then
+                cp libncsnd/lib/libncsnd.a /opt/devkitpro/portlibs/3ds/lib/libncsnd.a
+                cp libncsnd/include/ncsnd.h /opt/devkitpro/portlibs/3ds/include/
             fi
-          done
-
-      - name: Install Console Toolchains
-        run: |
-          if [ "${{ inputs.name }}" = "Nintendo 3DS" ]; then
-            dkp-pacman -S --noconfirm --needed 3ds-dev citro3d citro2d general-tools
+            cd ..
+            rm -rf libcwav
+            git clone https://github.com/PabloMK7/cwavtool.git
+            cd cwavtool
+            rm -rf buildtools
+            git clone https://github.com/Steveice10/buildtools.git buildtools
+            make
             mkdir -p /opt/devkitpro/tools/bin
+            cp output/linux-x86_64/cwavtool /opt/devkitpro/tools/bin/cwavtool
+            chmod +x /opt/devkitpro/tools/bin/cwavtool
+            cd ..
+            rm -rf cwavtool
             wget -q https://github.com/diasurgical/bannertool/releases/download/1.2.0/bannertool.zip -O bannertool.zip
             unzip -q bannertool.zip -d bannertool_extracted
             find bannertool_extracted -type f -name "bannertool" -exec cp {} /opt/devkitpro/tools/bin/ \;
@@ -101,32 +75,50 @@ jobs:
             unzip -q makerom.zip -d makerom_extracted
             find makerom_extracted -type f -name "makerom" -exec cp {} /opt/devkitpro/tools/bin/ \;
             chmod +x /opt/devkitpro/tools/bin/makerom
+            rm -rf bannertool.zip bannertool_extracted makerom.zip makerom_extracted
+            
           elif [ "${{ inputs.name }}" = "Wii U" ]; then
-            dkp-pacman -S --noconfirm --needed devkitppc-gcc wut wut-tools general-tools
+            dkp-pacman -S --noconfirm --needed devkitppc-gcc wut wut-tools general-tools wiiu-dev
+            haxelib git hxu_wut https://github.com/Ethantobot11/HxU_WUT --quiet
+            haxelib git hxu_libnotifications https://github.com/Ethantobot11/HxU_LibNotifications --quiet
+            haxelib git hxu_libmappedmemory https://github.com/Ethantobot11/HxU_LibMappedMemory --quiet
+            haxelib git slushiutilsU https://github.com/Ethantobot11/slushiUtilsU --quiet
+            haxelib git hxu_sdl2 https://github.com/Ethantobot11/HxU_SDL2 --quiet
+            haxelib git hxu_sdl_fontcache https://github.com/Ethantobot11/HxU_SDL_FontCache --quiet
+            haxelib git hxu_jansson https://github.com/Ethantobot11/HxU_Jansson --quiet
+            haxelib git hxu_vorbis https://github.com/Ethantobot11/HxU_Vorbis --quiet
+            
+            haxelib list
           fi
-          
-      - name: Build Hxcpp Tooling (For 3DS)
+
+      - name: Build HXCPP Runner and Tools (3DS)
         if: inputs.name == 'Nintendo 3DS'
         run: |
-          cd .haxelib/hxcpp/git/tools/hxcpp
-          haxe compile.hxml
-          cd ../../../../
+          mkdir -p .haxelib
+          haxelib setup .haxelib
+          haxelib git hxcpp https://github.com/PsychEngine-report/hxcpp --quiet
 
-      - name: Build HXCPP Runner and Tools
-        run: |
           cd .haxelib/hxcpp/git/tools/run
           haxe compile.hxml
           cd ../hxcpp
           haxe compile.hxml
-          cd ../../../../
+          cd ../../../../          
+          
 
-      - name: Create Missing 3DS Romfs Directory
+      - name: Setup Virtual Environment and Install Pillow (3DS)
         if: inputs.name == 'Nintendo 3DS'
         run: |
-          mkdir -p assets/romfs/haxe3ds
-          touch assets/romfs/haxe3ds/version
+          sudo apt-get update && sudo apt-get install -y python3-pip
+          pip install Pillow --break-system-packages
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          export PATH=/opt/devkitpro/tools/bin:$PATH
 
-      - name: Compile for 3DS via Haxe3DS (Safe Check)
+      - name: Convert Images, XMLs & Audio Files (3DS)
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          python3 convert_assets.py
+
+      - name: Build and Install 3DS Audio Libraries (3DS)
         if: inputs.name == 'Nintendo 3DS'
         run: |
           export DEVKITPRO=/opt/devkitpro
@@ -136,14 +128,29 @@ jobs:
           export CC=arm-none-eabi-gcc
           export AR=arm-none-eabi-ar
           export RANLIB=arm-none-eabi-ranlib
-          
+
+          haxelib git libcwav https://github.com/PabloMK7/libcwav.git --quiet
+          haxelib git libncsnd https://github.com/PabloMK7/libncsnd.git --quiet
+          haxelib git haxe3ds https://github.com/Ethantobot11/Haxe3DS.git --quiet
+
           haxelib run haxe3ds -c -Dnx -Dno_pch
 
-      - name: Archive and Upload Workspace for Inspection
-        if: always()
+      - name: Verify RomFS Inside Built CIA (3DS)
+        if: always() && inputs.name == 'Nintendo 3DS'
+        run: |
+          export PATH=/opt/devkitpro/tools/bin:$PATH
+          if [ -f "buildFiles/output.cia" ]; then
+            echo "=== Inspecting CIA RomFS Structure ==="
+            ls -lh buildFiles/output.cia
+          else
+            echo "output.cia not found!"
+          fi
+
+      - name: Archive and Upload Workspace for Inspection (3DS)
+        if: always() && inputs.name == 'Nintendo 3DS'
         uses: actions/upload-artifact@v4
         with:
-          name: workspace-debug-zip
+          name: workspace-debug-3ds
           path: |
             buildFiles/
           if-no-files-found: ignore
@@ -154,13 +161,35 @@ jobs:
           export DEVKITPRO=/opt/devkitpro
           export DEVKITPPC=${DEVKITPRO}/devkitPPC
           export PATH=${DEVKITPPC}/bin:${DEVKITPRO}/tools/bin:$PATH
-          git clone https://github.com/PsychEngine-report/hxCompileU.git
-          cd hxCompileU
+          mkdir -p .haxelib
+          haxelib setup .haxelib
+          
+          haxelib install hxcpp --quiet
+          git clone https://github.com/Ethantobot11/HaxeWiiU.git hxCompileU_repo
+          cd hxCompileU_repo
           haxe build.hxml
           cp export/haxeCompileU ../haxeCompileU
           cd ..
-          ./haxeCompileU --prepare
+          
+          haxelib remove hxcpp
+          haxelib git hxcpp https://github.com/Ethantobot11/hxcpp-wiiu --quiet
+          
+          cd .haxelib/hxcpp/git/tools/run
+          haxe compile.hxml
+          cd ../hxcpp
+          haxe compile.hxml
+
+          cd $GITHUB_WORKSPACE
           ./haxeCompileU --compile
+
+      - name: Archive and Upload Workspace for Inspection (Wii U)
+        if: always() && inputs.name == 'Wii U'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-debug-wiiu
+          path: |
+            output/
+          if-no-files-found: ignore
 
       - name: Upload Artifact
         uses: actions/upload-artifact@main

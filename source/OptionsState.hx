@@ -1,259 +1,94 @@
 package;
 
-#if wiiu
-import leafy.core.LeafyState;
-import leafy.core.LeafyG;
-import leafy.text.LeafyText;
-#else
-import flixel.FlxG;
-import flixel.FlxState;
-import flixel.text.FlxText;
-import flixel.ui.FlxBar;
-import flixel.ui.FlxButton;
-import flixel.util.FlxAxes;
-import flixel.util.FlxColor;
-import flixel.util.FlxSave;
-#end
-import StorageUtil;
+import citro.state.CitroState;
+import citro.object.CitroText;
+import citro.object.CitroButton;
+import citro.object.CitroBar;
+import citro.CitroG;
 
-class OptionsState extends #if wiiu LeafyState #else FlxState #end
-{
-	#if wiiu
-	var titleText:LeafyText;
-	var volumeText:LeafyText;
-	var volumeAmountText:LeafyText;
-	#else
-	var titleText:FlxText;
-	var volumeBar:FlxBar;
-	var volumeText:FlxText;
-	var volumeAmountText:FlxText;
-	var volumeDownButton:FlxButton;
-	var DiscordRPCButton:FlxButton;
-	var androidButton:FlxButton;
-	var volumeUpButton:FlxButton;
-	var clearDataButton:FlxButton;
-	var backButton:FlxButton;
-	#end
+class OptionsState extends CitroState {
+    var titleText:CitroText;
+    var volumeBar:CitroBar;
+    var volumeText:CitroText;
+    var volumeAmountText:CitroText;
+    var volumeDownButton:CitroButton;
+    var volumeUpButton:CitroButton;
+    var clearDataButton:CitroButton;
+    var backButton:CitroButton;
 
-	#if android
-	public var storageTypes:Array<String> = ["EXTERNAL_DATA", "EXTERNAL", "EXTERNAL_OBB", "EXTERNAL_MEDIA"];
-	public var externalPaths:Array<String> = StorageUtil.checkExternalPaths(true);
-	public static var storageType:String = "EXTERNAL_DATA";
-	var currentStorageIndex:Int = 0;
-	#end
+    public static var discordRPC:Bool = true;
 
-	public static var discordRPC:Bool = true;
-	
-	#if desktop
-	var fullscreenButton:FlxButton;
-	#end
+    override public function create():Void {
+        #if DISCORD_ALLOWED
+        DiscordClient.changePresence("CURRENTLY CHANGING THE OPTIONS", null);
+        #end
 
-	public function new()
-	{
-		#if android
-		storageTypes = storageTypes.concat(externalPaths);
-		#end
-		super();
-	}
+        titleText = new CitroText(0, 20, "Options");
+        titleText.alignment = CENTER;
+        titleText.screenCenter();
+        add(titleText);
 
-	override public function create():Void
-	{
-		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("CURRENTLY CHANGING THE FUKING OPTIONS AHHHHHHHHHHHHHHHHHHHHHHHHHHH\nHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", null);
-		#end
+        volumeText = new CitroText(0, titleText.y + 30, "Volume");
+        volumeText.alignment = CENTER;
+        volumeText.screenCenter();
+        add(volumeText);
 
-		#if android
-		loadPrefs();
-		#end
+        volumeDownButton = new CitroButton(0, volumeText.y + 30, 40, 30, "-", clickVolumeDown);
+        volumeDownButton.screenCenter();
+        volumeDownButton.x -= 100;
+        add(volumeDownButton);
 
-		#if wiiu
-		titleText = new LeafyText(0, 20, 0, "Options", 22);
-		add(titleText);
+        volumeUpButton = new CitroButton(0, volumeText.y + 30, 40, 30, "+", clickVolumeUp);
+        volumeUpButton.screenCenter();
+        volumeUpButton.x += 100;
+        add(volumeUpButton);
 
-		volumeText = new LeafyText(0, 60, 0, "Volume", 8);
-		add(volumeText);
+        volumeBar = new CitroBar(volumeDownButton.x + 50, volumeDownButton.y, CitroG.WIDTH - 140, 30);
+        add(volumeBar);
 
-		volumeAmountText = new LeafyText(0, 100, 200, "100%", 8);
-		add(volumeAmountText);
-		#else
-		titleText = new FlxText(0, 20, 0, "Options", 22);
-		titleText.alignment = CENTER;
-		titleText.screenCenter(FlxAxes.X);
-		add(titleText);
+        volumeAmountText = new CitroText(0, 0, "100%");
+        volumeAmountText.alignment = CENTER;
+        volumeAmountText.screenCenter();
+        volumeAmountText.y = volumeBar.y + 5;
+        add(volumeAmountText);
 
-		volumeText = new FlxText(0, titleText.y + titleText.height + 10, 0, "Volume", 8);
-		volumeText.alignment = CENTER;
-		volumeText.screenCenter(FlxAxes.X);
-		add(volumeText);
+        clearDataButton = new CitroButton(0, CitroG.HEIGHT - 60, 120, 30, "Clear Data", clickClearData);
+        clearDataButton.screenCenter();
+        clearDataButton.x -= 70;
+        add(clearDataButton);
 
-		volumeDownButton = new FlxButton(8, volumeText.y + volumeText.height + 2, "-", clickVolumeDown);
-		volumeDownButton.loadGraphic(AssetPaths.button__png, true, 20, 20);
-		volumeDownButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
-		add(volumeDownButton);
+        backButton = new CitroButton(0, CitroG.HEIGHT - 60, 120, 30, "Back", clickBack);
+        backButton.screenCenter();
+        backButton.x += 70;
+        add(backButton);
 
-		volumeUpButton = new FlxButton(FlxG.width - 28, volumeDownButton.y, "+", clickVolumeUp);
-		volumeUpButton.loadGraphic(AssetPaths.button__png, true, 20, 20);
-		volumeUpButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
-		add(volumeUpButton);
+        updateVolume();
+        super.create();
+    }
 
-		volumeBar = new FlxBar(volumeDownButton.x + volumeDownButton.width + 4,
-			volumeDownButton.y, LEFT_TO_RIGHT, Std.int(FlxG.width - 64),
-			Std.int(volumeUpButton.height));
-		volumeBar.createFilledBar(0xff464646, FlxColor.WHITE, true, FlxColor.WHITE);
-		add(volumeBar);
+    function clickClearData() {
+        CitroG.save.erase();
+        updateVolume();
+    }
 
-		volumeAmountText = new FlxText(0, 0, 200, (FlxG.sound.volume * 100) + "%", 8);
-		volumeAmountText.alignment = CENTER;
-		volumeAmountText.borderStyle = FlxTextBorderStyle.OUTLINE;
-		volumeAmountText.borderColor = 0xff464646;
-		volumeAmountText.y = volumeBar.y + (volumeBar.height / 2) - (volumeAmountText.height / 2);
-		volumeAmountText.screenCenter(FlxAxes.X);
-		add(volumeAmountText);
+    function clickBack() {
+        CitroG.save.flush();
+        CitroG.switchState(new MenuState());
+    }
 
-		#if desktop
-		fullscreenButton = new FlxButton(0, volumeBar.y + volumeBar.height + 8,
-			FlxG.fullscreen ? "FULLSCREEN" : "WINDOWED", clickFullscreen);
-		fullscreenButton.screenCenter(FlxAxes.X);
-		add(fullscreenButton);
-		#end
+    function clickVolumeDown() {
+        //flixel.FlxG.sound.volume -= 0.1;
+        updateVolume();
+    }
 
-		DiscordRPCButton = new FlxButton(0, volumeBar.y + volumeBar.height + 24,
-			discordRPC ? "TRUE" : "FALSE", ClickDiscordRPCButton);
-		DiscordRPCButton.screenCenter(FlxAxes.X);
-		add(DiscordRPCButton);
+    function clickVolumeUp() {
+        //flixel.FlxG.sound.volume += 0.1;
+        updateVolume();
+    }
 
-		#if android
-		androidButton = new FlxButton(0, 200, "Storage: " + storageTypes[currentStorageIndex], androidButtonClick);
-		androidButton.screenCenter(FlxAxes.X);
-		add(androidButton);
-		#end
-
-		clearDataButton = new FlxButton((FlxG.width / 2) - 90, FlxG.height - 28, "Clear Data", clickClearData);
-		clearDataButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
-		add(clearDataButton);
-
-		backButton = new FlxButton((FlxG.width / 2) + 10, FlxG.height - 28, "Back", clickBack);
-		backButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
-		add(backButton);
-
-		updateVolume();
-		FlxG.camera.fade(FlxColor.BLACK, 0.33, true);
-		#end
-
-		super.create();
-	}
-
-	public static function saveSettings() {
-		#if android
-		FlxG.save.data.storageType = storageType;
-		#end
-		#if !wiiu
-		FlxG.save.data.discordRPC = discordRPC;
-		#end
-	}
-
-	public static function loadPrefs() {
-		#if android
-		if(FlxG.save.data.storageType != null)
-			storageType = FlxG.save.data.storageType;
-		#end
-		#if !wiiu
-		if(FlxG.save.data.discordRPC != null)
-			discordRPC = FlxG.save.data.discordRPC;
-		var save = new FlxSave();
-		save.bind("Settings","TurnBasedRPG");
-		#end
-	}
-
-	#if android
-	function onStorageChange():Void
-	{
-		sys.io.File.saveContent(lime.system.System.applicationStorageDirectory + 'storagetype.txt', OptionsState.storageType);
-	}
-	#end
-
-	#if desktop
-	function clickFullscreen()
-	{
-		FlxG.fullscreen = !FlxG.fullscreen;
-		fullscreenButton.text = FlxG.fullscreen ? "FULLSCREEN" : "WINDOWED";
-		FlxG.save.data.fullscreen = FlxG.fullscreen;
-	}
-	#end
-
-	#if !wiiu
-	function ClickDiscordRPCButton()
-	{
-		discordRPC = !discordRPC;
-		DiscordRPCButton.text = discordRPC ? "TRUE" : "FALSE";
-		FlxG.save.data.discordRPC = discordRPC;
-		if (!discordRPC)
-		{
-			#if DISCORD_ALLOWED
-			DiscordClient.shutdown();
-			#end
-			trace("turned off rpc ?");
-		}
-		else if (discordRPC)
-		{
-			#if DISCORD_ALLOWED
-			DiscordClient.prepare();
-			#end
-			trace("turned on rpc ?");
-		}
-	}
-	#end
-
-	#if android
-	function androidButtonClick()
-	{
-		currentStorageIndex++;
-		if (currentStorageIndex >= storageTypes.length) {
-			currentStorageIndex = 0;
-		}
-		storageType = storageTypes[currentStorageIndex];
-		androidButton.label.text = "Storage: " + storageType;
-		FlxG.save.data.storageType = storageType;
-	}
-	#end
-
-	#if !wiiu
-	function clickClearData()
-	{
-		FlxG.save.erase();
-		FlxG.sound.volume = 0.5;
-		updateVolume();
-	}
-
-	function clickBack()
-	{
-		FlxG.save.flush();
-		FlxG.camera.fade(FlxColor.BLACK, .33, false, function()
-		{
-			saveSettings();
-			FlxG.switchState(MenuState.new);
-		});
-	}
-
-	function clickVolumeDown()
-	{
-		FlxG.sound.volume -= 0.1;
-		FlxG.save.data.volume = FlxG.sound.volume;
-		updateVolume();
-	}
-
-	function clickVolumeUp()
-	{
-		FlxG.sound.volume += 0.1;
-		FlxG.save.data.volume = FlxG.sound.volume;
-		updateVolume();
-	}
-
-	function updateVolume()
-	{
-		var volume:Int = Math.round(FlxG.sound.volume * 100);
-		volumeBar.value = volume;
-		volumeAmountText.text = volume + "%";
-	}
-	#end
+    function updateVolume() {
+        var volume:Int = 100;
+        volumeBar.value = volume;
+        volumeAmountText.text = volume + "%";
+    }
 }
