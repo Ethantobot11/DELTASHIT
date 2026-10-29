@@ -2,7 +2,6 @@ package;
 
 import citro.object.CitroAnimate;
 import citro.CitroG;
-import citro.object.CitroVector2D;
 
 enum EnemyType { REGULAR; BOSS; }
 
@@ -15,7 +14,8 @@ class Enemy extends CitroAnimate {
     var idleTimer:Float;
     var moveDirection:Float;
     public var seesPlayer:Bool;
-    public var playerPosition:CitroVector2D;
+
+    public var playerPosition:{x:Float, y:Float};
     public var active:Bool = true;
 
     public function new(x:Float, y:Float, type:EnemyType) {
@@ -28,6 +28,7 @@ class Enemy extends CitroAnimate {
         var frameW = if (type == BOSS) 25 else 21;
         var frameH = if (type == BOSS) 46 else 40;
         var anims = new Map<String, Array<Int>>();
+        
         if (type == BOSS) {
             anims.set("d_idle", [0]);
             anims.set("lr_idle", [1]);
@@ -87,14 +88,15 @@ class Enemy extends CitroAnimate {
         }
     }
 
-    public function changeType(type:EnemyType) {
+    public function changeType(newType:EnemyType) {
         if (this.type != newType) {
             this.type = newType;
             var graphic = if (newType == BOSS) AssetPaths.boss__t3x else AssetPaths.enemy__t3x;
             var frameW = if (newType == BOSS) 25 else 21;
             var frameH = if (newType == BOSS) 46 else 40;
             var anims = new Map<String, Array<Int>>();
-            if (type == BOSS) {
+            
+            if (newType == BOSS) {
                 anims.set("d_idle", [0]);
                 anims.set("lr_idle", [1]);
                 anims.set("u_idle", [2]);
