@@ -1,4 +1,3 @@
-#if !wiiu
 #if !macro
 #if DISCORD_ALLOWED
 import Discord;
@@ -8,5 +7,7 @@ import Discord;
 import sys.*;
 import sys.io.*;
 #end
-#end
+
+using StringTools;
+
 #end
