@@ -7,8 +7,7 @@ class CitroTilemap extends CitroObject {
     public var heightInTiles:Int;
     public var tileSize:Int;
     public var data:Array<Array<Int>>;
-    private var brush:CitroSprite;
-
+    private var brush:CitroAnimate;
     public function new(WidthInTiles:Int, HeightInTiles:Int, TileSize:Int) {
         super();
         widthInTiles = WidthInTiles;
@@ -23,15 +22,20 @@ class CitroTilemap extends CitroObject {
             }
             data.push(row);
         }
-        
-        brush = new CitroSprite();
+        brush = new CitroAnimate();
         trace("[CitroTilemap] Created: " + widthInTiles + "x" + heightInTiles + " tiles, size: " + tileSize);
     }
 
-    public function loadGraphic(tileGraphicPath:String):Void {
+    public function loadGraphic(tileGraphicPath:String):Bool {
         trace("[CitroTilemap] Loading graphic: " + tileGraphicPath);
-        brush.loadGraphic(tileGraphicPath, tileSize, tileSize);
-        trace("[CitroTilemap] Graphic loaded. Total frames available: " + brush.totalFrames);
+        var anims = new Map<String, Array<Int>>();
+        brush.loadFromT3XWithAnims(tileGraphicPath, tileSize, tileSize, anims);
+        if (brush.atlasSprite == null || brush.atlasSprite.totalFrames == 0) {
+            trace("[CitroTilemap] ERROR: Failed to load tileset!");
+            return false;
+        }
+        trace("[CitroTilemap] Graphic loaded. Total frames: " + brush.atlasSprite.totalFrames);
+        return true;
     }
 
     public function setTile(X:Int, Y:Int, TileIndex:Int):Void {
@@ -69,22 +73,22 @@ class CitroTilemap extends CitroObject {
     }
 
     override public function update():Bool {
-        if (!visible || alpha <= 0 || brush == null || brush.totalFrames == 0) {
+        if (!visible || alpha <= 0 || brush == null || brush.atlasSprite == null) {
             return false;
         }
         
         for (y in 0...heightInTiles) {
             for (x in 0...widthInTiles) {
                 var tileIndex = data[y][x];
-                if (tileIndex >= 0 && tileIndex < brush.totalFrames) {
-                    brush.frame = tileIndex;
-                    brush.x = this.x + (x * tileSize);
-                    brush.y = this.y + (y * tileSize);
-                    brush.alpha = this.alpha;
-                    brush.scale.x = this.scale.x;
-                    brush.scale.y = this.scale.y;
-                    brush.bottom = this.bottom;
-                    brush.update();
+                if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
+                    brush.atlasSprite.frame = tileIndex;
+                    brush.atlasSprite.x = this.x + (x * tileSize);
+                    brush.atlasSprite.y = this.y + (y * tileSize);
+                    brush.atlasSprite.alpha = this.alpha;
+                    brush.atlasSprite.scale.x = this.scale.x;
+                    brush.atlasSprite.scale.y = this.scale.y;
+                    brush.atlasSprite.bottom = this.bottom;
+                    brush.atlasSprite.update();
                 }
             }
         }
