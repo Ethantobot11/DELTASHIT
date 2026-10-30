@@ -76,22 +76,31 @@ class CitroTilemap extends CitroObject {
         if (!visible || alpha <= 0 || brush == null || brush.atlasSprite == null) {
             return false;
         }
-        
-        for (y in 0...heightInTiles) {
-            for (x in 0...widthInTiles) {
-                var tileIndex = data[y][x];
-                if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
+        final camX = CitroG.camera.scroll.x;
+        final camY = CitroG.camera.scroll.y;
+        final screenWidth = bottom ? 320 : 400;
+        final screenHeight = 240;
+        final startCol = Math.max(0, Math.floor((camX - x) / tileSize));
+        final endCol = Math.min(widthInTiles, Math.ceil((camX + screenWidth - x) / tileSize));
+        final startRow = Math.max(0, Math.floor((camY - y) / tileSize));
+        final endRow = Math.min(heightInTiles, Math.ceil((camY + screenHeight - y) / tileSize));
+        var drewSomething = false;
+        for (row in startRow...endRow) {
+            for (col in startCol...endCol) {
+                var tileIndex = data[row][col];
+                if (tileIndex > 0 && tileIndex < brush.atlasSprite.totalFrames) {
                     brush.atlasSprite.frame = tileIndex;
-                    brush.atlasSprite.x = this.x + (x * tileSize);
-                    brush.atlasSprite.y = this.y + (y * tileSize);
+                    brush.atlasSprite.x = this.x + (col * tileSize);
+                    brush.atlasSprite.y = this.y + (row * tileSize);
                     brush.atlasSprite.alpha = this.alpha;
                     brush.atlasSprite.scale.x = this.scale.x;
                     brush.atlasSprite.scale.y = this.scale.y;
                     brush.atlasSprite.bottom = this.bottom;
                     brush.atlasSprite.update();
+                    drewSomething = true;
                 }
             }
         }
-        return true;
+        return drewSomething;
     }
 }
