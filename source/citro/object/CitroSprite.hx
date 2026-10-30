@@ -64,12 +64,20 @@ class CitroSprite extends CitroObject {
 
     public function loadGraphic(file:String, ?frameWidth:Float = 0, ?frameHeight:Float = 0):Bool {
         if (CitroG.caches.exists(file)) {
-            untyped __cpp__('this->ss = (C2D_SpriteSheet){0}', CitroG.caches.get(file));
-            var cachedFrames = CitroG.caches.getMeta(file + "_frames");
-            if (cachedFrames != null) {
-                totalFrames = cachedFrames;
+            var cachedPtr = CitroG.caches.get(file);
+            if (cachedPtr != null) {
+                untyped __cpp__('this->ss = (C2D_SpriteSheet){0}', cachedPtr);
+                var cachedFrames = CitroG.caches.getMeta(file + "_frames");
+                if (cachedFrames != null) {
+                    totalFrames = cachedFrames;
+                }
+            } else {
+                CitroG.caches.remove(file);
+                CitroG.caches.remove(file + "_frames");
             }
-        } else {
+        }
+        
+        if (!CitroG.caches.exists(file)) {
             untyped __cpp__('
                 this->ss = C2D_SpriteSheetLoad(file.c_str());
                 if (!this->ss) return false;
@@ -78,15 +86,26 @@ class CitroSprite extends CitroObject {
             CitroG.caches.set(file, untyped __cpp__('this->ss'));
             CitroG.caches.setMeta(file + "_frames", totalFrames);
         }
+
+        var hasValidSheet:Bool = false;
+        untyped __cpp__('hasValidSheet = (this->ss != nullptr);');
+        if (!hasValidSheet) {
+            trace("ERROR: Sprite sheet is null after loading: " + file);
+            return false;
+        }
+
         var imageWidth:Float = 0;
         var imageHeight:Float = 0;
         untyped __cpp__('
             C2D_Image firstImg = C2D_SpriteSheetGetImage(this->ss, 0);
-            imageWidth = firstImg.subtex->width;
-            imageHeight = firstImg.subtex->height;
+            if (firstImg.subtex != NULL) {
+                imageWidth = firstImg.subtex->width;
+                imageHeight = firstImg.subtex->height;
+            }
         ');
         sheetWidth = imageWidth;
         sheetHeight = imageHeight;
+        
         if (frameWidth > 0 && frameHeight > 0) {
             width = frameWidth;
             height = frameHeight;         

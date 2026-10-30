@@ -19,8 +19,8 @@ class CitroCache {
 
     public function exists(path:String):Bool {
         return cache.exists(path);
- 	}
-	
+    }
+
     public function get(path:String):VoidPtr {
         return cache.get(path);
     }
@@ -43,9 +43,7 @@ class CitroCache {
     public function remove(path:String) {
         if (cache.exists(path)) {
             freeMemory(path);
-            cache.remove(path);
         }
-        meta.remove(path);
     }
 
     public function keyValueIterator() {
@@ -67,6 +65,8 @@ class CitroCache {
             default:
                 untyped __cpp__('SUPER_FREE((void**)&{0})', ptr);
         }
+        cache.remove(key);
+        meta.remove(key);
     }
 
     public function clear() {
