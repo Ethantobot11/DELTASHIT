@@ -8,42 +8,64 @@ import sys.FileSystem;
 #end
 
 using StringTools;
-using citro.editors.ogmo.CitroOgmoLoader;
 
 class CitroOgmoLoader {
-    public var project:ProjectData;
-    public var level:LevelData;
+    public var project:Dynamic;
+    public var level:Dynamic;
 
     public function new(projectDataPath:String, levelDataPath:String) {
-        var projectText = "";
-        var levelText = "";
+        var rawProjectText = "";
+        var rawLevelText = "";
 
         #if sys
         try {
-            if (FileSystem.exists(projectDataPath)) projectText = File.getContent(projectDataPath);
-            if (FileSystem.exists(levelDataPath)) levelText = File.getContent(levelDataPath);
+            if (FileSystem.exists(projectDataPath)) {
+                rawProjectText = File.getContent(projectDataPath);
+            } else {
+                trace("Warning: Project file does not exist at: " + projectDataPath);
+            }
+            if (FileSystem.exists(levelDataPath)) {
+                rawLevelText = File.getContent(levelDataPath);
+            } else {
+                trace("Warning: Level file does not exist at: " + levelDataPath);
+            }
         } catch (e:Dynamic) { 
             trace("Error loading Ogmo files: " + e); 
         }
         #end
 
-        projectText = sanitizeJson(projectText);
-        levelText = sanitizeJson(levelText);
+        var projectText = sanitizeJson(rawProjectText);
+        var levelText = sanitizeJson(rawLevelText);
+        if (rawProjectText.length != projectText.length) {
+            trace("[Ogmo] Sanitized project JSON: removed " + (rawProjectText.length - projectText.length) + " invalid control characters.");
+        }
+        if (rawLevelText.length != levelText.length) {
+            trace("[Ogmo] Sanitized level JSON: removed " + (rawLevelText.length - levelText.length) + " invalid control characters.");
+        }
 
         if (projectText.length > 0) {
-            try { project = cast Json.parse(projectText); } 
-            catch (e:Dynamic) { trace("Project JSON parse error: " + e); project = cast {}; }
+            try { 
+                project = Json.parse(projectText); 
+            } catch (e:Dynamic) { 
+                trace("Project JSON parse error: " + e); 
+                trace("Preview of sanitized text: " + projectText.substr(0, 100));
+                project = {}; 
+            }
         } else { 
             trace("Project text is empty"); 
-            project = cast {}; 
+            project = {}; 
         }
 
         if (levelText.length > 0) {
-            try { level = cast Json.parse(levelText); } 
-            catch (e:Dynamic) { trace("Level JSON parse error: " + e); level = cast {}; }
+            try { 
+                level = Json.parse(levelText); 
+            } catch (e:Dynamic) { 
+                trace("Level JSON parse error: " + e); 
+                level = {}; 
+            }
         } else { 
             trace("Level text is empty"); 
-            level = cast {}; 
+            level = {}; 
         }
     }
 
@@ -61,72 +83,86 @@ class CitroOgmoLoader {
 
     public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
         var tilemap = new CitroTilemap(0, 0, tileSize);
-        var layer = level.getTileLayer(tileLayer);
         
-        if (layer == null) {
-            trace("Warning: Tile layer '" + tileLayer + "' not found.");
+        if (level == null || !Reflect.hasField(level, "layers")) {
+            trace("Warning: Level data has no layers. Map will be empty.");
             return tilemap;
         }
 
-        tilemap.widthInTiles = layer.gridCellsX;
-        tilemap.heightInTiles = layer.gridCellsY;
-        tilemap.tileSize = tileSize;
-        tilemap.data = [];
-
-        for (y in 0...tilemap.heightInTiles) {
-            var row = [];
-            for (x in 0...tilemap.widthInTiles) row.push(0);
-            tilemap.data.push(row);
+        var layers:Array<Dynamic> = Reflect.field(level, "layers");
+        var layer:Dynamic = null;
+        
+        for (l in layers) {
+            var name:String = Std.string(Reflect.field(l, "name"));
+            if (name != null && name.trim() == tileLayer) {
+                layer = l;
+                break;
+            }
+        }
+        
+        if (layer == null) {
+            trace("Warning: Tile layer '" + tileLayer + "' not found. Available layers:");
+            for (l in layers) {
+                trace(" - '" + Reflect.field(l, "name") + "'");
+            }
+            return tilemap;
         }
 
-        if (layer.arrayMode == 0 && layer.data != null) {
-            for (i in 0...layer.data.length) {
-                tilemap.data[Math.floor(i / tilemap.widthInTiles)][i % tilemap.widthInTiles] = layer.data[i];
-            }
-        } else if (layer.arrayMode == 1 && layer.data2D != null) {
-            for (y in 0...layer.data2D.length) {
-                for (x in 0...layer.data2D[y].length) {
-                    tilemap.data[y][x] = layer.data2D[y][x];
+        var gridCellsX:Int = Std.int(Reflect.field(layer, "gridCellsX"));
+        var gridCellsY:Int = Std.int(Reflect.field(layer, "gridCellsY"));
+        
+        tilemap = new CitroTilemap(gridCellsX, gridCellsY, tileSize);
+        tilemap.loadGraphic(tileGraphic);
+
+        var arrayMode:Int = Std.int(Reflect.field(layer, "arrayMode"));
+        if (arrayMode == 0 && Reflect.hasField(layer, "data")) {
+            var data:Array<Int> = cast Reflect.field(layer, "data");
+            if (data != null) {
+                for (i in 0...data.length) {
+                    tilemap.data[Math.floor(i / tilemap.widthInTiles)][i % tilemap.widthInTiles] = data[i];
                 }
             }
-        } else if (layer.dataCSV != null) {
-            tilemap.loadMapFromCSV(layer.dataCSV, tileSize);
+        } else if (arrayMode == 1 && Reflect.hasField(layer, "data2D")) {
+            var data2D:Array<Array<Int>> = cast Reflect.field(layer, "data2D");
+            if (data2D != null) {
+                for (y in 0...data2D.length) {
+                    for (x in 0...data2D[y].length) {
+                        tilemap.data[y][x] = data2D[y][x];
+                    }
+                }
+            }
+        } else if (Reflect.hasField(layer, "dataCSV")) {
+            var dataCSV:String = cast Reflect.field(layer, "dataCSV");
+            if (dataCSV != null) {
+                tilemap.loadMapFromCSV(dataCSV, tileSize);
+            }
         }
 
         return tilemap;
     }
 
     public function loadEntities(entityLoadCallback:Dynamic->Void, entityLayer:String = "entities"):Void {
-        var layer = level.getEntityLayer(entityLayer);
-        if (layer != null && layer.entities != null) {
-            for (entity in layer.entities) {
-                entityLoadCallback(entity);
+        if (level == null || !Reflect.hasField(level, "layers")) return;
+        
+        var layers:Array<Dynamic> = Reflect.field(level, "layers");
+        var layer:Dynamic = null;
+        
+        for (l in layers) {
+            var name:String = Std.string(Reflect.field(l, "name"));
+            if (name != null && name.trim() == entityLayer) {
+                layer = l;
+                break;
             }
         }
-    }
 
-    public static function getTileLayer(data:LevelData, name:String):TileLayer {
-        if (data == null || data.layers == null) return null;
-        for (layer in data.layers) {
-            if (layer.name.trim() == name) return cast layer;
+        if (layer != null && Reflect.hasField(layer, "entities")) {
+            var entities:Array<Dynamic> = cast Reflect.field(layer, "entities");
+            if (entities != null) {
+                for (entity in entities) {
+                    entityLoadCallback(entity);
+                }
+            }
         }
-        return null;
-    }
-
-    public static function getEntityLayer(data:LevelData, name:String):EntityLayer {
-        if (data == null || data.layers == null) return null;
-        for (layer in data.layers) {
-            if (layer.name.trim() == name) return cast layer;
-        }
-        return null;
-    }
-
-    public static function getTilesetData(data:ProjectData, name:String):ProjectTilesetData {
-        if (data == null || data.tilesets == null) return null;
-        for (tileset in data.tilesets) {
-            if (tileset.label.trim() == name) return cast tileset;
-        }
-        return null;
     }
 }
 

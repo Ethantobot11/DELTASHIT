@@ -76,8 +76,7 @@ class CitroTilemap extends CitroObject {
         for (y in 0...heightInTiles) {
             for (x in 0...widthInTiles) {
                 var tileIndex = data[y][x];
-                
-                if (tileIndex > 0 && tileIndex < brush.totalFrames) {
+                if (tileIndex >= 0 && tileIndex < brush.totalFrames) {
                     brush.frame = tileIndex;
                     brush.x = this.x + (x * tileSize);
                     brush.y = this.y + (y * tileSize);
