@@ -83,7 +83,7 @@ class CitroOgmoLoader {
         return buf.toString();
     }
 
-        public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
+    public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
         var layer = getTileLayer(level, tileLayer);
         if (layer == null) {
             trace("Warning: Tile layer '" + tileLayer + "' not found. Available layers:");
@@ -91,27 +91,27 @@ class CitroOgmoLoader {
             if (layers != null) {
                 for (l in layers) {
                     trace(" - '" + Reflect.field(l, "name") + "'");
-            }
+                }
             }
             return new CitroTilemap(0, 0, tileSize);
         }
 
-        var gridCellsX:Int = Std.int(Reflect.field(layer, "gridCellsX"));
-        var gridCellsY:Int = Std.int(Reflect.field(layer, "gridCellsY"));
+        var gridCellsX:Int = Std.int(getFieldTrimmed(layer, "gridCellsX"));
+        var gridCellsY:Int = Std.int(getFieldTrimmed(layer, "gridCellsY"));
         
         var tilemap = new CitroTilemap(gridCellsX, gridCellsY, tileSize);
         tilemap.loadGraphic(tileGraphic);
 
-        var arrayMode:Int = Std.int(Reflect.field(layer, "arrayMode"));
-        if (arrayMode == 0 && Reflect.hasField(layer, "data")) {
-            var data:Array<Int> = cast Reflect.field(layer, "data");
+        var arrayMode:Int = Std.int(getFieldTrimmed(layer, "arrayMode"));
+        if (arrayMode == 0 && getFieldTrimmed(layer, "data") != null) {
+            var data:Array<Int> = cast getFieldTrimmed(layer, "data");
             if (data != null) {
                 for (i in 0...data.length) {
                     tilemap.data[Math.floor(i / tilemap.widthInTiles)][i % tilemap.widthInTiles] = data[i];
                 }
             }
-        } else if (arrayMode == 1 && Reflect.hasField(layer, "data2D")) {
-            var data2D:Array<Array<Int>> = cast Reflect.field(layer, "data2D");
+        } else if (arrayMode == 1 && getFieldTrimmed(layer, "data2D") != null) {
+            var data2D:Array<Array<Int>> = cast getFieldTrimmed(layer, "data2D");
             if (data2D != null) {
                 for (y in 0...data2D.length) {
                     for (x in 0...data2D[y].length) {
@@ -119,8 +119,8 @@ class CitroOgmoLoader {
                     }
                 }
             }
-        } else if (Reflect.hasField(layer, "dataCSV")) {
-            var dataCSV:String = cast Reflect.field(layer, "dataCSV");
+        } else if (getFieldTrimmed(layer, "dataCSV") != null) {
+            var dataCSV:String = cast getFieldTrimmed(layer, "dataCSV");
             if (dataCSV != null) {
                 tilemap.loadMapFromCSV(dataCSV, tileSize);
             }
@@ -151,6 +151,34 @@ class CitroOgmoLoader {
                 }
             }
         }
+    }
+
+    static function getTileLayer(data:Dynamic, name:String):Dynamic {
+        if (data == null || !Reflect.hasField(data, "layers")) return null;
+        var layers:Array<Dynamic> = cast Reflect.field(data, "layers");
+        if (layers != null) {
+            for (layer in layers) {
+                var layerName:String = Std.string(getFieldTrimmed(layer, "name"));
+                if (layerName != null && layerName.trim() == name) {
+                    return layer;
+                }
+            }
+        }
+        return null;
+    }
+
+    static function getEntityLayer(data:Dynamic, name:String):Dynamic {
+        if (data == null || !Reflect.hasField(data, "layers")) return null;
+        var layers:Array<Dynamic> = cast Reflect.field(data, "layers");
+        if (layers != null) {
+            for (layer in layers) {
+                var layerName:String = Std.string(getFieldTrimmed(layer, "name"));
+                if (layerName != null && layerName.trim() == name) {
+                    return layer;
+                }
+            }
+        }
+        return null;
     }
 }
 
