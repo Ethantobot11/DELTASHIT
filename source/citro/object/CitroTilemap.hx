@@ -8,6 +8,7 @@ class CitroTilemap extends CitroObject {
     public var tileSize:Int;
     public var data:Array<Array<Int>>;
     private var brush:CitroAnimate;
+    public var skipEmptyIndex:Bool = true; 
     public function new(WidthInTiles:Int, HeightInTiles:Int, TileSize:Int) {
         super();
         widthInTiles = WidthInTiles;
@@ -75,7 +76,12 @@ class CitroTilemap extends CitroObject {
     override public function update():Bool {
         if (!visible || alpha <= 0 || brush == null || brush.atlasSprite == null) {
             return false;
-        }        
+        }
+
+        if (widthInTiles <= 0 || heightInTiles <= 0 || data.length == 0) {
+            return false;
+        }
+
         final screenWidth = this.bottom ? CitroG.BOTTOM_WIDTH : CitroG.WIDTH;
         final screenHeight = CitroG.HEIGHT;
         final startX = Math.max(0, Math.floor((0 - this.x) / tileSize));
@@ -90,11 +96,10 @@ class CitroTilemap extends CitroObject {
         for (y in intStartY...intEndY) {
             if (y < 0 || y >= data.length) continue;
             var row = data[y];
-            
             for (x in intStartX...intEndX) {
-                if (x < 0 || x >= row.length) continue;
-                
+                if (x < 0 || x >= row.length) continue; 
                 var tileIndex = row[x];
+                if (skipEmptyIndex && tileIndex == 0) continue;
                 if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
                     brush.atlasSprite.frame = tileIndex;
                     brush.atlasSprite.x = this.x + (x * tileSize);
@@ -103,6 +108,7 @@ class CitroTilemap extends CitroObject {
                     brush.atlasSprite.scale.x = this.scale.x;
                     brush.atlasSprite.scale.y = this.scale.y;
                     brush.atlasSprite.bottom = this.bottom;
+                    
                     brush.atlasSprite.update();
                     drewSomething = true;
                 }

@@ -1,7 +1,7 @@
 package;
 
 import citro.CitroG;
-import citro.editors.ogmo.CitroOgmoLoader;
+import citro.editors.ogmo.CitroOgmo3Loader;
 import citro.object.CitroGroup;
 import citro.object.CitroSprite;
 import citro.object.CitroTilemap;
@@ -18,7 +18,7 @@ class PlayState extends CitroState {
     var ending:Bool;
     var won:Bool;
 
-    var map:CitroOgmoLoader;
+    var map:CitroOgmo3Loader;
     var walls:CitroTilemap;
     var coins:CitroGroup;
     var enemies:CitroGroup;
@@ -31,7 +31,7 @@ class PlayState extends CitroState {
         camera = new CitroCamera();
         add(camera);
 
-        map = new CitroOgmoLoader(AssetPaths.turnBasedRPG2__ogmo, AssetPaths.room_002__json);
+        map = new CitroOgmo3Loader(AssetPaths.turnBasedRPG2__ogmo, AssetPaths.room_002__json);
         walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
         camera.add(walls); 
 
