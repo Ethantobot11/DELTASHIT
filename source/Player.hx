@@ -27,7 +27,7 @@ class Player extends CitroAnimate {
         
         trace("[Player] Loading graphic: " + AssetPaths.player__t3x);
         loadFromT3XWithAnims(AssetPaths.player__t3x, 19, 38, anims);
-        framerate = 12;
+        framerate = 2;
         looped = true;
         
         if (atlasSprite == null) {

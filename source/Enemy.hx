@@ -47,7 +47,7 @@ class Enemy extends CitroAnimate {
         
         trace("[Enemy] Loading graphic: " + graphic);
         loadFromT3XWithAnims(graphic, frameW, frameH, anims);
-        framerate = type == BOSS ? 4 : 5;
+        framerate = type == BOSS ? 2 : 3;
         looped = true;
         
         if (atlasSprite == null) {
@@ -120,7 +120,7 @@ class Enemy extends CitroAnimate {
             }
             
             loadFromT3XWithAnims(graphic, frameW, frameH, anims);
-            framerate = newType == BOSS ? 4 : 5;
+            framerate = newType == BOSS ? 2 : 3;
         }
     }
 
