@@ -36,23 +36,15 @@ class CitroOgmoLoader {
 
         var projectText = sanitizeJson(rawProjectText);
         var levelText = sanitizeJson(rawLevelText);
-        if (rawProjectText.length != projectText.length) {
-            trace("[Ogmo] Sanitized project JSON: removed " + (rawProjectText.length - projectText.length) + " invalid control characters.");
-        }
-        if (rawLevelText.length != levelText.length) {
-            trace("[Ogmo] Sanitized level JSON: removed " + (rawLevelText.length - levelText.length) + " invalid control characters.");
-        }
 
         if (projectText.length > 0) {
             try { 
                 project = Json.parse(projectText); 
             } catch (e:Dynamic) { 
                 trace("Project JSON parse error: " + e); 
-                trace("Preview of sanitized text: " + projectText.substr(0, 100));
                 project = {}; 
             }
         } else { 
-            trace("Project text is empty"); 
             project = {}; 
         }
 
@@ -64,9 +56,19 @@ class CitroOgmoLoader {
                 level = {}; 
             }
         } else { 
-            trace("Level text is empty"); 
             level = {}; 
         }
+    }
+
+    static function getFieldTrimmed(obj:Dynamic, key:String):Dynamic {
+        if (obj == null) return null;
+        if (Reflect.hasField(obj, key)) return Reflect.field(obj, key);
+        for (f in Reflect.fields(obj)) {
+            if (f.trim() == key) {
+                return Reflect.field(obj, f);
+            }
+        }
+        return null;
     }
 
     static function sanitizeJson(json:String):String {
@@ -81,37 +83,23 @@ class CitroOgmoLoader {
         return buf.toString();
     }
 
-    public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
-        var tilemap = new CitroTilemap(0, 0, tileSize);
-        
-        if (level == null || !Reflect.hasField(level, "layers")) {
-            trace("Warning: Level data has no layers. Map will be empty.");
-            return tilemap;
-        }
-
-        var layers:Array<Dynamic> = Reflect.field(level, "layers");
-        var layer:Dynamic = null;
-        
-        for (l in layers) {
-            var name:String = Std.string(Reflect.field(l, "name"));
-            if (name != null && name.trim() == tileLayer) {
-                layer = l;
-                break;
-            }
-        }
-        
+        public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
+        var layer = getTileLayer(level, tileLayer);
         if (layer == null) {
             trace("Warning: Tile layer '" + tileLayer + "' not found. Available layers:");
-            for (l in layers) {
-                trace(" - '" + Reflect.field(l, "name") + "'");
+            var layers:Array<Dynamic> = cast Reflect.field(level, "layers");
+            if (layers != null) {
+                for (l in layers) {
+                    trace(" - '" + Reflect.field(l, "name") + "'");
             }
-            return tilemap;
+            }
+            return new CitroTilemap(0, 0, tileSize);
         }
 
         var gridCellsX:Int = Std.int(Reflect.field(layer, "gridCellsX"));
         var gridCellsY:Int = Std.int(Reflect.field(layer, "gridCellsY"));
         
-        tilemap = new CitroTilemap(gridCellsX, gridCellsY, tileSize);
+        var tilemap = new CitroTilemap(gridCellsX, gridCellsY, tileSize);
         tilemap.loadGraphic(tileGraphic);
 
         var arrayMode:Int = Std.int(Reflect.field(layer, "arrayMode"));
@@ -144,19 +132,19 @@ class CitroOgmoLoader {
     public function loadEntities(entityLoadCallback:Dynamic->Void, entityLayer:String = "entities"):Void {
         if (level == null || !Reflect.hasField(level, "layers")) return;
         
-        var layers:Array<Dynamic> = Reflect.field(level, "layers");
+        var layers:Array<Dynamic> = cast Reflect.field(level, "layers");
         var layer:Dynamic = null;
         
         for (l in layers) {
-            var name:String = Std.string(Reflect.field(l, "name"));
+            var name:String = Std.string(getFieldTrimmed(l, "name"));
             if (name != null && name.trim() == entityLayer) {
                 layer = l;
                 break;
             }
         }
 
-        if (layer != null && Reflect.hasField(layer, "entities")) {
-            var entities:Array<Dynamic> = cast Reflect.field(layer, "entities");
+        if (layer != null && getFieldTrimmed(layer, "entities") != null) {
+            var entities:Array<Dynamic> = cast getFieldTrimmed(layer, "entities");
             if (entities != null) {
                 for (entity in entities) {
                     entityLoadCallback(entity);

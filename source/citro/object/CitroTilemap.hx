@@ -76,20 +76,32 @@ class CitroTilemap extends CitroObject {
         if (!visible || alpha <= 0 || brush == null || brush.atlasSprite == null) {
             return false;
         }
+        
+        if (widthInTiles <= 0 || heightInTiles <= 0 || data.length == 0) {
+            return false;
+        }
+
         final screenWidth = this.bottom ? CitroG.BOTTOM_WIDTH : CitroG.WIDTH;
         final screenHeight = CitroG.HEIGHT;
         final startX = Math.max(0, Math.floor((0 - this.x) / tileSize));
         final endX = Math.min(widthInTiles, Math.ceil((screenWidth - this.x) / tileSize));
         final startY = Math.max(0, Math.floor((0 - this.y) / tileSize));
         final endY = Math.min(heightInTiles, Math.ceil((screenHeight - this.y) / tileSize));
+        
         final intStartX = Std.int(startX);
         final intEndX = Std.int(endX);
         final intStartY = Std.int(startY);
         final intEndY = Std.int(endY);
+        
         var drewSomething = false;
         for (y in intStartY...intEndY) {
+            if (y < 0 || y >= data.length) continue;
+            var row = data[y];
+            
             for (x in intStartX...intEndX) {
-                var tileIndex = data[y][x];
+                if (x < 0 || x >= row.length) continue;
+                
+                var tileIndex = row[x];
                 if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
                     brush.atlasSprite.frame = tileIndex;
                     brush.atlasSprite.x = this.x + (x * tileSize);
