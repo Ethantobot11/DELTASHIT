@@ -25,15 +25,15 @@ class PlayState extends CitroState {
 
     override public function create() {
         #if DISCORD_ALLOWED
-        DiscordClient.changePresence("...", null);
+        DiscordClient.changePresence("WE CALL IT : PLAYSTATE CUZ FUCK YOU", null);
         #end
 
         camera = new CitroCamera();
         add(camera);
 
-        map = new CitroOgmoLoader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
-		walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
-        add(walls);
+        map = new CitroOgmoLoader(AssetPaths.turnBasedRPG2__ogmo, AssetPaths.room_002__json);
+        walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
+        camera.add(walls); 
 
         enemies = new CitroGroup();
         camera.add(enemies);
