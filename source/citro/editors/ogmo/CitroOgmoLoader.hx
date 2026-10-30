@@ -35,27 +35,32 @@ class CitroOgmoLoader {
 
         if (projectText != null && projectText.length > 0) {
             try {
-                projectText = projectText.replace("\r", "").replace("\n", "");
-                project = Json.parse(projectText);
-            } catch (e:Dynamic) {
-                trace("ERROR parsing project JSON: " + e);
-                trace("Trying to find invalid character...");
+                var cleanProject = "";
                 for (i in 0...projectText.length) {
-                    var char = projectText.charCodeAt(i);
-                    if (char < 32 && char != 10 && char != 13) {
-                        trace('Invalid char ${char} at position ${i}');
+                    var code = projectText.charCodeAt(i);
+                    if (code >= 32 || code == 9 || code == 10 || code == 13) {
+                        cleanProject += projectText.charAt(i);
                     }
                 }
+                project = Json.parse(cleanProject);
+            } catch (e:Dynamic) {
+                trace("ERROR parsing project JSON: " + e);
                 project = {};
             }
         }
 
         if (levelText != null && levelText.length > 0) {
             try {
-                level = Json.parse(levelText);
+                var cleanLevel = "";
+                for (i in 0...levelText.length) {
+                    var code = levelText.charCodeAt(i);
+                    if (code >= 32 || code == 9 || code == 10 || code == 13) {
+                        cleanLevel += levelText.charAt(i);
+                    }
+                }
+                level = Json.parse(cleanLevel);
             } catch (e:Dynamic) {
                 trace("ERROR parsing level JSON: " + e);
-                trace("Content preview: " + levelText.substr(0, 100));
                 level = {};
             }
         } else {

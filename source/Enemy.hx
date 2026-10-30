@@ -153,9 +153,9 @@ class Enemy extends CitroAnimate {
 
         if (atlasSprite != null) {
             if (acceleration.x < 0) {
-                atlasSprite.flipX = true;
-            } else if (acceleration.x > 0) {
                 atlasSprite.flipX = false;
+            } else if (acceleration.x > 0) {
+                atlasSprite.flipX = true;
             }
         }
         

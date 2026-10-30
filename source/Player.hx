@@ -59,11 +59,11 @@ class Player extends CitroAnimate {
             } else if (left) {
                 newAngle = 180;
                 facing = "left";
-                if (atlasSprite != null) atlasSprite.flipX = true;
+                if (atlasSprite != null) atlasSprite.flipX = false;
             } else if (right) {
                 newAngle = 0;
                 facing = "right";
-                if (atlasSprite != null) atlasSprite.flipX = false;
+                if (atlasSprite != null) atlasSprite.flipX = true;
             }
 
             var radians = newAngle * (Math.PI / 180);

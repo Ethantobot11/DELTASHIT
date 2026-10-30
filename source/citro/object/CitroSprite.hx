@@ -78,7 +78,6 @@ class CitroSprite extends CitroObject {
             CitroG.caches.set(file, untyped __cpp__('this->ss'));
             CitroG.caches.setMeta(file + "_frames", totalFrames);
         }
-
         var imageWidth:Float = 0;
         var imageHeight:Float = 0;
         untyped __cpp__('
@@ -88,14 +87,13 @@ class CitroSprite extends CitroObject {
         ');
         sheetWidth = imageWidth;
         sheetHeight = imageHeight;
-
         if (frameWidth > 0 && frameHeight > 0) {
             width = frameWidth;
-            height = frameHeight;
-            
+            height = frameHeight;         
             var framesPerRow:Int = Std.int(sheetWidth / frameWidth);
             var framesPerCol:Int = Std.int(sheetHeight / frameHeight);
             totalFrames = framesPerRow * framesPerCol;
+            trace("DEBUG loadGraphic: file=" + file + " | sheetWidth=" + sheetWidth + " | frameWidth=" + frameWidth + " | totalFrames=" + totalFrames);         
             CitroG.caches.setMeta(file + "_frames", totalFrames);
         } else {
             width = sheetWidth;
