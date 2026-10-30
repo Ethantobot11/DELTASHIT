@@ -24,7 +24,7 @@ typedef CitroFrame = {
 class CitroAnimate extends CitroObject {
     var timeLeft:Float = 0;
     public var frames:Map<String, CitroFrame>;
-    var atlasSprite:CitroSprite = null;
+    public var atlasSprite:CitroSprite = null;
     var atlasPath:String = "";
 
     public var framerate:Float = 24;
