@@ -9,6 +9,7 @@ class CitroTilemap extends CitroObject {
     public var data:Array<Array<Int>>;
     private var brush:CitroAnimate;
     public var skipEmptyIndex:Bool = true; 
+    
     public function new(WidthInTiles:Int, HeightInTiles:Int, TileSize:Int) {
         super();
         widthInTiles = WidthInTiles;
@@ -102,14 +103,11 @@ class CitroTilemap extends CitroObject {
                 if (skipEmptyIndex && tileIndex == 0) continue;
                 if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
                     brush.atlasSprite.frame = tileIndex;
-                    brush.atlasSprite.x = this.x + (x * tileSize);
-                    brush.atlasSprite.y = this.y + (y * tileSize);
                     brush.atlasSprite.alpha = this.alpha;
                     brush.atlasSprite.scale.x = this.scale.x;
                     brush.atlasSprite.scale.y = this.scale.y;
-                    brush.atlasSprite.bottom = this.bottom;
-                    
-                    brush.atlasSprite.update();
+                    brush.atlasSprite.color = this.color;
+                    brush.atlasSprite.drawRaw(this.x + (x * tileSize), this.y + (y * tileSize));
                     drewSomething = true;
                 }
             }

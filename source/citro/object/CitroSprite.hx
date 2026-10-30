@@ -166,6 +166,56 @@ class CitroSprite extends CitroObject {
         return true;
     }
 
+    /**
+     * Draws the sprite directly at the specified coordinates without modifying the global view matrix.
+     * This is much faster and safer for drawing many instances (like tilemaps).
+     */
+    public function drawRaw(drawX:Float, drawY:Float):Void {
+        if (isDestroyed || !visible || alpha <= 0) return;
+        
+        untyped __cpp__('
+            Float sw = this->scale->x, sh = this->scale->y;
+            Float drawSw = this->flipX ? -fabs(sw) : fabs(sw);
+            Float drawSh = this->flipY ? -fabs(sh) : fabs(sh);
+
+            if (this->image.tex == NULL || this->image.subtex == NULL) {
+                CONVERT_TO_COMPATIBLE_COLOR(this->color)
+                C2D_DrawRectSolid({0}, {1}, 0, this->width * fabs(sw), this->height * fabs(sh), finalColor);
+            } else {
+                C2D_ImageTint tint;
+                C2D_PlainImageTint(
+                    &tint,
+                    C2D_Color32(
+                        (this->color >> 16) & 0xFF,
+                        (this->color >> 8) & 0xFF,
+                        this->color & 0xFF,
+                        ((this->color >> 24) & 0xFF) * C2D_Clamp(this->alpha, 0, 1)
+                    ),
+                    fabs(((Float)(this->color & 0xFFFFFF) / 16777215.0) - 1) / 2.0
+                );
+                
+                if (this->useSrcRect) {
+                    Tex3DS_SubTexture srcSubTex;
+                    srcSubTex.width = (u16)this->srcWidth;
+                    srcSubTex.height = (u16)this->srcHeight;
+                    Tex3DS_SubTexture* orig = this->image.subtex;
+                    float uScale = (orig->right - orig->left) / orig->width;
+                    float vScale = (orig->bottom - orig->top) / orig->height;
+                    srcSubTex.left = orig->left + this->srcX * uScale;
+                    srcSubTex.right = orig->left + (this->srcX + this->srcWidth) * uScale;
+                    srcSubTex.top = orig->top + this->srcY * vScale;
+                    srcSubTex.bottom = orig->top + (this->srcY + this->srcHeight) * vScale;
+                    
+                    C2D_Image drawImg = this->image;
+                    drawImg.subtex = &srcSubTex;
+                    C2D_DrawImageAt(drawImg, {0}, {1}, 0, &tint, drawSw, drawSh);
+                } else {
+                    C2D_DrawImageAt(this->image, {0}, {1}, 0, &tint, drawSw, drawSh);
+                }
+            }
+        ', drawX, drawY);
+    }
+
     override function update():Bool {
         if (isDestroyed || !visible || alpha <= 0) return false;
         
