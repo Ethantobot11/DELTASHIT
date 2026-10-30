@@ -10,7 +10,8 @@ import sys.FileSystem;
 class CitroOgmoLoader {
     public var project:Dynamic;
     public var level:Dynamic;
-        public function new(projectDataPath:String, levelDataPath:String) {
+
+    public function new(projectDataPath:String, levelDataPath:String) {
         var projectText = "";
         var levelText = "";
         #if sys
@@ -32,6 +33,7 @@ class CitroOgmoLoader {
         #end
         if (projectText != null && projectText.length > 0) {
             try {
+                projectText = sanitizeJson(projectText);
                 project = Json.parse(projectText);
             } catch (e:Dynamic) {
                 trace("ERROR parsing project JSON: " + e);
@@ -41,27 +43,29 @@ class CitroOgmoLoader {
             trace("Error: Project file is empty or missing: " + projectDataPath);
             project = {};
         }
-
         if (levelText != null && levelText.length > 0) {
             try {
+                levelText = sanitizeJson(levelText);
                 level = Json.parse(levelText);
             } catch (e:Dynamic) {
                 trace("ERROR parsing level JSON: " + e);
-                var lines = levelText.split("\n");
-                var charCount = 0;
-                for (i in 0...lines.length) {
-                    charCount += lines[i].length + 1;
-                    if (charCount >= 4000) {
-                        trace("The error is around line " + (i + 1) + ": " + lines[i]);
-                        break;
-                    }
-                }
                 level = {};
             }
         } else {
             trace("Error: Level file is empty or missing: " + levelDataPath);
             level = {};
         }
+    }
+
+    static function sanitizeJson(json:String):String {
+        var buf = new StringBuf();
+        for (i in 0...json.length) {
+            var code = json.charCodeAt(i);
+            if (code >= 32 || code == 9 || code == 10 || code == 13) {
+                buf.addChar(code);
+            }
+        }
+        return buf.toString();
     }
 
     public function loadTilemap(tileGraphic:String, tileLayer:String = "tiles", tileSize:Int = 16):CitroTilemap {
