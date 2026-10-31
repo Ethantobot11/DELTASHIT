@@ -7,8 +7,8 @@ class CitroTilemap extends CitroObject {
     public var heightInTiles:Int;
     public var tileSize:Int;
     public var data:Array<Array<Int>>;
-    private var brush:CitroAnimate;
-    public var skipEmptyIndex:Bool = false; 
+    private var brush:CitroAnimate;  // Use CitroAnimate for T3X frame support
+    public var skipEmptyIndex:Bool = true;
     
     public function new(WidthInTiles:Int, HeightInTiles:Int, TileSize:Int) {
         super();
@@ -32,6 +32,8 @@ class CitroTilemap extends CitroObject {
 
     public function loadGraphic(tileGraphicPath:String):Bool {
         trace("[CitroTilemap] Loading graphic: " + tileGraphicPath);
+        
+        // Use CitroAnimate's T3X loader which properly handles frame grids
         var anims = new Map<String, Array<Int>>();
         brush.loadFromT3XWithAnims(tileGraphicPath, tileSize, tileSize, anims);
         
@@ -92,31 +94,41 @@ class CitroTilemap extends CitroObject {
         var drewSomething = false;
         var tilesDrawn = 0;
         var maxFrame = brush.atlasSprite.totalFrames;
+        
         for (y in 0...heightInTiles) {
             if (y >= data.length) break;
             var row = data[y];
+            
             for (x in 0...widthInTiles) {
                 if (x >= row.length) break;
                 var tileIndex = row[x];
+                
                 if (skipEmptyIndex && tileIndex == 0) {
                     continue;
                 }
 
                 if (tileIndex >= 0 && tileIndex < maxFrame) {
                     brush.atlasSprite.frame = tileIndex;
+                    brush.atlasSprite.alpha = this.alpha;
+                    brush.atlasSprite.scale.x = this.scale.x;
+                    brush.atlasSprite.scale.y = this.scale.y;
+                    brush.atlasSprite.color = this.color;
+                    
                     var drawX = this.x + (x * tileSize);
-                    var drawY = this.y + (y * tileSize);                    
+                    var drawY = this.y + (y * tileSize);
                     brush.atlasSprite.drawRaw(drawX, drawY);
                     drewSomething = true;
                     tilesDrawn++;
-                } else {
-                    if (tileIndex >= maxFrame) {
-                         trace("Bad Tile Index: " + tileIndex); 
-                    }
+                } else if (tileIndex >= maxFrame) {
+                    trace("Bad Tile Index: " + tileIndex + " (max: " + maxFrame + ")");
                 }
             }
         }
-        if (tilesDrawn > 0) trace("[CitroTilemap] Drew " + tilesDrawn + " tiles");
+        
+        if (tilesDrawn > 0) {
+            trace("[CitroTilemap] Drew " + tilesDrawn + " tiles");
+        }
+        
         return drewSomething;
     }
 }
