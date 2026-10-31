@@ -8,7 +8,7 @@ class CitroTilemap extends CitroObject {
     public var tileSize:Int;
     public var data:Array<Array<Int>>;
     private var brush:CitroAnimate;
-    public var skipEmptyIndex:Bool = true; 
+    public var skipEmptyIndex:Bool = false; 
     
     public function new(WidthInTiles:Int, HeightInTiles:Int, TileSize:Int) {
         super();
@@ -34,10 +34,12 @@ class CitroTilemap extends CitroObject {
         trace("[CitroTilemap] Loading graphic: " + tileGraphicPath);
         var anims = new Map<String, Array<Int>>();
         brush.loadFromT3XWithAnims(tileGraphicPath, tileSize, tileSize, anims);
+        
         if (brush.atlasSprite == null || brush.atlasSprite.totalFrames == 0) {
             trace("[CitroTilemap] ERROR: Failed to load tileset!");
             return false;
         }
+        
         trace("[CitroTilemap] Graphic loaded. Total frames: " + brush.atlasSprite.totalFrames);
         return true;
     }
@@ -82,33 +84,39 @@ class CitroTilemap extends CitroObject {
         if (!visible || alpha <= 0 || brush == null || brush.atlasSprite == null) {
             return false;
         }
+
         if (widthInTiles <= 0 || heightInTiles <= 0 || data.length == 0) {
-            trace("[CitroTilemap] SKIP: Invalid dimensions or empty data");
             return false;
-        }
-        
-        if (data.length > 0 && data[0].length > 0) {
-            trace("[CitroTilemap] First tile: " + data[0][0] + " | Total frames: " + brush.atlasSprite.totalFrames);
         }
 
         var drewSomething = false;
         var tilesDrawn = 0;
-        for (y in 0...Std.int(Math.min(5, heightInTiles))) {
-            for (x in 0...Std.int(Math.min(5, widthInTiles))) {
-                var tileIndex = data[y][x];
-                
-                if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
+        var maxFrame = brush.atlasSprite.totalFrames;
+        for (y in 0...heightInTiles) {
+            if (y >= data.length) break;
+            var row = data[y];
+            for (x in 0...widthInTiles) {
+                if (x >= row.length) break;
+                var tileIndex = row[x];
+                if (skipEmptyIndex && tileIndex == 0) {
+                    continue;
+                }
+
+                if (tileIndex >= 0 && tileIndex < maxFrame) {
                     brush.atlasSprite.frame = tileIndex;
-                    brush.atlasSprite.drawRaw(this.x + (x * tileSize), this.y + (y * tileSize));
+                    var drawX = this.x + (x * tileSize);
+                    var drawY = this.y + (y * tileSize);                    
+                    brush.atlasSprite.drawRaw(drawX, drawY);
                     drewSomething = true;
                     tilesDrawn++;
                 } else {
-                    trace("[CitroTilemap] SKIP TILE[" + x + "," + y + "]: index=" + tileIndex + " maxFrames=" + brush.atlasSprite.totalFrames);
+                    if (tileIndex >= maxFrame) {
+                         trace("Bad Tile Index: " + tileIndex); 
+                    }
                 }
             }
         }
-        
-        trace("[CitroTilemap] Drew " + tilesDrawn + " tiles");
+        if (tilesDrawn > 0) trace("[CitroTilemap] Drew " + tilesDrawn + " tiles");
         return drewSomething;
     }
 }
