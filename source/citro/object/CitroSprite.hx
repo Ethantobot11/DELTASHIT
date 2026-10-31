@@ -177,12 +177,11 @@ class CitroSprite extends CitroObject {
             Float sw = this->scale->x, sh = this->scale->y;
             Float drawSw = this->flipX ? -fabs(sw) : fabs(sw);
             Float drawSh = this->flipY ? -fabs(sh) : fabs(sh);
-
             if (this->image.tex == NULL || this->image.subtex == NULL) {
                 CONVERT_TO_COMPATIBLE_COLOR(this->color)
                 C2D_DrawRectSolid({0}, {1}, 0, this->width * fabs(sw), this->height * fabs(sh), finalColor);
             } else {
-                C2D_ImageTint tint;
+                static C2D_ImageTint tint;
                 C2D_PlainImageTint(
                     &tint,
                     C2D_Color32(
@@ -193,7 +192,6 @@ class CitroSprite extends CitroObject {
                     ),
                     fabs(((Float)(this->color & 0xFFFFFF) / 16777215.0) - 1) / 2.0
                 );
-                
                 if (this->useSrcRect) {
                     Tex3DS_SubTexture srcSubTex;
                     srcSubTex.width = (u16)this->srcWidth;
