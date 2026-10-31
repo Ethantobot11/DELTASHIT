@@ -86,13 +86,15 @@ class CitroTilemap extends CitroObject {
             trace("[CitroTilemap] SKIP: Invalid dimensions or empty data");
             return false;
         }
+        
         if (data.length > 0 && data[0].length > 0) {
             trace("[CitroTilemap] First tile: " + data[0][0] + " | Total frames: " + brush.atlasSprite.totalFrames);
         }
+
         var drewSomething = false;
         var tilesDrawn = 0;
-        for (y in 0...Math.min(5, heightInTiles)) {
-            for (x in 0...Math.min(5, widthInTiles)) {
+        for (y in 0...Std.int(Math.min(5, heightInTiles))) {
+            for (x in 0...Std.int(Math.min(5, widthInTiles))) {
                 var tileIndex = data[y][x];
                 
                 if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
