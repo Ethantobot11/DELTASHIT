@@ -82,28 +82,31 @@ class CitroTilemap extends CitroObject {
         if (!visible || alpha <= 0 || brush == null || brush.atlasSprite == null) {
             return false;
         }
-
         if (widthInTiles <= 0 || heightInTiles <= 0 || data.length == 0) {
+            trace("[CitroTilemap] SKIP: Invalid dimensions or empty data");
             return false;
-        } 
+        }
+        if (data.length > 0 && data[0].length > 0) {
+            trace("[CitroTilemap] First tile: " + data[0][0] + " | Total frames: " + brush.atlasSprite.totalFrames);
+        }
         var drewSomething = false;
-        for (y in 0...heightInTiles) {
-            var row = data[y];
-            for (x in 0...widthInTiles) {
-                var tileIndex = row[x];
-                if (skipEmptyIndex && tileIndex == 0) continue;
+        var tilesDrawn = 0;
+        for (y in 0...Math.min(5, heightInTiles)) {
+            for (x in 0...Math.min(5, widthInTiles)) {
+                var tileIndex = data[y][x];
                 
                 if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
                     brush.atlasSprite.frame = tileIndex;
-                    brush.atlasSprite.alpha = this.alpha;
-                    brush.atlasSprite.scale.x = this.scale.x;
-                    brush.atlasSprite.scale.y = this.scale.y;
-                    brush.atlasSprite.color = this.color;
                     brush.atlasSprite.drawRaw(this.x + (x * tileSize), this.y + (y * tileSize));
                     drewSomething = true;
+                    tilesDrawn++;
+                } else {
+                    trace("[CitroTilemap] SKIP TILE[" + x + "," + y + "]: index=" + tileIndex + " maxFrames=" + brush.atlasSprite.totalFrames);
                 }
             }
         }
+        
+        trace("[CitroTilemap] Drew " + tilesDrawn + " tiles");
         return drewSomething;
     }
 }
