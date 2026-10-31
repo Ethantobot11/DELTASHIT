@@ -205,7 +205,6 @@ class CitroSprite extends CitroObject {
                     srcSubTex.right = orig->left + (this->srcX + this->srcWidth) * uScale;
                     srcSubTex.top = orig->top + this->srcY * vScale;
                     srcSubTex.bottom = orig->top + (this->srcY + this->srcHeight) * vScale;
-                    
                     C2D_Image drawImg = this->image;
                     drawImg.subtex = &srcSubTex;
                     C2D_DrawImageAt(drawImg, {0}, {1}, 0, &tint, drawSw, drawSh);

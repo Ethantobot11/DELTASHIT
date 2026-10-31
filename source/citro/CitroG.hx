@@ -6,6 +6,7 @@ import citro.backend.CitroCache;
 import citro.backend.CitroSoundSystem;
 import citro.backend.CitroTimer;
 import citro.backend.CitroTween;
+import citro.backend.CitroCamera
 import citro.math.CitroRandom;
 import citro.object.CitroObject;
 import citro.state.CitroState;
@@ -92,6 +93,13 @@ class CitroG {
      * Example: CitroG.sound.play("romfs:/assets/sounds/select.cwav");
      */
     public static var sound:CitroSoundSystem = new CitroSoundSystem();
+
+	/**
+     * Global sound manager, similar to FlxG.sound in HaxeFlixel.
+     * Use this to load and play sounds globally.
+     * Example: CitroG.sound.play("romfs:/assets/sounds/select.cwav");
+     */
+    public static var camera:CitroCamera = new CitroCamera();
 
 	/**
 	 * Function to check if both of the objects are overlapping or not.

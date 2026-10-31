@@ -85,8 +85,7 @@ class CitroTilemap extends CitroObject {
 
         if (widthInTiles <= 0 || heightInTiles <= 0 || data.length == 0) {
             return false;
-        }
-
+        } 
         var drewSomething = false;
         for (y in 0...heightInTiles) {
             var row = data[y];
