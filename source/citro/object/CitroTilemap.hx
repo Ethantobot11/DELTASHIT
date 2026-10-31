@@ -15,8 +15,10 @@ class CitroTilemap extends CitroObject {
         widthInTiles = WidthInTiles;
         heightInTiles = HeightInTiles;
         tileSize = TileSize;
-        data = [];
+        this.width = widthInTiles * tileSize;
+        this.height = heightInTiles * tileSize;
         
+        data = [];
         for (y in 0...heightInTiles) {
             var row = [];
             for (x in 0...widthInTiles) {
@@ -61,6 +63,8 @@ class CitroTilemap extends CitroObject {
         if (heightInTiles > 0) {
             widthInTiles = rows[0].split(",").length;
             data = [];
+            this.width = widthInTiles * tileSize;
+            this.height = heightInTiles * tileSize;
             
             for (y in 0...heightInTiles) {
                 var cols = rows[y].split(",");
@@ -83,24 +87,13 @@ class CitroTilemap extends CitroObject {
             return false;
         }
 
-        final screenWidth = this.bottom ? CitroG.BOTTOM_WIDTH : CitroG.WIDTH;
-        final screenHeight = CitroG.HEIGHT;
-        final startX = Math.max(0, Math.floor((0 - this.x) / tileSize));
-        final endX = Math.min(widthInTiles, Math.ceil((screenWidth - this.x) / tileSize));
-        final startY = Math.max(0, Math.floor((0 - this.y) / tileSize));
-        final endY = Math.min(heightInTiles, Math.ceil((screenHeight - this.y) / tileSize));
-        final intStartX = Std.int(startX);
-        final intEndX = Std.int(endX);
-        final intStartY = Std.int(startY);
-        final intEndY = Std.int(endY);
         var drewSomething = false;
-        for (y in intStartY...intEndY) {
-            if (y < 0 || y >= data.length) continue;
+        for (y in 0...heightInTiles) {
             var row = data[y];
-            for (x in intStartX...intEndX) {
-                if (x < 0 || x >= row.length) continue; 
+            for (x in 0...widthInTiles) {
                 var tileIndex = row[x];
                 if (skipEmptyIndex && tileIndex == 0) continue;
+                
                 if (tileIndex >= 0 && tileIndex < brush.atlasSprite.totalFrames) {
                     brush.atlasSprite.frame = tileIndex;
                     brush.atlasSprite.alpha = this.alpha;
