@@ -95,9 +95,7 @@ class CitroG {
     public static var sound:CitroSoundSystem = new CitroSoundSystem();
 
 	/**
-     * Global sound manager, similar to FlxG.sound in HaxeFlixel.
-     * Use this to load and play sounds globally.
-     * Example: CitroG.sound.play("romfs:/assets/sounds/select.cwav");
+     * what it's a camera idk how to explain it bruh
      */
     public static var camera:CitroCamera = new CitroCamera();
 
