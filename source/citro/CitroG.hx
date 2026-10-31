@@ -6,7 +6,7 @@ import citro.backend.CitroCache;
 import citro.backend.CitroSoundSystem;
 import citro.backend.CitroTimer;
 import citro.backend.CitroTween;
-import citro.object.CitroCamera
+import citro.object.CitroCamera;
 import citro.math.CitroRandom;
 import citro.object.CitroObject;
 import citro.state.CitroState;
