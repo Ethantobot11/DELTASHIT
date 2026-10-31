@@ -70,7 +70,11 @@ class CitroCache {
     }
 
     public function clear() {
+        var keys = [];
         for (key in cache.keys()) {
+            keys.push(key);
+        }
+        for (key in keys) {
             freeMemory(key);
         }
         cache.clear();

@@ -95,9 +95,9 @@ class CitroG {
     public static var sound:CitroSoundSystem = new CitroSoundSystem();
 
 	/**
-     * what it's a camera idk how to explain it bruh
+     * what it's a camera idk how to explain it bruh : currently unused
      */
-    public static var camera:CitroCamera = new CitroCamera();
+    //public static var camera:CitroCamera = new CitroCamera();
 
 	/**
 	 * Function to check if both of the objects are overlapping or not.
