@@ -7,7 +7,7 @@ class CitroTilemap extends CitroObject {
     public var heightInTiles:Int;
     public var tileSize:Int;
     public var data:Array<Array<Int>>;
-    private var brush:CitroAnimate;  // Use CitroAnimate for T3X frame support
+    private var brush:CitroAnimate;
     public var skipEmptyIndex:Bool = true;
     
     public function new(WidthInTiles:Int, HeightInTiles:Int, TileSize:Int) {
