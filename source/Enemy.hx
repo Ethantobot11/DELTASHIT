@@ -49,6 +49,8 @@ class Enemy extends CitroAnimate {
         
         trace("[Enemy] Loading graphic: " + graphic);
         loadFromT3XWithAnims(graphic, frameW, frameH, anims);
+        this.width = frameW;
+        this.height = frameH;
         framerate = type == BOSS ? 2 : 3;
         looped = true;
         
