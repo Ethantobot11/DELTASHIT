@@ -1,17 +1,20 @@
 package;
 
 import citro.object.CitroAnimate;
+import citro.object.CitroTilemap;
 import citro.CitroG;
 import haxe3ds.services.HID;
 
 class Player extends CitroAnimate {
-    static inline var SPEED:Float = 100;
+    static inline var SPEED:Float = 0.5;
     public var up:Bool;
     public var down:Bool;
     public var left:Bool;
     public var right:Bool;
     public var active:Bool = true;
     private var facing:String = "down";
+    var walls:CitroTilemap;
+    
     public function new(x:Float = 0, y:Float = 0) {
         super();
         this.x = x;
@@ -27,6 +30,8 @@ class Player extends CitroAnimate {
         
         trace("[Player] Loading graphic: " + AssetPaths.player__t3x);
         loadFromT3XWithAnims(AssetPaths.player__t3x, 19, 38, anims);
+        this.width = 19;
+        this.height = 38;
         framerate = 2;
         looped = true;
         
@@ -36,6 +41,10 @@ class Player extends CitroAnimate {
             trace("[Player] Successfully loaded. Total frames: " + atlasSprite.totalFrames);
         }
     }
+    
+    public function setWalls(wallMap:CitroTilemap) {
+        walls = wallMap;
+    }
 
     function updateMovement() {
         up = HID.keyHeld(HIDKey.UP);
@@ -43,36 +52,53 @@ class Player extends CitroAnimate {
         left = HID.keyHeld(HIDKey.LEFT);
         right = HID.keyHeld(HIDKey.RIGHT);
 
-        var moving = (acceleration.x != 0 || acceleration.y != 0);
+        var moving = false;
         var animName = "";
+        var newX = x;
+        var newY = y;
 
         if (up || down || left || right) {
+            moving = true;
             var newAngle:Float = 0;
             if (up) {
                 newAngle = -90;
                 if (left) newAngle -= 45; else if (right) newAngle += 45;
                 facing = "up";
+                newY -= SPEED;
             } else if (down) {
                 newAngle = 90;
                 if (left) newAngle += 45; else if (right) newAngle -= 45;
                 facing = "down";
+                newY += SPEED;
             } else if (left) {
                 newAngle = 180;
                 facing = "left";
                 if (atlasSprite != null) atlasSprite.flipX = false;
+                newX -= SPEED;
             } else if (right) {
                 newAngle = 0;
                 facing = "right";
                 if (atlasSprite != null) atlasSprite.flipX = true;
+                newX += SPEED;
             }
 
-            var radians = newAngle * (Math.PI / 180);
-            acceleration.x = Math.cos(radians) * SPEED;
-            acceleration.y = Math.sin(radians) * SPEED;
+            if (walls != null) {
+                if (!walls.checkTileCollision(newX, y, width * scale.x, height * scale.y)) {
+                    x = newX;
+                }
+                if (!walls.checkTileCollision(x, newY, width * scale.x, height * scale.y)) {
+                    y = newY;
+                }
+            } else {
+                x = newX;
+                y = newY;
+            }
             
-            if (facing == "down") animName = moving ? "d_walk" : "d_idle";
-            else if (facing == "up") animName = moving ? "u_walk" : "u_idle";
-            else animName = moving ? "lr_walk" : "lr_idle";
+            acceleration.x = 0;
+            acceleration.y = 0;
+            if (facing == "down") animName = "d_walk";
+            else if (facing == "up") animName = "u_walk";
+            else animName = "lr_walk";
         } else {
             acceleration.x = 0;
             acceleration.y = 0;

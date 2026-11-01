@@ -1,61 +1,50 @@
 package;
 
 import citro.object.CitroAnimate;
+import citro.object.CitroTilemap;
 import citro.CitroG;
 
 enum EnemyType { REGULAR; BOSS; }
 
 class Enemy extends CitroAnimate {
-    static inline var WALK_SPEED:Float = 40;
-    static inline var CHASE_SPEED:Float = 70;
+    static inline var WALK_SPEED:Float = 0.5;
+    static inline var CHASE_SPEED:Float = 1.5;
 
     public var type:EnemyType;
     var brain:FSM;
     var idleTimer:Float;
     var moveDirection:Float;
     public var seesPlayer:Bool;
+    public var isMoving:Bool = false;
+    var lastMoveX:Float = 0;
+    var lastMoveY:Float = 0;
 
     public var playerPosition:{x:Float, y:Float};
     public var active:Bool = true;
+    var walls:CitroTilemap;
 
     public function new(x:Float, y:Float, type:EnemyType) {
         super();
         this.x = x;
         this.y = y;
         this.type = type;
-
         var graphic = if (type == BOSS) AssetPaths.boss__t3x else AssetPaths.enemy__t3x;
         var frameW = if (type == BOSS) 25 else 21;
         var frameH = if (type == BOSS) 46 else 40;
         var anims = new Map<String, Array<Int>>();
-        
         if (type == BOSS) {
-            anims.set("d_idle", [0]);
-            anims.set("lr_idle", [1]);
-            anims.set("u_idle", [2]);
-            anims.set("d_walk", [0, 1]);
-            anims.set("lr_walk", [1, 2]);
-            anims.set("u_walk", [2, 0]);
+            anims.set("d_idle", [0]); anims.set("lr_idle", [1]); anims.set("u_idle", [2]);
+            anims.set("d_walk", [0, 1]); anims.set("lr_walk", [1, 2]); anims.set("u_walk", [2, 0]);
         } else {
-            anims.set("d_idle", [9]);
-            anims.set("lr_idle", [4]);
-            anims.set("u_idle", [0]);
-            anims.set("d_walk", [8, 9, 10, 11]);
-            anims.set("lr_walk", [4, 5, 6, 7]);
-            anims.set("u_walk", [0, 1, 2, 3]);
+            anims.set("d_idle", [9]); anims.set("lr_idle", [4]); anims.set("u_idle", [0]);
+            anims.set("d_walk", [8, 9, 10, 11]); anims.set("lr_walk", [4, 5, 6, 7]); anims.set("u_walk", [0, 1, 2, 3]);
         }
         
-        trace("[Enemy] Loading graphic: " + graphic);
         loadFromT3XWithAnims(graphic, frameW, frameH, anims);
+        this.width = frameW;
+        this.height = frameH;
         framerate = type == BOSS ? 2 : 3;
         looped = true;
-        
-        if (atlasSprite == null) {
-            trace("[Enemy] ERROR: atlasSprite is NULL! Graphic failed to load.");
-        } else {
-            trace("[Enemy] Successfully loaded. Total frames: " + atlasSprite.totalFrames);
-        }
-        
         playerPosition = {x: 0, y: 0};
         brain = new FSM(idle);
         idleTimer = 0;
@@ -65,22 +54,41 @@ class Enemy extends CitroAnimate {
         if (seesPlayer) {
             brain.activeState = chase;
         } else if (idleTimer <= 0) {
+            isMoving = false;
             if (Math.random() < 0.95) {
                 moveDirection = CitroG.random.int(0, 8) * 45;
                 var radians = moveDirection * (Math.PI / 180);
-                acceleration.x = Math.cos(radians) * WALK_SPEED;
-                acceleration.y = Math.sin(radians) * WALK_SPEED;
-            } else {
-                moveDirection = -1;
-                acceleration.x = 0;
-                acceleration.y = 0;
+                var moveX = Math.cos(radians) * WALK_SPEED;
+                var moveY = Math.sin(radians) * WALK_SPEED;
+                
+                var movedX = false;
+                var movedY = false;
+                if (walls != null) {
+                    if (!walls.checkTileCollision(x + moveX, y, width * scale.x, height * scale.y)) {
+                        x += moveX; movedX = true; lastMoveX = moveX;
+                    }
+                    if (!walls.checkTileCollision(x, y + moveY, width * scale.x, height * scale.y)) {
+                        y += moveY; movedY = true; lastMoveY = moveY;
+                    }
+                } else {
+                    x += moveX; y += moveY;
+                    movedX = true; movedY = true;
+                    lastMoveX = moveX; lastMoveY = moveY;
+                }
+                isMoving = movedX || movedY;
             }
+            acceleration.x = 0;
+            acceleration.y = 0;
             idleTimer = CitroG.random.int(1, 4);
         } else {
             idleTimer -= elapsed / 1000;
         }
     }
-
+    
+    public function setWalls(wallMap:CitroTilemap) {
+        walls = wallMap;
+    }
+    
     function chase(elapsed:Float) {
         if (!seesPlayer) {
             brain.activeState = idle;
@@ -89,8 +97,27 @@ class Enemy extends CitroAnimate {
             var dy = playerPosition.y - this.y;
             var distance = Math.sqrt(dx * dx + dy * dy);
             if (distance > 0) {
-                acceleration.x = (dx / distance) * CHASE_SPEED;
-                acceleration.y = (dy / distance) * CHASE_SPEED;
+                var newX = x + (dx / distance) * CHASE_SPEED;
+                var newY = y + (dy / distance) * CHASE_SPEED;
+                
+                var movedX = false;
+                var movedY = false;
+                if (walls != null) {
+                    if (!walls.checkTileCollision(newX, y, width * scale.x, height * scale.y)) {
+                        x = newX; movedX = true; lastMoveX = (dx / distance) * CHASE_SPEED;
+                    }
+                    if (!walls.checkTileCollision(x, newY, width * scale.x, height * scale.y)) {
+                        y = newY; movedY = true; lastMoveY = (dy / distance) * CHASE_SPEED;
+                    }
+                } else {
+                    x = newX; y = newY;
+                    movedX = true; movedY = true;
+                    lastMoveX = (dx / distance) * CHASE_SPEED; lastMoveY = (dy / distance) * CHASE_SPEED;
+                }
+                
+                isMoving = movedX || movedY;
+                acceleration.x = 0;
+                acceleration.y = 0;
             }
         }
     }
@@ -126,22 +153,18 @@ class Enemy extends CitroAnimate {
 
     override public function update():Bool {
         if (!active || !exists) return false;
-        
-        var action = "idle";
-        if (acceleration.x != 0 || acceleration.y != 0) {
-            action = "walk";
-        }
-        
+        var action = isMoving ? "walk" : "idle";
         var animName = "";
+        
         if (action == "walk") {
-            if (Math.abs(acceleration.y) > Math.abs(acceleration.x)) {
-                animName = acceleration.y < 0 ? "u_walk" : "d_walk";
+            if (Math.abs(lastMoveY) > Math.abs(lastMoveX)) {
+                animName = lastMoveY < 0 ? "u_walk" : "d_walk";
             } else {
                 animName = "lr_walk";
             }
         } else {
-            if (Math.abs(acceleration.y) > Math.abs(acceleration.x)) {
-                animName = acceleration.y < 0 ? "u_idle" : "d_idle";
+            if (Math.abs(lastMoveY) > Math.abs(lastMoveX)) {
+                animName = lastMoveY < 0 ? "u_idle" : "d_idle";
             } else {
                 animName = "lr_idle";
             }
@@ -152,11 +175,8 @@ class Enemy extends CitroAnimate {
         }
 
         if (atlasSprite != null) {
-            if (acceleration.x < 0) {
-                atlasSprite.flipX = false;
-            } else if (acceleration.x > 0) {
-                atlasSprite.flipX = true;
-            }
+            if (lastMoveX < 0) atlasSprite.flipX = false;
+            else if (lastMoveX > 0) atlasSprite.flipX = true;
         }
         
         brain.update(CitroG.deltaTime / 1000);
