@@ -41,7 +41,7 @@ class PlayState2 extends CitroState {
         music.looped = true;
         music.play();
         
-        map = new CitroOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
+        map = new CitroOgmo3Loader(AssetPaths.turnBasedRPG2__ogmo, AssetPaths.room_002__json);
         walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
         walls.bottom = false;
         walls.camera = camera;
