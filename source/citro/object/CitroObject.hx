@@ -207,10 +207,9 @@ class CitroObject {
 	public function isOnScreen():Bool {
         if (!visible || alpha <= 0) return false; 
         if (scale == null) return false; 
-
-        return x - (width * scale.x) > 0 &&
+        return x + (width * scale.x) > 0 &&
                x < (bottom ? 320 : 400) &&
-               y - (height * scale.y) > 0 &&
+               y + (height * scale.y) > 0 &&
                y < 240;
     }
 }
