@@ -36,6 +36,10 @@ class PlayState extends CitroState {
         camera.bottom = false;
         add(camera);
 
+        music = CitroG.sound.load(AssetPaths.boxing_game__cwav);
+        music.looped = true;
+        music.play();
+
         map = new CitroOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
         walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
         walls.bottom = false;
