@@ -7,6 +7,7 @@ import citro.object.CitroGroup;
 import citro.object.CitroSprite;
 import citro.object.CitroObject;
 import citro.object.CitroTilemap;
+import citro.backend.CitroSound;
 import citro.math.CitroMath;
 import citro.state.CitroState;
 import haxe3ds.services.HID;
@@ -20,7 +21,7 @@ class PlayState extends CitroState {
     var combatHud:CombatHUD;
     var ending:Bool;
     var won:Bool;
-
+    var music:CitroSound;
     var map:CitroOgmo3Loader;
     var walls:CitroTilemap;
     var coins:CitroGroup;
