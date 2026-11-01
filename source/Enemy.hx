@@ -17,6 +17,7 @@ class Enemy extends CitroAnimate {
 
     public var playerPosition:{x:Float, y:Float};
     public var active:Bool = true;
+    var walls:CitroTilemap;
 
     public function new(x:Float, y:Float, type:EnemyType) {
         super();
@@ -80,7 +81,11 @@ class Enemy extends CitroAnimate {
             idleTimer -= elapsed / 1000;
         }
     }
-
+    
+    public function setWalls(wallMap:CitroTilemap) {
+        walls = wallMap;
+    }
+    
     function chase(elapsed:Float) {
         if (!seesPlayer) {
             brain.activeState = idle;
@@ -89,6 +94,21 @@ class Enemy extends CitroAnimate {
             var dy = playerPosition.y - this.y;
             var distance = Math.sqrt(dx * dx + dy * dy);
             if (distance > 0) {
+                var newX = x + (dx / distance) * CHASE_SPEED;
+                var newY = y + (dy / distance) * CHASE_SPEED;
+                
+                if (walls != null) {
+                    if (!walls.checkTileCollision(newX, y, width * scale.x, height * scale.y)) {
+                        x = newX;
+                    }
+                    if (!walls.checkTileCollision(x, newY, width * scale.x, height * scale.y)) {
+                        y = newY;
+                    }
+                } else {
+                    x = newX;
+                    y = newY;
+                }
+                
                 acceleration.x = (dx / distance) * CHASE_SPEED;
                 acceleration.y = (dy / distance) * CHASE_SPEED;
             }
