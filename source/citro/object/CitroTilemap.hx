@@ -65,7 +65,7 @@ class CitroTilemap extends CitroObject {
             for (tx in left...right + 1) {
                 if (ty >= 0 && ty < heightInTiles && tx >= 0 && tx < widthInTiles) {
                     var tile = data[ty][tx];
-                    if (tile > 0) { // Solid tile
+                    if (tile > 0) {
                         return true;
                     }
                 }
@@ -106,20 +106,23 @@ class CitroTilemap extends CitroObject {
 
         var framesPerRow:Int = Std.int(brush.sheetWidth / tileSize);
         var maxTiles:Int = framesPerRow * Std.int(brush.sheetHeight / tileSize);
-        
+        var screenWidth = this.bottom ? CitroG.BOTTOM_WIDTH : CitroG.WIDTH;
+        var screenHeight = CitroG.HEIGHT;
+        var startTileX = Math.max(0, Math.floor((-this.x) / tileSize) - 1);
+        var endTileX = Math.min(widthInTiles, Math.ceil((screenWidth - this.x) / tileSize) + 1);
+        var startTileY = Math.max(0, Math.floor((-this.y) / tileSize) - 1);
+        var endTileY = Math.min(heightInTiles, Math.ceil((screenHeight - this.y) / tileSize) + 1);
         var tilesDrawn = 0;
-        
         brush.alpha = this.alpha;
         brush.scale.x = this.scale.x;
         brush.scale.y = this.scale.y;
         brush.color = this.color;
-
-        for (y in 0...heightInTiles) {
+        for (y in startTileY...endTileY) {
             if (y >= data.length) break;
             var row = data[y];
             if (row == null) continue;
             
-            for (x in 0...widthInTiles) {
+            for (x in startTileX...endTileX) {
                 if (x >= row.length) break;
                 
                 var tileIndex = row[x];
