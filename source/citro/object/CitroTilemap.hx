@@ -136,7 +136,13 @@ class CitroTilemap extends CitroObject {
                 }
                 
                 trace("[CitroTilemap] Setting properties for tile " + tileIndex);
-                // brush.frame = tileIndex; 
+                if (brush.atlasSprite == null) {
+                    trace("[CitroTilemap] ERROR: brush.atlasSprite is NULL!");
+                } else {
+                    trace("[CitroTilemap] Setting brush.frame to " + tileIndex);
+                    brush.frame = tileIndex;
+                    trace("[CitroTilemap] brush.frame set successfully!");
+                }
                 brush.alpha = this.alpha;
                 if (brush.scale == null) {
                     trace("[CitroTilemap] ERROR: brush.scale is NULL!");
