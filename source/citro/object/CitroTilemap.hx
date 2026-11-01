@@ -62,11 +62,12 @@ class CitroTilemap extends CitroObject {
         var bottom = Std.int((localY + h - 0.1) / tileSize);
         if (left > right) { var temp = left; left = right; right = temp; }
         if (top > bottom) { var temp = top; top = bottom; bottom = temp; }
-        
         for (ty in top...bottom + 1) {
             for (tx in left...right + 1) {
                 if (ty >= 0 && ty < heightInTiles && tx >= 0 && tx < widthInTiles) {
-                    if (data[ty][tx] > 0) return true;
+                    if (data[ty][tx] == 2) {
+                        return true;
+                    }
                 }
             }
         }
@@ -107,10 +108,10 @@ class CitroTilemap extends CitroObject {
         var camY = camera != null ? camera.y : 0;
         var screenWidth = this.bottom ? CitroG.BOTTOM_WIDTH : CitroG.WIDTH;
         var screenHeight = CitroG.HEIGHT;
-        var startTileX = Std.int(Math.max(0, camX / tileSize)) - 1;
-        var endTileX = Std.int(Math.min(widthInTiles, (camX + screenWidth) / tileSize)) + 1;
-        var startTileY = Std.int(Math.max(0, camY / tileSize)) - 1;
-        var endTileY = Std.int(Math.min(heightInTiles, (camY + screenHeight) / tileSize)) + 1;
+        var startTileX = Std.int(Math.max(0, Math.floor(camX / tileSize))) - 1;
+        var endTileX = Std.int(Math.min(widthInTiles, Math.ceil((camX + screenWidth) / tileSize))) + 1;
+        var startTileY = Std.int(Math.max(0, Math.floor(camY / tileSize))) - 1;
+        var endTileY = Std.int(Math.min(heightInTiles, Math.ceil((camY + screenHeight) / tileSize))) + 1;
         for (y in startTileY...endTileY) {
             if (y < 0 || y >= data.length) continue;
             var row = data[y];
