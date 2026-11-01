@@ -257,10 +257,7 @@ class CombatHUD extends CitroGroup
                 {
                     damages[1].text = "5";
                     CitroTween.tweenObject(enemySprite, {x: enemySprite.x + 4}, 0.1, {
-                        onComplete: function()
-                        {
-                            CitroTween.tweenObject(enemySprite, {x: enemySprite.x - 4}, 0.1);
-                        }
+                        onComplete: function() { CitroTween.tweenObject(enemySprite, {x: enemySprite.x - 4}, 0.1); }
                     });
                     hurtSound.play();
                     enemyHealth--;
@@ -275,16 +272,11 @@ class CombatHUD extends CitroGroup
                 damages[1].y = enemySprite.y + 4;
                 damages[1].alpha = 0;
                 damages[1].visible = true;
-                if (enemyHealth > 0)
-                    enemyAttack();
-                CitroTween.tweenNumber(damages[0].y, damages[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v)
-                {
-                    damages[0].y = damages[1].y = v;
-                }});
-                CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneDamageIn, onUpdate: function(v)
-                {
-                    damages[0].alpha = damages[1].alpha = v;
-                }});
+                
+                if (enemyHealth > 0) enemyAttack();
+                
+                CitroTween.tweenNumber(damages[0].y, damages[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v) { damages[0].y = damages[1].y = v; }});
+                CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneDamageIn, onUpdate: function(v) { damages[0].alpha = damages[1].alpha = v; }});
 
             case ACT:
                 spareBar++;
@@ -293,50 +285,45 @@ class CombatHUD extends CitroGroup
                 spare[1].y = enemySprite.y + 4;
                 spare[1].alpha = 0;
                 spare[1].visible = true;
-                if (enemyHealth > 0)
-                    enemyAttack();
-                CitroTween.tweenNumber(spare[0].y, spare[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v)
-                {
-                    spare[0].y = spare[1].y = v;
-                }});
-                CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneSpareIn, onUpdate: function(v)
-                {
-                    spare[0].alpha = spare[1].alpha = v;
-                }});
+                
+                if (enemyHealth > 0) enemyAttack();
+                
+                CitroTween.tweenNumber(spare[0].y, spare[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v) { spare[0].y = spare[1].y = v; }});
+                CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneSpareIn, onUpdate: function(v) { spare[0].alpha = spare[1].alpha = v; }});
 
             case ITEM:
                 var itemText = new CitroText(10, 10, "USED AN ITEM ?");
                 add(itemText);
                 background.visible = false;
-                if (enemyHealth > 0)
-                {
+                
+                if (enemyHealth > 0) {
                     enemyAttack();
-                    background.visible = true;
-                    remove(itemText);
+                } else {
+                    wait = false;
+                    pointer.visible = true;
                 }
+                background.visible = true;
+                remove(itemText);
+
             case SPARE:
-                var spareText = new CitroText(10, 10, "SPARED ?");
-                add(spareText);
-                background.visible = false;
-                if (enemyHealth > 0)
-                {
-                    enemyAttack();
-                    background.visible = true;
-                    remove(spareText);
-                }
-                if (spareBar >= 100)
-                {
-                    enemyAttack();
+                if (spareBar >= 100) {
                     outcome = SPARED;
                     results.text = "SPARED!";
                     fledSound.play();
                     results.visible = true;
                     results.alpha = 0;
                     CitroTween.tweenObject(results, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_INOUT, onComplete: doneResultsIn});
+                } else {
+                    if (enemyHealth > 0) {
+                        enemyAttack();
+                    } else {
+                        wait = false;
+                        pointer.visible = true;
+                    }
                 }
+
             case FLEE:
-                if (Math.random() < 0.50)
-                {
+                if (Math.random() < 0.50) {
                     battle.stop();
                     vs_susie.stop();
                     outcome = ESCAPE;
@@ -345,18 +332,10 @@ class CombatHUD extends CitroGroup
                     results.visible = true;
                     results.alpha = 0;
                     CitroTween.tweenObject(results, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_INOUT, onComplete: doneResultsIn});
-                }
-                else
-                {
+                } else {
                     enemyAttack();
-                    CitroTween.tweenNumber(damages[0].y, damages[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v)
-                    {
-                        damages[0].y = damages[1].y = v;
-                    }});
-                    CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneDamageIn, onUpdate: function(v)
-                    {
-                        damages[0].alpha = damages[1].alpha = v;
-                    }});
+                    CitroTween.tweenNumber(damages[0].y, damages[0].y - 12, 1, {ease: CitroEase.CIRC_OUT, onUpdate: function(v) { damages[0].y = damages[1].y = v; }});
+                    CitroTween.tweenNumber(0, 1, 0.2, {ease: CitroEase.CIRC_INOUT, onComplete: doneDamageIn, onUpdate: function(v) { damages[0].alpha = damages[1].alpha = v; }});
                 }
         }
         wait = true;
@@ -444,6 +423,9 @@ class CombatHUD extends CitroGroup
             results.visible = true;
             results.alpha = 0;
             CitroTween.tweenObject(results, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_INOUT, onComplete: doneResultsIn});
+        }
+        else if (outcome == SPARED || outcome == ESCAPE)
+        {
         }
         else
         {
