@@ -1,6 +1,7 @@
 package citro.object;
 
 import citro.CitroG;
+import citro.object.CitroCamera;
 
 class CitroTilemap extends CitroObject {
     public var widthInTiles:Int;
@@ -9,7 +10,7 @@ class CitroTilemap extends CitroObject {
     public var data:Array<Array<Int>>;
     private var brush:CitroSprite;
     public var skipEmptyIndex:Bool = true;
-    
+    public var camera:CitroCamera;
     public function new(WidthInTiles:Int, HeightInTiles:Int, TileSize:Int) {
         super();
         widthInTiles = WidthInTiles;
@@ -102,10 +103,20 @@ class CitroTilemap extends CitroObject {
         brush.scale.x = this.scale.x;
         brush.scale.y = this.scale.y;
         brush.color = this.color;
-        for (y in 0...heightInTiles) {
+        var camX = camera != null ? camera.x : 0;
+        var camY = camera != null ? camera.y : 0;
+        var screenWidth = this.bottom ? CitroG.BOTTOM_WIDTH : CitroG.WIDTH;
+        var screenHeight = CitroG.HEIGHT;
+        var startTileX = Std.int(Math.max(0, camX / tileSize)) - 1;
+        var endTileX = Std.int(Math.min(widthInTiles, (camX + screenWidth) / tileSize)) + 1;
+        var startTileY = Std.int(Math.max(0, camY / tileSize)) - 1;
+        var endTileY = Std.int(Math.min(heightInTiles, (camY + screenHeight) / tileSize)) + 1;
+        for (y in startTileY...endTileY) {
+            if (y < 0 || y >= data.length) continue;
             var row = data[y];
             if (row == null) continue;
-            for (x in 0...widthInTiles) {
+            for (x in startTileX...endTileX) {
+                if (x < 0 || x >= row.length) continue;
                 var tileIndex = row[x];
                 if (skipEmptyIndex && tileIndex == 0) continue;
                 if (tileIndex < 0 || tileIndex >= maxTiles) continue;
