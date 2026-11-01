@@ -124,7 +124,7 @@ class PlayState extends #if wiiu LeafyState #else FlxState #end
 		{
 			case "player":
 				player.setPosition(x, y);
-			case "coin":
+			case "coins":
 				coins.add(new Coin(x + 4, y + 4));
 			case "enemy":
 				enemies.add(new Enemy(x + 4, y, REGULAR));
