@@ -116,19 +116,6 @@ class PlayState extends CitroState {
         }
     }
 
-    function placeEntities(entity:Dynamic) {
-        var x:Float = entity.x;
-        var y:Float = entity.y;
-        switch (entity.name) {
-            case "player": player.x = x; player.y = y;
-            case "coin": coins.add(new Coin(x + 4, y + 4));
-            case "enemy": 
-                enemies.add(new Enemy(x + 4, y, REGULAR));
-            case "boss": 
-                enemies.add(new Enemy(x + 4, y, BOSS));
-        }
-    }
-
     function playerTouchCoin(coin:Coin) {
         if (player.exists && coin.exists) {
             money++;
