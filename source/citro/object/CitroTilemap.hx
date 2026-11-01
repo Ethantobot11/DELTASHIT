@@ -53,16 +53,19 @@ class CitroTilemap extends CitroObject {
     }
 
     public function checkTileCollision(x:Float, y:Float, width:Float, height:Float):Bool {
-        var left = Math.floor(x / tileSize);
-        var right = Math.floor((x + width - 0.1) / tileSize);
-        var top = Math.floor(y / tileSize);
-        var bottom = Math.floor((y + height - 0.1) / tileSize);
+        var localX = x - this.x;
+        var localY = y - this.y;
+        
+        var left = Math.floor(localX / tileSize);
+        var right = Math.floor((localX + width - 0.1) / tileSize);
+        var top = Math.floor(localY / tileSize);
+        var bottom = Math.floor((localY + height - 0.1) / tileSize);
         
         for (ty in top...bottom + 1) {
             for (tx in left...right + 1) {
                 if (ty >= 0 && ty < heightInTiles && tx >= 0 && tx < widthInTiles) {
                     var tile = data[ty][tx];
-                    if (tile > 0) {
+                    if (tile > 0) { // Solid tile
                         return true;
                     }
                 }
