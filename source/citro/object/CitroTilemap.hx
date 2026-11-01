@@ -1,6 +1,7 @@
 package citro.object;
 
 import citro.CitroG;
+import citro.object.CitroObject.CitroVector2D;
 
 class CitroTilemap extends CitroObject {
     public var widthInTiles:Int;
@@ -86,6 +87,10 @@ class CitroTilemap extends CitroObject {
             trace("[CitroTilemap] SKIP: brush is NULL!");
             return false;
         }
+        if (data == null) {
+            trace("[CitroTilemap] SKIP: data is NULL!");
+            return false;
+        }
 
         if (widthInTiles <= 0 || heightInTiles <= 0 || data.length == 0) {
             trace("[CitroTilemap] SKIP: invalid dimensions");
@@ -95,10 +100,21 @@ class CitroTilemap extends CitroObject {
         var maxFrame = brush.totalFrames;
         trace("[CitroTilemap] maxFrame = " + maxFrame);
         
+        if (this.scale == null) {
+            trace("[CitroTilemap] ERROR: this.scale is NULL! Fixing...");
+            this.scale = new CitroVector2D();
+        }
+        
+        trace("[CitroTilemap] About to start loop. heightInTiles=" + heightInTiles);
+        
         var tilesDrawn = 0;
         
         for (y in 0...heightInTiles) {
-            if (y >= data.length) break;
+            trace("[CitroTilemap] Loop y=" + y);
+            if (y >= data.length) {
+                trace("[CitroTilemap] Breaking: y >= data.length");
+                break;
+            }
             var row = data[y];
             if (row == null) {
                 trace("[CitroTilemap] ERROR: row is NULL at y=" + y);
@@ -118,26 +134,29 @@ class CitroTilemap extends CitroObject {
                     trace("[CitroTilemap] Invalid tile at (" + x + "," + y + "): index=" + tileIndex);
                     continue;
                 }
+                
+                trace("[CitroTilemap] Setting properties for tile " + tileIndex);
                 brush.frame = tileIndex;
                 brush.alpha = this.alpha;
-                if (this.scale == null) {
-                    trace("[CitroTilemap] ERROR: this.scale is NULL!");
-                } else {
-                    brush.scale.x = this.scale.x;
-                    brush.scale.y = this.scale.y;
-                }
+                brush.scale.x = this.scale.x;
+                brush.scale.y = this.scale.y;
                 brush.color = this.color;
+                
                 var drawX = this.x + (x * tileSize);
                 var drawY = this.y + (y * tileSize);
-                trace("[CitroTilemap] Drawing tile " + tileIndex + " at " + drawX + "," + drawY);
+                
+                trace("[CitroTilemap] Calling drawRaw at " + drawX + "," + drawY);
                 brush.drawRaw(drawX, drawY);
+                trace("[CitroTilemap] drawRaw finished");
+                
                 tilesDrawn++;
                 if (tilesDrawn >= 10) {
-                    trace("[CitroTilemap] Drew 10 tiles successfully. Stopping early to prevent spam.");
+                    trace("[CitroTilemap] Drew 10 tiles, stopping loop to prevent spam.");
                     return true; 
                 }
             }
         }
+        
         trace("[CitroTilemap] update() END. Drew " + tilesDrawn + " tiles");
         return tilesDrawn > 0;
     }
