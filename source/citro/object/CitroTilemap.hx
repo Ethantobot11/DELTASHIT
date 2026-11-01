@@ -7,7 +7,7 @@ class CitroTilemap extends CitroObject {
     public var heightInTiles:Int;
     public var tileSize:Int;
     public var data:Array<Array<Int>>;
-    private var brush:CitroAnimate;
+    private var brush:CitroSprite;
     public var skipEmptyIndex:Bool = true;
     
     public function new(WidthInTiles:Int, HeightInTiles:Int, TileSize:Int) {
@@ -17,7 +17,6 @@ class CitroTilemap extends CitroObject {
         tileSize = TileSize;
         this.width = widthInTiles * tileSize;
         this.height = heightInTiles * tileSize;
-        
         data = [];
         for (y in 0...heightInTiles) {
             var row = [];
@@ -26,23 +25,19 @@ class CitroTilemap extends CitroObject {
             }
             data.push(row);
         }
-        brush = new CitroAnimate();
+        brush = new CitroSprite();
         trace("[CitroTilemap] Created: " + widthInTiles + "x" + heightInTiles + " tiles, size: " + tileSize);
     }
 
     public function loadGraphic(tileGraphicPath:String):Bool {
-        trace("[CitroTilemap] Loading graphic: " + tileGraphicPath);
-        
-        // Use CitroAnimate's T3X loader which properly handles frame grids
-        var anims = new Map<String, Array<Int>>();
-        brush.loadFromT3XWithAnims(tileGraphicPath, tileSize, tileSize, anims);
-        
-        if (brush.atlasSprite == null || brush.atlasSprite.totalFrames == 0) {
-            trace("[CitroTilemap] ERROR: Failed to load tileset!");
+        trace("[CitroTilemap] Loading: " + tileGraphicPath);
+        if (!brush.loadGraphic(tileGraphicPath, tileSize, tileSize)) {
+            trace("[CitroTilemap] FAILED TO LOAD T3X!");
             return false;
         }
         
-        trace("[CitroTilemap] Graphic loaded. Total frames: " + brush.atlasSprite.totalFrames);
+        trace("[CitroTilemap] SUCCESS! Total frames: " + brush.totalFrames);
+        trace("[CitroTilemap] Sheet size: " + brush.sheetWidth + "x" + brush.sheetHeight);
         return true;
     }
 
@@ -83,7 +78,7 @@ class CitroTilemap extends CitroObject {
     }
 
     override public function update():Bool {
-        if (!visible || alpha <= 0 || brush == null || brush.atlasSprite == null) {
+        if (!visible || alpha <= 0 || brush == null) {
             return false;
         }
 
@@ -91,44 +86,38 @@ class CitroTilemap extends CitroObject {
             return false;
         }
 
-        var drewSomething = false;
+        var maxFrame = brush.totalFrames;
         var tilesDrawn = 0;
-        var maxFrame = brush.atlasSprite.totalFrames;
-        
+        var tilesSkipped = 0;
         for (y in 0...heightInTiles) {
             if (y >= data.length) break;
             var row = data[y];
-            
             for (x in 0...widthInTiles) {
                 if (x >= row.length) break;
                 var tileIndex = row[x];
                 
                 if (skipEmptyIndex && tileIndex == 0) {
+                    tilesSkipped++;
                     continue;
                 }
-
-                if (tileIndex >= 0 && tileIndex < maxFrame) {
-                    brush.atlasSprite.frame = tileIndex;
-                    brush.atlasSprite.alpha = this.alpha;
-                    brush.atlasSprite.scale.x = this.scale.x;
-                    brush.atlasSprite.scale.y = this.scale.y;
-                    brush.atlasSprite.color = this.color;
-                    
-                    var drawX = this.x + (x * tileSize);
-                    var drawY = this.y + (y * tileSize);
-                    brush.atlasSprite.drawRaw(drawX, drawY);
-                    drewSomething = true;
-                    tilesDrawn++;
-                } else if (tileIndex >= maxFrame) {
-                    trace("Bad Tile Index: " + tileIndex + " (max: " + maxFrame + ")");
+                
+                if (tileIndex < 0 || tileIndex >= maxFrame) {
+                    trace("[CitroTilemap] Invalid tile at (" + x + "," + y + "): index=" + tileIndex + " (max=" + maxFrame + ")");
+                    continue;
                 }
+                
+                brush.frame = tileIndex;
+                brush.alpha = this.alpha;
+                brush.scale.x = this.scale.x;
+                brush.scale.y = this.scale.y;
+                brush.color = this.color;
+                var drawX = this.x + (x * tileSize);
+                var drawY = this.y + (y * tileSize);
+                brush.drawRaw(drawX, drawY);
+                tilesDrawn++;
             }
         }
-        
-        if (tilesDrawn > 0) {
-            trace("[CitroTilemap] Drew " + tilesDrawn + " tiles");
-        }
-        
-        return drewSomething;
+        trace("[CitroTilemap] Drew " + tilesDrawn + " tiles, skipped " + tilesSkipped + " empty tiles");
+        return tilesDrawn > 0;
     }
 }
