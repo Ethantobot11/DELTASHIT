@@ -1,6 +1,7 @@
 package;
 
 import citro.object.CitroAnimate;
+import citro.object.CitroTilemap;
 import citro.CitroG;
 import haxe3ds.services.HID;
 
