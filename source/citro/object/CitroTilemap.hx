@@ -124,7 +124,7 @@ class CitroTilemap extends CitroObject {
                     trace("[CitroTilemap] ERROR: this.scale is NULL!");
                 } else {
                     brush.scale.x = this.scale.x;
-                    brush.scale.y = this.scale.y
+                    brush.scale.y = this.scale.y;
                 }
                 brush.color = this.color;
                 var drawX = this.x + (x * tileSize);
