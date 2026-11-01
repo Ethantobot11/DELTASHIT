@@ -52,6 +52,25 @@ class CitroTilemap extends CitroObject {
         return 0;
     }
 
+    public function checkTileCollision(x:Float, y:Float, width:Float, height:Float):Bool {
+        var left = Math.floor(x / tileSize);
+        var right = Math.floor((x + width - 0.1) / tileSize);
+        var top = Math.floor(y / tileSize);
+        var bottom = Math.floor((y + height - 0.1) / tileSize);
+        
+        for (ty in top...bottom + 1) {
+            for (tx in left...right + 1) {
+                if (ty >= 0 && ty < heightInTiles && tx >= 0 && tx < widthInTiles) {
+                    var tile = data[ty][tx];
+                    if (tile > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public function loadMapFromCSV(MapData:String, TileSize:Int):Void {
         tileSize = TileSize;
         var rows = MapData.split("\n");
@@ -83,9 +102,10 @@ class CitroTilemap extends CitroObject {
         }
 
         var framesPerRow:Int = Std.int(brush.sheetWidth / tileSize);
-        var framesPerCol:Int = Std.int(brush.sheetHeight / tileSize);
-        var maxTiles:Int = framesPerRow * framesPerCol;
+        var maxTiles:Int = framesPerRow * Std.int(brush.sheetHeight / tileSize);
+        
         var tilesDrawn = 0;
+        
         brush.alpha = this.alpha;
         brush.scale.x = this.scale.x;
         brush.scale.y = this.scale.y;
@@ -108,9 +128,10 @@ class CitroTilemap extends CitroObject {
                 if (tileIndex < 0 || tileIndex >= maxTiles) {
                     continue;
                 }
-
+                
                 var srcX:Float = (tileIndex % framesPerRow) * tileSize;
                 var srcY:Float = Math.floor(tileIndex / framesPerRow) * tileSize;
+                
                 brush.setSourceRect(srcX, srcY, tileSize, tileSize);
                 
                 var drawX = this.x + (x * tileSize);
