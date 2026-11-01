@@ -78,7 +78,6 @@ class Player extends CitroAnimate {
                 newX += SPEED;
             }
 
-            // Check wall collision before moving
             if (walls != null) {
                 if (!walls.checkTileCollision(newX, y, width * scale.x, height * scale.y)) {
                     x = newX;
