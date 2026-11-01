@@ -66,13 +66,13 @@ class PlayState extends CitroState {
 
         hud = new HUD();
         hud.bottom = false;
-        add(hud);    
+        add(hud);
+
+        super.create();
         
         combatHud = new CombatHUD();
         combatHud.bottom = false;
         add(combatHud);
-
-        super.create();
     }
 
     function placeEntities(entity:Dynamic) {
