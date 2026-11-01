@@ -269,6 +269,7 @@ class CitroAnimate extends CitroObject {
     override function update():Bool {
         if (isDestroyed || atlasSprite == null) return false;
         if (!visible || alpha <= 0) return false;
+        super.update(); 
 
         if ((timeLeft -= CitroG.deltaTime) < 1) {
             timeLeft = 1000 / framerate;
@@ -293,7 +294,6 @@ class CitroAnimate extends CitroObject {
         final frameKey = format();
         if (frames.exists(frameKey) && visible) {
             final frm = frames[frameKey];
-            
             width = frm.frameWidth;
             height = frm.frameHeight;
             atlasSprite.x = x - frm.offsetX;
