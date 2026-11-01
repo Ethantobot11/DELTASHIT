@@ -52,12 +52,13 @@ class Player extends CitroAnimate {
         left = HID.keyHeld(HIDKey.LEFT);
         right = HID.keyHeld(HIDKey.RIGHT);
 
-        var moving = (acceleration.x != 0 || acceleration.y != 0);
+        var moving = false;
         var animName = "";
         var newX = x;
         var newY = y;
 
         if (up || down || left || right) {
+            moving = true;
             var newAngle:Float = 0;
             if (up) {
                 newAngle = -90;
@@ -92,14 +93,12 @@ class Player extends CitroAnimate {
                 x = newX;
                 y = newY;
             }
-
-            var radians = newAngle * (Math.PI / 180);
-            acceleration.x = Math.cos(radians) * SPEED;
-            acceleration.y = Math.sin(radians) * SPEED;
             
-            if (facing == "down") animName = moving ? "d_walk" : "d_idle";
-            else if (facing == "up") animName = moving ? "u_walk" : "u_idle";
-            else animName = moving ? "lr_walk" : "lr_idle";
+            acceleration.x = 0;
+            acceleration.y = 0;
+            if (facing == "down") animName = "d_walk";
+            else if (facing == "up") animName = "u_walk";
+            else animName = "lr_walk";
         } else {
             acceleration.x = 0;
             acceleration.y = 0;
