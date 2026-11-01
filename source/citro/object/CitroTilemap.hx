@@ -17,6 +17,7 @@ class CitroTilemap extends CitroObject {
         tileSize = TileSize;
         this.width = widthInTiles * tileSize;
         this.height = heightInTiles * tileSize;
+        
         data = [];
         for (y in 0...heightInTiles) {
             var row = [];
@@ -35,7 +36,6 @@ class CitroTilemap extends CitroObject {
             trace("[CitroTilemap] FAILED TO LOAD T3X!");
             return false;
         }
-        
         trace("[CitroTilemap] SUCCESS! Total frames: " + brush.totalFrames);
         trace("[CitroTilemap] Sheet size: " + brush.sheetWidth + "x" + brush.sheetHeight);
         return true;
@@ -58,13 +58,11 @@ class CitroTilemap extends CitroObject {
         tileSize = TileSize;
         var rows = MapData.split("\n");
         heightInTiles = rows.length;
-        
         if (heightInTiles > 0) {
             widthInTiles = rows[0].split(",").length;
             data = [];
             this.width = widthInTiles * tileSize;
             this.height = heightInTiles * tileSize;
-            
             for (y in 0...heightInTiles) {
                 var cols = rows[y].split(",");
                 var row = [];
@@ -78,46 +76,69 @@ class CitroTilemap extends CitroObject {
     }
 
     override public function update():Bool {
-        if (!visible || alpha <= 0 || brush == null) {
+        trace("[CitroTilemap] update() START");
+        
+        if (!visible || alpha <= 0) {
+            trace("[CitroTilemap] SKIP: not visible or alpha <= 0");
+            return false;
+        }
+        if (brush == null) {
+            trace("[CitroTilemap] SKIP: brush is NULL!");
             return false;
         }
 
         if (widthInTiles <= 0 || heightInTiles <= 0 || data.length == 0) {
+            trace("[CitroTilemap] SKIP: invalid dimensions");
             return false;
         }
 
         var maxFrame = brush.totalFrames;
+        trace("[CitroTilemap] maxFrame = " + maxFrame);
+        
         var tilesDrawn = 0;
-        var tilesSkipped = 0;
+        
         for (y in 0...heightInTiles) {
             if (y >= data.length) break;
             var row = data[y];
+            if (row == null) {
+                trace("[CitroTilemap] ERROR: row is NULL at y=" + y);
+                continue;
+            }
+            
             for (x in 0...widthInTiles) {
                 if (x >= row.length) break;
+                
                 var tileIndex = row[x];
                 
                 if (skipEmptyIndex && tileIndex == 0) {
-                    tilesSkipped++;
                     continue;
                 }
                 
                 if (tileIndex < 0 || tileIndex >= maxFrame) {
-                    trace("[CitroTilemap] Invalid tile at (" + x + "," + y + "): index=" + tileIndex + " (max=" + maxFrame + ")");
+                    trace("[CitroTilemap] Invalid tile at (" + x + "," + y + "): index=" + tileIndex);
                     continue;
                 }
-                
                 brush.frame = tileIndex;
                 brush.alpha = this.alpha;
-                brush.scale.x = this.scale.x;
-                brush.scale.y = this.scale.y;
+                if (this.scale == null) {
+                    trace("[CitroTilemap] ERROR: this.scale is NULL!");
+                } else {
+                    brush.scale.x = this.scale.x;
+                    brush.scale.y = this.scale.y
+                }
                 brush.color = this.color;
                 var drawX = this.x + (x * tileSize);
                 var drawY = this.y + (y * tileSize);
+                trace("[CitroTilemap] Drawing tile " + tileIndex + " at " + drawX + "," + drawY);
                 brush.drawRaw(drawX, drawY);
                 tilesDrawn++;
+                if (tilesDrawn >= 10) {
+                    trace("[CitroTilemap] Drew 10 tiles successfully. Stopping early to prevent spam.");
+                    return true; 
+                }
             }
         }
-        trace("[CitroTilemap] Drew " + tilesDrawn + " tiles, skipped " + tilesSkipped + " empty tiles");
+        trace("[CitroTilemap] update() END. Drew " + tilesDrawn + " tiles");
         return tilesDrawn > 0;
     }
 }
