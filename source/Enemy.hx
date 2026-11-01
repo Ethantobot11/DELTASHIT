@@ -6,8 +6,8 @@ import citro.CitroG;
 enum EnemyType { REGULAR; BOSS; }
 
 class Enemy extends CitroAnimate {
-    static inline var WALK_SPEED:Float = 40;
-    static inline var CHASE_SPEED:Float = 70;
+    static inline var WALK_SPEED:Float = 1.5;
+    static inline var CHASE_SPEED:Float = 2.5;
 
     public var type:EnemyType;
     var brain:FSM;
