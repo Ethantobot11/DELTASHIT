@@ -73,6 +73,8 @@ class PlayState extends CitroState {
         
         combatHud = new CombatHUD();
         combatHud.bottom = false;
+        combatHud.visible = false;
+        combatHud.exists = false;
         add(combatHud);
     }
 
