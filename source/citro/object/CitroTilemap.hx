@@ -53,19 +53,20 @@ class CitroTilemap extends CitroObject {
     }
 
     public function checkTileCollision(x:Float, y:Float, width:Float, height:Float):Bool {
+        var w = width > 0 ? width : tileSize;
+        var h = height > 0 ? height : tileSize;
         var localX = x - this.x;
         var localY = y - this.y;
-        
-        var left = Math.floor(localX / tileSize);
-        var right = Math.floor((localX + width - 0.1) / tileSize);
-        var top = Math.floor(localY / tileSize);
-        var bottom = Math.floor((localY + height - 0.1) / tileSize);
-        
+        var left = Std.int(localX / tileSize);
+        var right = Std.int((localX + w - 0.1) / tileSize);
+        var top = Std.int(localY / tileSize);
+        var bottom = Std.int((localY + h - 0.1) / tileSize);
+        if (left > right) { var temp = left; left = right; right = temp; }
+        if (top > bottom) { var temp = top; top = bottom; bottom = temp; }
         for (ty in top...bottom + 1) {
             for (tx in left...right + 1) {
                 if (ty >= 0 && ty < heightInTiles && tx >= 0 && tx < widthInTiles) {
-                    var tile = data[ty][tx];
-                    if (tile > 0) {
+                    if (data[ty][tx] > 0) {
                         return true;
                     }
                 }
