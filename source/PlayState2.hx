@@ -127,7 +127,51 @@ class PlayState extends CitroState {
         combatHud.initCombat(health, enemy);
     }
 
+    private function separate(obj1:CitroObject, obj2:CitroObject, condition:Bool = true):Bool
+    {
+        if (!condition || !CitroG.overlaps(obj1, obj2))
+        {
+            return false;
+        }
+
+        var overlapX1 = (obj1.x + (obj1.width * obj1.scale.x)) - obj2.x;
+        var overlapX2 = (obj2.x + (obj2.width * obj2.scale.x)) - obj1.x;
+        var overlapY1 = (obj1.y + (obj1.height * obj1.scale.y)) - obj2.y;
+        var overlapY2 = (obj2.y + (obj2.height * obj2.scale.y)) - obj1.y;
+
+        var minOverlapX = overlapX1 < overlapX2 ? overlapX1 : overlapX2;
+        var minOverlapY = overlapY1 < overlapY2 ? overlapY1 : overlapY2;
+
+        if (minOverlapX < minOverlapY)
+        {
+            if (overlapX1 < overlapX2)
+            {
+                obj1.x -= overlapX1;
+            }
+            else
+            {
+                obj1.x += overlapX2;
+            }
+        }
+        else
+        {
+            if (overlapY1 < overlapY2)
+            {
+                obj1.y -= overlapY1;
+            }
+            else
+            {
+                obj1.y += overlapY2;
+            }
+        }
+
+        return true;
+    }
+
     override public function update(delta:Int):Void {
+        separate(player, walls , true);
+        separate(enemies, walls, true);
+        
         if (inCombat) {
             if (!combatHud.exists) {
                 health = combatHud.playerHealth;
