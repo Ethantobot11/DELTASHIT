@@ -32,30 +32,38 @@ class PlayState extends CitroState {
         #end
 
         camera = new CitroCamera();
+        camera.bottom = false;
         add(camera);
 
         map = new CitroOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
         walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
+        walls.bottom = false;
         camera.add(walls); 
 
         enemies = new CitroGroup();
+        enemies.bottom = false;
         camera.add(enemies);
 
         coins = new CitroGroup();
+        coins.bottom = false;
         camera.add(coins);
 
         player = new Player();
         player.setWalls(walls);
         map.loadEntities(placeEntities);
         for (enemy in enemies.members) { if (Std.is(enemy, Enemy)) { cast(enemy, Enemy).setWalls(walls); } }
+        player.bottom = false;
         camera.add(player);
+        
         camera.follow(player, true);
         camera.target = player;
 
         hud = new HUD();
+        hud.bottom = false;
         add(hud);    
         
         combatHud = new CombatHUD();
+        combatHud.bottom = false;
         add(combatHud);
 
         super.create();
