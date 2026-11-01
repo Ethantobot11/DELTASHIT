@@ -13,6 +13,7 @@ class CitroSound {
     
     private var cwavPtr:VoidPtr;
     private static var initialized:Bool = false;
+    private var wasPlaying:Bool = false;
 
     public function new(path:String) {
         this.path = path;
@@ -53,6 +54,7 @@ class CitroSound {
 
     public function play(?force:Bool = false):Void {
         if (isPlaying && !force) return;
+        
         if (cwavPtr == null) {
             load();
         }
@@ -60,6 +62,7 @@ class CitroSound {
             untyped __cpp__("((CWAV*){0})->volume = {1}", this.cwavPtr, this.volume);
             untyped __cpp__("cwavPlay({0}, 0, -1)", this.cwavPtr);
             this.isPlaying = true;
+            this.wasPlaying = true;
         }
     }
 
@@ -67,6 +70,7 @@ class CitroSound {
         if (cwavPtr != null) {
             untyped __cpp__("cwavStop({0}, -1, -1)", this.cwavPtr);
             this.isPlaying = false;
+            this.wasPlaying = false;
         }
     }
     
@@ -76,6 +80,15 @@ class CitroSound {
     
     public function resume():Void {
         play();
+    }
+
+    public function update():Void {
+        if (looped && wasPlaying && cwavPtr != null) {
+            var currentlyPlaying:Bool = untyped __cpp__("cwavIsPlaying({0})", this.cwavPtr);
+            if (!currentlyPlaying) {
+                play(true);
+            }
+        }
     }
 }
 #end
