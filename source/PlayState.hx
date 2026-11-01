@@ -136,6 +136,7 @@ class PlayState extends CitroState {
         #if DISCORD_ALLOWED
         DiscordClient.changePresence("FIGHTING", null);
         #end
+        music.pause();
         inCombat = true;
         player.active = false;
         enemies.forEach(function(e:Dynamic) { if(e.exists) e.active = false; });
@@ -200,13 +201,16 @@ class PlayState extends CitroState {
                     if (combatHud.enemy.type == BOSS) {
                         //won = true;
                         //ending = true;
+                        music.stop();
                         CitroG.switchState(new PlayState2());
                     } else {
+                        //music.resume();
                         inCombat = false;
                         player.active = true;
                         enemies.forEach(function(e:Dynamic) { if(e.exists) e.active = true; });
                     }
                 } else {
+                    //music.resume();
                     inCombat = false;
                     player.active = true;
                     enemies.forEach(function(e:Dynamic) { if(e.exists) e.active = true; });
