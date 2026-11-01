@@ -5,7 +5,7 @@ import citro.CitroG;
 import haxe3ds.services.HID;
 
 class Player extends CitroAnimate {
-    static inline var SPEED:Float = 100;
+    static inline var SPEED:Float = 2.5;
     public var up:Bool;
     public var down:Bool;
     public var left:Bool;
