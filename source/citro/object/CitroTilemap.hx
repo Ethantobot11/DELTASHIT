@@ -1,7 +1,6 @@
 package citro.object;
 
 import citro.CitroG;
-import citro.object.CitroObject.CitroVector2D;
 
 class CitroTilemap extends CitroObject {
     public var widthInTiles:Int;
@@ -136,10 +135,15 @@ class CitroTilemap extends CitroObject {
                 }
                 
                 trace("[CitroTilemap] Setting properties for tile " + tileIndex);
-                brush.frame = tileIndex;
+                // brush.frame = tileIndex; 
                 brush.alpha = this.alpha;
-                brush.scale.x = this.scale.x;
-                brush.scale.y = this.scale.y;
+                if (brush.scale == null) {
+                    trace("[CitroTilemap] ERROR: brush.scale is NULL!");
+                } else {
+                    brush.scale.x = this.scale.x;
+                    brush.scale.y = this.scale.y;
+                }
+                
                 brush.color = this.color;
                 
                 var drawX = this.x + (x * tileSize);
