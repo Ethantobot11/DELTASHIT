@@ -5,6 +5,7 @@ import citro.editors.ogmo.CitroOgmo3Loader;
 import citro.object.CitroCamera;
 import citro.object.CitroGroup;
 import citro.object.CitroSprite;
+import citro.object.CitroObject;
 import citro.object.CitroTilemap;
 import citro.math.CitroMath;
 import citro.state.CitroState;
