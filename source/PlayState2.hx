@@ -11,7 +11,7 @@ import citro.math.CitroMath;
 import citro.state.CitroState;
 import haxe3ds.services.HID;
 
-class PlayState extends CitroState {
+class PlayState2 extends CitroState {
     var player:Player;
     var hud:HUD;
     var money:Int = 0;
