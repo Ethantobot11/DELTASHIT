@@ -139,11 +139,6 @@ class CombatHUD extends CitroGroup
         results.visible = false;
         add(results);
 
-        for (member in members)
-        {
-            member.alpha = 0;
-        }
-
         vs_susie = CitroG.sound.load(AssetPaths.vs_susie__cwav);
         vs_susie.looped = true;
         fledSound = CitroG.sound.load(AssetPaths.fled__cwav);
@@ -167,16 +162,31 @@ class CombatHUD extends CitroGroup
         enemyHealthBar.value = 100;
         spareBarGame.value = 0;
         enemySprite.changeType(enemy.type);
-
         wait = true;
         results.text = "";
         pointer.visible = false;
         results.visible = false;
         selected = FIGHT;
         movePointer();
+        exists = true;
         visible = true;
 
-        CitroTween.tweenObject(this, {alpha: 1}, 0.66, {ease: CitroEase.CIRC_OUT, onComplete: finishFadeIn});
+        this.alpha = 0;
+        for (member in members) {
+            member.alpha = 0;
+        }
+
+        CitroTween.tweenNumber(0, 1, 0.66, {
+            ease: CitroEase.CIRC_OUT, 
+            onComplete: finishFadeIn,
+            onUpdate: function(v:Float) {
+                this.alpha = v;
+                for (member in members) {
+                    member.alpha = v;
+                }
+            }
+        });
+
         if (enemy.type == REGULAR)
             battle.play(true);
         else if (enemy.type == BOSS)
@@ -192,7 +202,6 @@ class CombatHUD extends CitroGroup
 
     function finishFadeIn()
     {
-        exists = true;
         wait = false;
         pointer.visible = true;
         selectSound.play();
@@ -307,6 +316,10 @@ class CombatHUD extends CitroGroup
 
             case SPARE:
                 if (spareBar >= 100) {
+                    if (enemy.type == REGULAR)
+                        battle.stop();
+                    else if (enemy.type == BOSS)
+                        vs_susie.stop();
                     outcome = SPARED;
                     results.text = "SPARED!";
                     fledSound.play();
@@ -324,8 +337,10 @@ class CombatHUD extends CitroGroup
 
             case FLEE:
                 if (Math.random() < 0.50) {
-                    battle.stop();
-                    vs_susie.stop();
+                    if (enemy.type == REGULAR)
+                        battle.stop();
+                    else if (enemy.type == BOSS)
+                        vs_susie.stop();
                     outcome = ESCAPE;
                     results.text = "ESCAPED!";
                     fledSound.play();
@@ -404,8 +419,10 @@ class CombatHUD extends CitroGroup
 
         if (playerHealth <= 0)
         {
-            battle.stop();
-            vs_susie.stop();
+            if (enemy.type == REGULAR)
+                battle.stop();
+            else if (enemy.type == BOSS)
+                vs_susie.stop();
             outcome = DEFEAT;
             loseSound.play();
             results.text = "DEFEAT!";
@@ -415,8 +432,10 @@ class CombatHUD extends CitroGroup
         }
         else if (enemyHealth <= 0)
         {
-            battle.stop();
-            vs_susie.stop();
+            if (enemy.type == REGULAR)
+                battle.stop();
+            else if (enemy.type == BOSS)
+                vs_susie.stop();
             outcome = VICTORY;
             winSound.play();
             results.text = "VICTORY!";
