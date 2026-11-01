@@ -12,6 +12,8 @@ class Player extends CitroAnimate {
     public var right:Bool;
     public var active:Bool = true;
     private var facing:String = "down";
+    var walls:CitroTilemap;
+    
     public function new(x:Float = 0, y:Float = 0) {
         super();
         this.x = x;
@@ -36,6 +38,10 @@ class Player extends CitroAnimate {
             trace("[Player] Successfully loaded. Total frames: " + atlasSprite.totalFrames);
         }
     }
+    
+    public function setWalls(wallMap:CitroTilemap) {
+        walls = wallMap;
+    }
 
     function updateMovement() {
         up = HID.keyHeld(HIDKey.UP);
@@ -45,6 +51,8 @@ class Player extends CitroAnimate {
 
         var moving = (acceleration.x != 0 || acceleration.y != 0);
         var animName = "";
+        var newX = x;
+        var newY = y;
 
         if (up || down || left || right) {
             var newAngle:Float = 0;
@@ -52,18 +60,35 @@ class Player extends CitroAnimate {
                 newAngle = -90;
                 if (left) newAngle -= 45; else if (right) newAngle += 45;
                 facing = "up";
+                newY -= SPEED;
             } else if (down) {
                 newAngle = 90;
                 if (left) newAngle += 45; else if (right) newAngle -= 45;
                 facing = "down";
+                newY += SPEED;
             } else if (left) {
                 newAngle = 180;
                 facing = "left";
                 if (atlasSprite != null) atlasSprite.flipX = false;
+                newX -= SPEED;
             } else if (right) {
                 newAngle = 0;
                 facing = "right";
                 if (atlasSprite != null) atlasSprite.flipX = true;
+                newX += SPEED;
+            }
+
+            // Check wall collision before moving
+            if (walls != null) {
+                if (!walls.checkTileCollision(newX, y, width * scale.x, height * scale.y)) {
+                    x = newX;
+                }
+                if (!walls.checkTileCollision(x, newY, width * scale.x, height * scale.y)) {
+                    y = newY;
+                }
+            } else {
+                x = newX;
+                y = newY;
             }
 
             var radians = newAngle * (Math.PI / 180);
