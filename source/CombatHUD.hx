@@ -55,40 +55,48 @@ class CombatHUD extends CitroGroup
         wait = true;
         exists = false;
         visible = false;
-
+        this.bottom = false;
+    
         screenFlash = new CitroSprite(0, 0);
         screenFlash.makeGraphic(400, 240, 0xFFFFFFFF);
         screenFlash.alpha = 0;
+        screenFlash.bottom = false;
         add(screenFlash);
-
+    
         background = new CitroSprite(0, 0);
         background.makeGraphic(220, 130, 0xFFFFFFFF);
         background.x = (400 - 220) / 2;
         background.y = 10;
+        background.bottom = false;
         add(background);
 
         playerSprite = new Player(background.x - 26, background.y + 26);
         playerSprite.active = false;
+        playerSprite.bottom = false;
         add(playerSprite);
 
         enemySprite = new Enemy(background.x + 156, background.y + 26, EnemyType.REGULAR);
         enemySprite.active = false;
+        enemySprite.bottom = false;
         add(enemySprite);
 
         playerHealthCounter = new CitroText(0, playerSprite.y + playerSprite.height + 2, "20 / 20");
         playerHealthCounter.alignment = CENTER;
+        playerHealthCounter.bottom = false;
         add(playerHealthCounter);
 
-        spareBarGame = new CitroBar(enemySprite.x - 15, playerHealthCounter.y - 40, 150, 20);
+        spareBarGame = new CitroBar(0, 0, 150, 20);
         spareBarGame.min = 0;
         spareBarGame.max = 100;
         spareBarGame.value = 0;
+        spareBarGame.bottom = false;
         add(spareBarGame);
-
-        enemyHealthBar = new CitroBar(enemySprite.x - 35, playerHealthCounter.y, 150, 20);
+        
+        enemyHealthBar = new CitroBar(0, 0, 150, 20);
         enemyHealthBar.min = 0;
         enemyHealthBar.max = 100;
         enemyHealthBar.value = 100;
+        enemyHealthBar.bottom = false;
         add(enemyHealthBar);
 
         choices = new Map();
@@ -108,7 +116,7 @@ class CombatHUD extends CitroGroup
 
         pointer = new CitroSprite(buttonX - 10, choices[FIGHT].y + 4);
         pointer.loadGraphic("romfs:/assets/images/pointer.t3x");
-        pointer.bottom = true;
+        pointer.bottom = false;
         pointer.visible = false;
         add(pointer);
 
@@ -130,6 +138,10 @@ class CombatHUD extends CitroGroup
             b.alignment = CENTER;
             b.visible = false;
             add(b);
+        }
+
+        for (member in members) {
+            member.bottom = false;
         }
 
         results = new CitroText(background.x + 2, background.y + 9, "");
@@ -162,20 +174,25 @@ class CombatHUD extends CitroGroup
         enemyHealthBar.value = 100;
         spareBarGame.value = 0;
         enemySprite.changeType(enemy.type);
+        enemyHealthBar.x = enemySprite.x - 35;
+        enemyHealthBar.y = enemySprite.y + enemySprite.height + 5;
+        
+        spareBarGame.x = enemySprite.x - 15;
+        spareBarGame.y = enemyHealthBar.y - 25;
         wait = true;
         results.text = "";
         pointer.visible = false;
         results.visible = false;
         selected = FIGHT;
         movePointer();
-        exists = true;
         visible = true;
-
+        exists = true;
         this.alpha = 0;
         for (member in members) {
             member.alpha = 0;
+            member.visible = true;
         }
-
+    
         CitroTween.tweenNumber(0, 1, 0.66, {
             ease: CitroEase.CIRC_OUT, 
             onComplete: finishFadeIn,
@@ -186,7 +203,7 @@ class CombatHUD extends CitroGroup
                 }
             }
         });
-
+    
         if (enemy.type == REGULAR)
             battle.play(true);
         else if (enemy.type == BOSS)
