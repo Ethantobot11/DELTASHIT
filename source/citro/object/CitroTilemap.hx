@@ -1,6 +1,7 @@
 package citro.object;
 
 import citro.CitroG;
+import citro.object.CitroObject.CitroVector2D;
 
 class CitroTilemap extends CitroObject {
     public var widthInTiles:Int;
