@@ -39,6 +39,7 @@ class PlayState2 extends CitroState {
         map = new CitroOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
         walls = map.loadTilemap(AssetPaths.tiles__t3x, "walls", 16);
         walls.bottom = false;
+        walls.camera = camera;
         camera.add(walls); 
 
         enemies = new CitroGroup();
