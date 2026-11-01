@@ -108,10 +108,10 @@ class CitroTilemap extends CitroObject {
         var maxTiles:Int = framesPerRow * Std.int(brush.sheetHeight / tileSize);
         var screenWidth = this.bottom ? CitroG.BOTTOM_WIDTH : CitroG.WIDTH;
         var screenHeight = CitroG.HEIGHT;
-        var startTileX = Math.max(0, Math.floor((-this.x) / tileSize) - 1);
-        var endTileX = Math.min(widthInTiles, Math.ceil((screenWidth - this.x) / tileSize) + 1);
-        var startTileY = Math.max(0, Math.floor((-this.y) / tileSize) - 1);
-        var endTileY = Math.min(heightInTiles, Math.ceil((screenHeight - this.y) / tileSize) + 1);
+        var startTileX = Std.int(Math.max(0, Math.floor((-this.x) / tileSize) - 1));
+        var endTileX = Std.int(Math.min(widthInTiles, Math.ceil((screenWidth - this.x) / tileSize) + 1));
+        var startTileY = Std.int(Math.max(0, Math.floor((-this.y) / tileSize) - 1));
+        var endTileY = Std.int(Math.min(heightInTiles, Math.ceil((screenHeight - this.y) / tileSize) + 1));
         var tilesDrawn = 0;
         brush.alpha = this.alpha;
         brush.scale.x = this.scale.x;
@@ -121,12 +121,9 @@ class CitroTilemap extends CitroObject {
             if (y >= data.length) break;
             var row = data[y];
             if (row == null) continue;
-            
             for (x in startTileX...endTileX) {
                 if (x >= row.length) break;
-                
                 var tileIndex = row[x];
-                
                 if (skipEmptyIndex && tileIndex == 0) {
                     continue;
                 }
@@ -137,12 +134,9 @@ class CitroTilemap extends CitroObject {
                 
                 var srcX:Float = (tileIndex % framesPerRow) * tileSize;
                 var srcY:Float = Math.floor(tileIndex / framesPerRow) * tileSize;
-                
                 brush.setSourceRect(srcX, srcY, tileSize, tileSize);
-                
                 var drawX = this.x + (x * tileSize);
                 var drawY = this.y + (y * tileSize);
-                
                 brush.drawRaw(drawX, drawY);
                 tilesDrawn++;
             }
