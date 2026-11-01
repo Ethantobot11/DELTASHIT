@@ -136,7 +136,7 @@ class CitroTilemap extends CitroObject {
                 }
                 
                 trace("[CitroTilemap] Setting properties for tile " + tileIndex);
-                if (brush.atlasSprite == null) {
+                if (brush == null) {
                     trace("[CitroTilemap] ERROR: brush.atlasSprite is NULL!");
                 } else {
                     trace("[CitroTilemap] Setting brush.frame to " + tileIndex);
