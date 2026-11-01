@@ -193,9 +193,9 @@ class PlayState extends CitroState {
                 } else if (combatHud.outcome == VICTORY) {
                     combatHud.enemy.exists = false;
                     if (combatHud.enemy.type == BOSS) {
-                        won = true;
-                        ending = true;
-                        CitroG.switchState(new GameOverState(won, money));
+                        //won = true;
+                        //ending = true;
+                        CitroG.switchState(new PlayState2());
                     } else {
                         inCombat = false;
                         player.active = true;
