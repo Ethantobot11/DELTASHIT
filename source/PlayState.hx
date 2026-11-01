@@ -179,8 +179,8 @@ class PlayState extends CitroState {
     }
 
     override public function update(delta:Int):Void {
-        separate(player, walls , true);
-        separate(enemies, walls, true);
+        //separate(player, walls , true);
+        //separate(enemies, walls, true);
         
         if (inCombat) {
             if (!combatHud.exists) {
