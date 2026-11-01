@@ -2,6 +2,7 @@ package;
 
 import citro.CitroG;
 import citro.editors.ogmo.CitroOgmo3Loader;
+import citro.object.CitroCamera;
 import citro.object.CitroGroup;
 import citro.object.CitroSprite;
 import citro.object.CitroTilemap;
@@ -22,10 +23,11 @@ class PlayState extends CitroState {
     var walls:CitroTilemap;
     var coins:CitroGroup;
     var enemies:CitroGroup;
+    var camera:CitroCamera;
 
     override public function create() {
         #if DISCORD_ALLOWED
-        DiscordClient.changePresence("WE CALL IT : PLAYSTATE CUZ FUCK YOU", null);
+        DiscordClient.changePresence("...", null);
         #end
 
         camera = new CitroCamera();
@@ -42,9 +44,10 @@ class PlayState extends CitroState {
         camera.add(coins);
 
         player = new Player();
+        player.setWalls(walls);
         map.loadEntities(placeEntities);
+        for (enemy in enemies.members) { if (Std.is(enemy, Enemy)) { cast(enemy, Enemy).setWalls(walls); } }
         camera.add(player);
-
         camera.follow(player, true);
         camera.target = player;
 
@@ -61,12 +64,16 @@ class PlayState extends CitroState {
         var x:Float = entity.x;
         var y:Float = entity.y;
         switch (entity.name) {
-            case "player": player.x = x; player.y = y;
-            case "coin": coins.add(new Coin(x + 4, y + 4));
+            case "player":
+                player.x = x; player.y = y;
+            case "coin": 
+                coins.add(new Coin(x + 4, y + 4));
             case "enemy": 
                 enemies.add(new Enemy(x + 4, y, REGULAR));
             case "boss": 
                 enemies.add(new Enemy(x + 4, y, BOSS));
+            default:
+                trace("[PlayState] Unknown entity: " + entity.name);
         }
     }
 
@@ -78,11 +85,24 @@ class PlayState extends CitroState {
         }
     }
 
+    function hasLineOfSight(fromX:Float, fromY:Float, toX:Float, toY:Float, walls:CitroTilemap):Bool {
+        var steps = Std.int(Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2)) / 8);
+        for (i in 0...steps) {
+            var t = i / steps;
+            var checkX = fromX + (toX - fromX) * t;
+            var checkY = fromY + (toY - fromY) * t;
+            if (walls.checkTileCollision(checkX, checkY, 1, 1)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function checkEnemyVision(enemy:Enemy) {
         var dx = player.x - enemy.x;
         var dy = player.y - enemy.y;
         var dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 150) {
+        if (dist < 150 && hasLineOfSight(enemy.x, enemy.y, player.x, player.y, walls)) {
             enemy.seesPlayer = true;
             enemy.playerPosition.x = player.x;
             enemy.playerPosition.y = player.y;
