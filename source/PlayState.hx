@@ -81,7 +81,7 @@ class PlayState extends #if wiiu LeafyState #else FlxState #end
 		#if !ios
 		map = new FlxOgmo3Loader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
 		#elseif ios
-		map = new PsychOgmoLoader(AssetPaths.turnBasedRPG__ogmo, AssetPaths.room_001__json);
+		map = new PsychOgmoLoader("assets/data/turnBasedRPG.ogmo", "assets/data/room_001.json");
 		#end
 		walls = map.loadTilemap(AssetPaths.tiles__png, "walls");
 		walls.follow();
