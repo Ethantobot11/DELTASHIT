@@ -17,10 +17,10 @@ class HUD extends CitroGroup {
         background = new CitroSprite(0, 0);
         background.makeGraphic(400, 20, 0xFF000000);
         
-        healthCounter = new CitroText(16, 2, "20 / 20");
+        healthCounter = new CitroText(16, 4, "20 / 20");
         healthCounter.setBorderStyle(0xFF808080, 1, SHADOW);
         
-        moneyCounter = new CitroText(0, 2, "0");
+        moneyCounter = new CitroText(-16, 2, "0");
         moneyCounter.setBorderStyle(0xFF808080, 1, SHADOW);
         moneyCounter.alignment = RIGHT;
         
